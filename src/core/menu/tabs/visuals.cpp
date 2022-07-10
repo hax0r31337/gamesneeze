@@ -107,6 +107,8 @@ void Menu::drawVisualsTab() {
                 if (CONFIGBOOL("Visuals>Players>Enemies>Box")) {
                     ImGui::ColorEdit4("Box Color", (float*)&CONFIGCOL("Visuals>Players>Enemies>Box Color"), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_PickerHueWheel);
                     ImGui::SameLine();
+                    ImGui::ColorEdit4("Box Color", (float*)&CONFIGCOL("Visuals>Players>Enemies>Vis Box Color"), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_PickerHueWheel);
+                    ImGui::SameLine();
                 }
                 ImGui::Checkbox("Box", &CONFIGBOOL("Visuals>Players>Enemies>Box"));
 

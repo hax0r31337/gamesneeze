@@ -64,6 +64,30 @@ namespace Features {
     namespace ClantagChanger {
         void frameStageNotify(FrameStage frame);
     }
+    namespace NameStealer {
+        bool changeName(bool reconnect, const char* newName);
+        void setName(const char* name);
+        void setBannedName(const char *name);
+        void frameStageNotify();
+        enum class Colors {
+          WHITE = 1,
+          DARK_RED,
+          LIGHT_PURPLE,
+          DARK_GREEN,
+          LIGHT_GREEN,
+          GREEN,
+          LIGHT_RED,
+          GRAY,
+          YELLOW,
+          LIGHT_BLUE,
+          BLUE,
+          DARK_BLUE,
+          DARK_GRAY,
+          PURPLE,
+          RED,
+          ORANGE,
+        };
+    }
     namespace SkyboxChanger {
         void frameStageNotify(FrameStage frame);
     }

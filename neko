@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+# Copy paste from Gamesennze and Fuzion
+# https://github.com/seksea/gamesneeze
+# https://github.com/LWSS/Fuzion
+
+
+tlibname="libgamemodeauto.so.0" # Pretend to be gamemode, change this to another lib that may be in /maps (if already using real gamemode, I'd suggest using libMangoHud.so)
+gdb="$(dirname "$0")/gdb" # For using a gdb build such as the cathook one (The one included)
+libraryname="libgamesneeze.so" # The name of the library to patch
+
+function echo_green {
+	echo -e "\\e[32m$*\\e[0m"
+}
+
+function echo_orange {
+	echo -e "\\e[33m$*\\e[0m"
+}
+
+function echo_red {
+	echo -e "\\e[31m$*\\e[0m"
+}
+
+secs_to_human() {
+    if [[ -z ${1} || ${1} -lt 60 ]] ;then
+        min=0 ; secs="${1}"
+    else
+        time_mins=$(echo "scale=2; ${1}/60" | bc)
+        min=$(echo ${time_mins} | cut -d'.' -f1)
+        secs="0.$(echo ${time_mins} | cut -d'.' -f2)"
+        secs=$(echo ${secs}*60|bc|awk '{print int($1+0.5)}')
+    fi
+    echo "Time Elapsed : ${min} minutes and ${secs} seconds."
+}
+
+function load() {
+    csgo_pid=$(pidof csgo_linux64)
+    if [ -z "$csgo_pid" ]; then
+        echo_red "CS:GO needs to be open before you can inject, exiting..."
+        exit 1
+    fi
+
+    echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope > /dev/null # get the sudo permission
+
+    start=$(date +%s)
+
+    echo_orange "Injecting cheat $libraryname into pid $csgo_pid..."
+
+
+    # pBypass for crash dumps being sent
+    # You may also want to consider using -nobreakpad in your launch options.
+    sudo rm -rf /tmp/dumps           # Remove if it exists
+    sudo mkdir --mode=000 /tmp/dumps # Make it as root with no permissions
+
+    sudo killall -19 steam
+    sudo killall -19 steamwebhelper
+
+    sudo cp $libraryname /usr/lib/$tlibname
+    gdbOut=$(
+      $gdb -n -q -batch \
+      -ex "set auto-load safe-path /usr/lib/" \
+      -ex "attach $csgo_pid" \
+      -ex "set \$dlopen = (void*(*)(char*, int)) dlopen" \
+      -ex "call \$dlopen(\"/usr/lib/$tlibname\", 1)" \
+      -ex "detach" \
+      -ex "quit" 2> /dev/null
+    )
+    lastLine="${gdbOut##*$'\n'}"
+    if [[ "$lastLine" != "\$1 = (void *) 0x0" ]]; then
+        echo_green "Successfully injected!"
+    else
+        echo_red "Injection failed, make sure you have compiled."
+    fi
+
+    sudo rm /usr/lib/$tlibname > /dev/null
+
+    sleep 1
+    sudo killall -18 steamwebhelper
+    sudo killall -18 steam
+
+    secs_to_human "$(($(date +%s) - ${start}))"
+}
+
+function build {
+    cmake .
+
+    if ! hash patchelf 2>/dev/null; then
+        echo_red -e "You need to install the \"patchelf\" command!\nUse your package manager to install it, or get source here:\nhttps://github.com/NixOS/patchelf"
+        exit 1
+    fi
+    
+    make -j"$(grep -c "^processor" /proc/cpuinfo)" "$@" 
+    strip -s -v "$libraryname"
+    patchelf --set-soname "$tlibname" "$libraryname"
+
+    echo "Build Completed."
+}
+
+while [[ $# -gt 0 ]]
+do
+keys="$1"
+case $keys in
+    -l|--load)
+        load
+        shift
+        ;;
+    -b|--build)
+        build
+        shift
+        ;;
+    *)
+        echo "
+Neko:
+    -l, --load    Load nekosense into CS:GO
+    -b, --build   Build nekosense
+"
+        exit
+        ;;
+esac
+done

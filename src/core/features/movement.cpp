@@ -1,37 +1,74 @@
 #include "../../includes.hpp"
 #include "features.hpp"
+#include <algorithm>
 
 void bhop(CUserCmd *cmd) {
     if (CONFIGBOOL("Misc>Misc>Movement>JumpBug") &&
         Menu::CustomWidgets::isKeyDown(CONFIGINT("Misc>Misc>Movement>JumpBug Key")))
         return;
+
+    if (!Interfaces::engine->IsInGame())
+      return;
+    if (!Globals::localPlayer)
+      return;
+    if (Globals::localPlayer->moveType() == MOVETYPE_NOCLIP)
+      return;
+    if (Globals::localPlayer->moveType() == MOVETYPE_LADDER)
+      return;
+
     if (CONFIGBOOL("Misc>Misc>Movement>Auto Hop")) {
-        if (Globals::localPlayer->moveType() == 9)
-            return;
-        if (CONFIGBOOL("Misc>Misc>Movement>Humanised Bhop")) {
-            // https://www.unknowncheats.me/forum/counterstrike-global-offensive/333797-humanised-bhop.html
-            static int hopsRestricted = 0;
-            static int hopsHit = 0;
-            if (!(Globals::localPlayer->flags() & FL_ONGROUND)) {
-                cmd->buttons &= ~IN_JUMP;
-                hopsRestricted = 0;
-            } else if ((rand() % 100 > CONFIGINT("Misc>Misc>Movement>Bhop Hitchance") &&
-                        hopsRestricted <
-                           CONFIGINT("Misc>Misc>Movement>Bhop Max Misses")) ||
-                       (CONFIGINT("Misc>Misc>Movement>Bhop Max Hops Hit") > 0 &&
-                        hopsHit > CONFIGINT("Misc>Misc>Movement>Bhop Max Hops Hit"))) {
-                cmd->buttons &= ~IN_JUMP;
-                hopsRestricted++;
-                hopsHit = 0;
-            } else {
-                hopsHit++;
-            }
+        static bool jumped_last_tick = false;
+        static bool should_fake_jump = false;
+
+        if (!jumped_last_tick && should_fake_jump) {
+          should_fake_jump = false;
+          cmd->buttons |= IN_JUMP;
+        } else if (cmd->buttons & IN_JUMP) {
+          if (Globals::localPlayer->flags() & FL_ONGROUND) {
+            jumped_last_tick = true;
+            should_fake_jump = true;
+          } else {
+            cmd->buttons &= ~IN_JUMP;
+            jumped_last_tick = false;
+          }
         } else {
-            if (!(Globals::localPlayer->flags() & FL_ONGROUND)) {
-                cmd->buttons &= ~IN_JUMP;
-            }
+          jumped_last_tick = false;
+          should_fake_jump = false;
         }
     }
+}
+
+void autoStrafe(CUserCmd *cmd) {
+  if (!CONFIGBOOL("Misc>Misc>Movement>Auto Strafe")) 
+    return;
+  if (!Interfaces::engine->IsInGame())
+    return;
+  if (!Globals::localPlayer)
+    return;
+  if (Globals::localPlayer->moveType() == MOVETYPE_NOCLIP)
+    return;
+  if (Globals::localPlayer->moveType() == MOVETYPE_LADDER)
+    return;
+
+  if (!(Globals::localPlayer->flags() & FL_ONGROUND)) {
+    if (cmd->mousedx > 1 || cmd->mousedx < -1) {
+      cmd->sidemove = std::clamp(cmd->mousedx < 0.f ? -400.f : 400.f, -400.f, 400.f);
+    } else {
+      if (Globals::localPlayer->velocity().Length2D() == 0 ||
+          Globals::localPlayer->velocity().Length2D() == NAN) {
+        cmd->forwardmove = 400;
+        return;
+      }
+      cmd->forwardmove = std::clamp(
+          5850.f / Globals::localPlayer->velocity().Length2D(), -400.f, 400.f);
+      if (cmd->forwardmove < -400 || cmd->forwardmove > 400)
+        cmd->forwardmove = 0;
+      cmd->sidemove =
+          std::clamp((cmd->command_number % 2) == 0 ? -400.f : 400.f, -400.f, 400.f);
+      if (cmd->sidemove < -400 || cmd->sidemove > 400)
+        cmd->sidemove = 0;
+    }
+  }
 }
 
 void edgeJump(CUserCmd *cmd) {
@@ -78,6 +115,7 @@ void Features::Movement::prePredCreateMove(CUserCmd *cmd) {
     velBackup = Globals::localPlayer->velocity();
 
     bhop(cmd);
+    autoStrafe(cmd);
 
     if (shouldEdgebug && shouldDuckNext)
         cmd->buttons |= IN_DUCK;

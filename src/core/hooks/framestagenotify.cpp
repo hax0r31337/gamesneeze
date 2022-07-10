@@ -3,7 +3,13 @@
 
 void Hooks::FrameStageNotify::hook(void* thisptr, FrameStage frame) {
     Globals::localPlayer = (Player*)Interfaces::entityList->GetClientEntity(Interfaces::engine->GetLocalPlayer());
+
+    if (Interfaces::engine->IsConnected() && !Interfaces::engine->IsInGame()) {
+      Features::NameStealer::changeName(true, "");
+    }
+
     Features::ClantagChanger::frameStageNotify(frame);
+    Features::NameStealer::frameStageNotify();
     Features::SkyboxChanger::frameStageNotify(frame);
     Features::RecoilCrosshair::frameStageNotify(frame);
     Features::SkinChanger::frameStageNotify(frame);

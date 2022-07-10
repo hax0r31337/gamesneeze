@@ -72,7 +72,8 @@ void Menu::drawMiscTab() {
                 }; ImGui::SameLine();
                 if (ImGui::Button("Load", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.315, 0))) {
                     Config::load();
-                    FULLUPDATE();
+                    // FULLUPDATE();
+                    // Features::NameStealer::changeName(true, nullptr);
                 }; ImGui::SameLine();
                 if (ImGui::Button("Remove", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.315, 0))) {
                     Config::remove();
@@ -91,22 +92,26 @@ void Menu::drawMiscTab() {
                 ImGui::EndChild();
             }
 
+            ImGui::BeginChild("Name", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.38, ImGui::GetWindowHeight() * 0.14f), true); {
+                ImGui::Text("Name");
+                ImGui::Separator();
+                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+                ImGui::InputText("##name-tbox", playerName, IM_ARRAYSIZE(playerName));
+                if (ImGui::Button("Set", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.315, 0))) {
+                    Features::NameStealer::setName(playerName);
+                }; ImGui::SameLine();
+                if (ImGui::Button("Set Banned", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.315, 0))) {
+                    Features::NameStealer::setBannedName(playerName);
+                }; ImGui::SameLine();
+                ImGui::Checkbox("Name Stealer", &CONFIGBOOL("Misc>Misc>Name>Name Stealer"));
+                ImGui::EndChild();
+            }
+
             ImGui::BeginChild("Movement", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.38, ImGui::GetWindowHeight() * 0.326f), true); {
                 ImGui::Text("Movement");
                 ImGui::Separator();
                 ImGui::Checkbox("Auto Hop", &CONFIGBOOL("Misc>Misc>Movement>Auto Hop"));
-                ImGui::Checkbox("Humanised Bhop", &CONFIGBOOL("Misc>Misc>Movement>Humanised Bhop"));
-                if (CONFIGBOOL("Misc>Misc>Movement>Humanised Bhop")) {
-                    ImGui::Text("Bhop Hitchance");
-                    ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                    ImGui::SliderInt("##Bhop Hitchance", &CONFIGINT("Misc>Misc>Movement>Bhop Hitchance"), 0, 100);
-                    ImGui::Text("Bhop Max Misses");
-                    ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                    ImGui::SliderInt("##Bhop Max Misses", &CONFIGINT("Misc>Misc>Movement>Bhop Max Misses"), 0, 16);
-                    ImGui::Text("Bhop Max Hops Hit");
-                    ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                    ImGui::SliderInt("##Bhop Max Hops Hit", &CONFIGINT("Misc>Misc>Movement>Bhop Max Hops Hit"), 0, 16);
-                }
+                ImGui::Checkbox("Auto Strafe", &CONFIGBOOL("Misc>Misc>Movement>Auto Strafe"));
                 if (CONFIGBOOL("Misc>Misc>Movement>Edge Jump")) {
                     static bool toggled = false;
                     Menu::CustomWidgets::drawKeyBinder("Key", &CONFIGINT("Misc>Misc>Movement>Edge Jump Key"), &toggled);

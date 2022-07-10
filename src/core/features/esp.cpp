@@ -148,7 +148,7 @@ void drawPlayer(Player* p) {
                             }
                             
                             drawBox(x, y, x2, y2, CONFIGBOOL("Visuals>Players>Enemies>Box"), 
-                                        CONFIGCOL("Visuals>Players>Enemies>Box Color"), CONFIGBOOL("Visuals>Players>Enemies>Name") ? info.name : (char*)"", 
+                                        p->visible() ? CONFIGCOL("Visuals>Players>Enemies>Vis Box Color") :  CONFIGCOL("Visuals>Players>Enemies>Box Color"), CONFIGBOOL("Visuals>Players>Enemies>Name") ? info.name : (char*)"", 
                                         (char*)rightText.str().c_str(), CONFIGBOOL("Visuals>Players>Enemies>Health Bar") ? p->health() : -1, CONFIGBOOL("Visuals>Players>Enemies>Dynamic Color"), 
                                         CONFIGCOL("Visuals>Players>Enemies>Health Bar Color"));
                             
