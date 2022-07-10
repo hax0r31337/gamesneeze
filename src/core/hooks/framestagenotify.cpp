@@ -22,8 +22,9 @@ void Hooks::FrameStageNotify::hook(void* thisptr, FrameStage frame) {
         if (Globals::localPlayer && Globals::localPlayer->health() > 0 && Interfaces::input->m_fCameraInThirdPerson) {
             QAngle viewAngles;
             Interfaces::engine->GetViewAngles(viewAngles);
-            Globals::localPlayer->viewAngles()->y = CONFIGBOOL("Rage>Enabled") ? Features::AntiAim::fakeYaw : viewAngles.y;
-            Globals::localPlayer->viewAngles()->x = CONFIGBOOL("Rage>Enabled") ? CONFIGINT("Rage>AntiAim>Pitch") : viewAngles.x;
+            bool rageEnabled = CONFIGINT("Rage>AntiAim>Type") != 0 && CONFIGBOOL("Rage>Enabled");
+            Globals::localPlayer->viewAngles()->y = rageEnabled ? Features::AntiAim::fakeYaw : viewAngles.y;
+            Globals::localPlayer->viewAngles()->x = rageEnabled ? CONFIGINT("Rage>AntiAim>Pitch") : viewAngles.x;
         }
     }
 
