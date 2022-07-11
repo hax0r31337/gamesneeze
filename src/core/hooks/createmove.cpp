@@ -45,6 +45,7 @@ bool Hooks::CreateMove::hook(void* thisptr, float flInputSampleTime, CUserCmd* c
                 cmd->buttons |= (1 << 5);
             }
         endMovementFix(cmd);
+        Features::QuickPeek::createMove(cmd);
 	    Features::SlowWalk::createMove(cmd);
 
         auto view_backup = cmd->viewangles;

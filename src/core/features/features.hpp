@@ -88,6 +88,11 @@ namespace Features {
           ORANGE,
         };
     }
+
+    namespace QuickPeek {
+        void gotoStart(CUserCmd* cmd);
+        void createMove(CUserCmd *cmd);
+    }
     namespace SkyboxChanger {
         void frameStageNotify(FrameStage frame);
     }

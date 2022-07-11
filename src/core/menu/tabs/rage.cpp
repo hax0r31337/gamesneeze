@@ -31,7 +31,7 @@ void Menu::drawRageTab() {
         ImGui::EndChild();
     }
     ImGui::SameLine();
-    ImGui::BeginChild("Anti-Aim", ImVec2((ImGui::GetWindowContentRegionWidth()/2) - 4, 520), true); {
+    ImGui::BeginChild("Others", ImVec2((ImGui::GetWindowContentRegionWidth()/2) - 4, 520), true); {
         ImGui::Text("Anti-Aim");
         ImGui::Separator();
         
@@ -133,6 +133,20 @@ void Menu::drawRageTab() {
         }
         ImGui::Checkbox("Slow Walk",&CONFIGBOOL("Rage>AntiAim>Slow Walk"));
         ImGui::SliderInt("Slow Walk Speed (%)", &CONFIGINT("Rage>AntiAim>Slow Walk Speed"), 0, 255);
+        ImGui::Checkbox("Third Person",
+                        &CONFIGBOOL("Visuals>World>World>Third Person"));
+
+        ImGui::Text("Others");
+        ImGui::Separator();
+
+        ImGui::Checkbox("Quick Peek", &CONFIGBOOL("Rage>Quick Peek>Enabled"));
+        ImGui::SameLine();
+        if (CONFIGBOOL("Rage>Quick Peek>Enabled")) {
+          static bool toggled = false;
+          Menu::CustomWidgets::drawKeyBinder(
+              "Key", &CONFIGINT("Rage>Quick Peek>Key"), &toggled);
+        }
+        
         ImGui::EndChild();
     }
 }
