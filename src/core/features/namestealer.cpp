@@ -70,7 +70,7 @@ void Features::NameStealer::frameStageNotify() {
     if (!Interfaces::engine->GetPlayerInfo(i, &playerInfo))
       continue;
 
-    if (playerInfo.fakeplayer || !((Player*)entity)->isEnemy() ||
+    if (playerInfo.fakeplayer || ((Player*)entity)->isEnemy() ||
         std::ranges::find(stolenIds, playerInfo.userid) != stolenIds.cend())
       continue;
 

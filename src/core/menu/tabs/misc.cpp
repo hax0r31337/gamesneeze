@@ -110,7 +110,7 @@ void Menu::drawMiscTab() {
             ImGui::BeginChild("Movement", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.38, ImGui::GetWindowHeight() * 0.326f), true); {
                 ImGui::Text("Movement");
                 ImGui::Separator();
-                ImGui::Checkbox("Auto Hop", &CONFIGBOOL("Misc>Misc>Movement>Auto Hop"));
+                ImGui::Checkbox("Bunny Hop", &CONFIGBOOL("Misc>Misc>Movement>Bunny Hop"));
                 ImGui::Checkbox("Auto Strafe", &CONFIGBOOL("Misc>Misc>Movement>Auto Strafe"));
                 if (CONFIGBOOL("Misc>Misc>Movement>Edge Jump")) {
                     static bool toggled = false;

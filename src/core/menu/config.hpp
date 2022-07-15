@@ -362,7 +362,7 @@ namespace Config {
         // }
         // }
         // Misc {
-        CONFIGITEM("Misc>Misc>Movement>Auto Hop", false),
+        CONFIGITEM("Misc>Misc>Movement>Bunny Hop", false),
         CONFIGITEM("Misc>Misc>Movement>Auto Strafe", false),
         CONFIGITEM("Misc>Misc>Movement>Bhop Hitchance", 100),
         CONFIGITEM("Misc>Misc>Movement>Bhop Max Misses", 0),

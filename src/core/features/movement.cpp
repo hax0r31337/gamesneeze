@@ -3,39 +3,34 @@
 #include <algorithm>
 
 void bhop(CUserCmd *cmd) {
-    if (CONFIGBOOL("Misc>Misc>Movement>JumpBug") &&
-        Menu::CustomWidgets::isKeyDown(CONFIGINT("Misc>Misc>Movement>JumpBug Key")))
-        return;
+  if (!Interfaces::engine->IsInGame())
+    return;
+  if (!Globals::localPlayer)
+    return;
+  if (Globals::localPlayer->moveType() == MOVETYPE_NOCLIP ||
+      Globals::localPlayer->moveType() == MOVETYPE_LADDER)
+    return;
 
-    if (!Interfaces::engine->IsInGame())
-      return;
-    if (!Globals::localPlayer)
-      return;
-    if (Globals::localPlayer->moveType() == MOVETYPE_NOCLIP)
-      return;
-    if (Globals::localPlayer->moveType() == MOVETYPE_LADDER)
-      return;
+  if (CONFIGBOOL("Misc>Misc>Movement>Bunny Hop")) {
+    static bool jumped_last_tick = false;
+    static bool should_fake_jump = false;
 
-    if (CONFIGBOOL("Misc>Misc>Movement>Auto Hop")) {
-        static bool jumped_last_tick = false;
-        static bool should_fake_jump = false;
-
-        if (!jumped_last_tick && should_fake_jump) {
-          should_fake_jump = false;
-          cmd->buttons |= IN_JUMP;
-        } else if (cmd->buttons & IN_JUMP) {
-          if (Globals::localPlayer->flags() & FL_ONGROUND) {
-            jumped_last_tick = true;
-            should_fake_jump = true;
-          } else {
-            cmd->buttons &= ~IN_JUMP;
-            jumped_last_tick = false;
-          }
-        } else {
-          jumped_last_tick = false;
-          should_fake_jump = false;
-        }
+    if (!jumped_last_tick && should_fake_jump) {
+      should_fake_jump = false;
+      cmd->buttons |= IN_JUMP;
+    } else if (cmd->buttons & IN_JUMP) {
+      if (Globals::localPlayer->flags() & FL_ONGROUND) {
+        jumped_last_tick = true;
+        should_fake_jump = true;
+      } else {
+        cmd->buttons &= ~IN_JUMP;
+        jumped_last_tick = false;
+      }
+    } else {
+      jumped_last_tick = false;
+      should_fake_jump = false;
     }
+  }
 }
 
 void autoStrafe(CUserCmd *cmd) {
@@ -45,28 +40,21 @@ void autoStrafe(CUserCmd *cmd) {
     return;
   if (!Globals::localPlayer)
     return;
-  if (Globals::localPlayer->moveType() == MOVETYPE_NOCLIP)
-    return;
-  if (Globals::localPlayer->moveType() == MOVETYPE_LADDER)
+  if (Globals::localPlayer->moveType() == MOVETYPE_NOCLIP || Globals::localPlayer->moveType() == MOVETYPE_LADDER)
     return;
 
   if (!(Globals::localPlayer->flags() & FL_ONGROUND)) {
     if (cmd->mousedx > 1 || cmd->mousedx < -1) {
-      cmd->sidemove = std::clamp(cmd->mousedx < 0.f ? -400.f : 400.f, -400.f, 400.f);
+      cmd->sidemove = cmd->mousedx < 0.f ? -400.f : 400.f;
     } else {
       if (Globals::localPlayer->velocity().Length2D() == 0 ||
           Globals::localPlayer->velocity().Length2D() == NAN) {
         cmd->forwardmove = 400;
         return;
       }
-      cmd->forwardmove = std::clamp(
-          5850.f / Globals::localPlayer->velocity().Length2D(), -400.f, 400.f);
-      if (cmd->forwardmove < -400 || cmd->forwardmove > 400)
-        cmd->forwardmove = 0;
-      cmd->sidemove =
-          std::clamp((cmd->command_number % 2) == 0 ? -400.f : 400.f, -400.f, 400.f);
-      if (cmd->sidemove < -400 || cmd->sidemove > 400)
-        cmd->sidemove = 0;
+      cmd->forwardmove = std::clamp(5850.f / Globals::localPlayer->velocity().Length2D(),
+                                    -400.0f, 400.0f);
+      cmd->sidemove = (cmd->command_number % 2) == 0 ? -400.f : 400.f;
     }
   }
 }
