@@ -5,7 +5,8 @@
 #include <utility>
 
 namespace Netvar {
-    inline std::map<std::pair<std::string_view, std::string_view>, uintptr_t> offsets {
+inline std::map<std::pair<std::string_view, std::string_view>, uintptr_t>
+    offsets{
         /* Entity */
         {std::make_pair("DT_BaseEntity", "m_Collision"), 0},
         {std::make_pair("DT_BaseEntity", "m_iTeamNum"), 0},
@@ -28,14 +29,17 @@ namespace Netvar {
         {std::make_pair("DT_CSPlayer", "m_flFlashDuration"), 0},
         {std::make_pair("DT_CSPlayer", "m_flFlashMaxAlpha"), 0},
         {std::make_pair("DT_CSPlayer", "m_bIsScoped"), 0},
+        {std::make_pair("DT_CSPlayer", "m_bGunGameImmunity"), 0},
         {std::make_pair("DT_BasePlayer", "deadflag"), 0},
         {std::make_pair("DT_CSPlayer", "m_bHasHelmet"), 0},
         {std::make_pair("DT_CSPlayer", "m_ArmorValue"), 0},
-        {std::make_pair("DT_BaseEntity", "m_nRenderMode"), 0}, // Used for movetype
+        {std::make_pair("DT_BaseEntity", "m_nRenderMode"),
+         0}, // Used for movetype
         {std::make_pair("DT_CSPlayer", "m_nSurvivalTeam"), 0},
 
         /* Item */
-        {std::make_pair("DT_BaseAttributableItem", "m_iItemDefinitionIndex"), 0},
+        {std::make_pair("DT_BaseAttributableItem", "m_iItemDefinitionIndex"),
+         0},
 
         /* Weapon */
         {std::make_pair("DT_BaseCombatWeapon", "m_hOwner"), 0},
@@ -45,15 +49,23 @@ namespace Netvar {
         {std::make_pair("DT_BaseCombatWeapon", "m_nFallbackPaintKit"), 0},
         {std::make_pair("DT_BaseCombatWeapon", "m_flFallbackWear"), 0},
         {std::make_pair("DT_BaseCombatWeapon", "m_nFallbackStatTrak"), 0},
+        {std::make_pair("DT_BaseCombatWeapon", "m_flNextPrimaryAttack"), 0},
+        {std::make_pair("DT_BaseCombatWeapon", "m_iClip1"), 0},
 
         /* Bomb */
         {std::make_pair("DT_PlantedC4", "m_flC4Blow"), 0},
 
         /* Tonemap Controller */
-        {std::make_pair("DT_EnvTonemapController", "m_bUseCustomAutoExposureMin"), 0},
-        {std::make_pair("DT_EnvTonemapController", "m_bUseCustomAutoExposureMax"), 0},
-        {std::make_pair("DT_EnvTonemapController", "m_flCustomAutoExposureMin"), 0},
-        {std::make_pair("DT_EnvTonemapController", "m_flCustomAutoExposureMax"), 0},
+        {std::make_pair("DT_EnvTonemapController",
+                        "m_bUseCustomAutoExposureMin"),
+         0},
+        {std::make_pair("DT_EnvTonemapController",
+                        "m_bUseCustomAutoExposureMax"),
+         0},
+        {std::make_pair("DT_EnvTonemapController", "m_flCustomAutoExposureMin"),
+         0},
+        {std::make_pair("DT_EnvTonemapController", "m_flCustomAutoExposureMax"),
+         0},
 
         /* Player Resource */
         {std::make_pair("DT_PlayerResource", "m_iPing"), 0},
@@ -66,7 +78,7 @@ namespace Netvar {
         {std::make_pair("DT_FogController", "m_fog.maxdensity"), 0},
         {std::make_pair("DT_FogController", "m_fog.colorPrimary"), 0},
     };
-    bool init();
+bool init();
 }
 
 namespace Offsets {

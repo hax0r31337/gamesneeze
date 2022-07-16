@@ -1,6 +1,7 @@
 #include "../../includes.hpp"
 #include "features.hpp"
 #include <algorithm>
+#include <cmath>
 
 void bhop(CUserCmd *cmd) {
   if (!Interfaces::engine->IsInGame())
@@ -47,12 +48,12 @@ void autoStrafe(CUserCmd *cmd) {
     if (cmd->mousedx > 1 || cmd->mousedx < -1) {
       cmd->sidemove = cmd->mousedx < 0.f ? -400.f : 400.f;
     } else {
-      if (Globals::localPlayer->velocity().Length2D() == 0 ||
-          Globals::localPlayer->velocity().Length2D() == NAN) {
+      auto l2d = Globals::localPlayer->velocity().Length2D();
+      if (l2d == 0 || l2d == INFINITY || l2d == NAN) {
         cmd->forwardmove = 400;
         return;
       }
-      cmd->forwardmove = std::clamp(5850.f / Globals::localPlayer->velocity().Length2D(),
+      cmd->forwardmove = std::clamp(5850.f / l2d,
                                     -400.0f, 400.0f);
       cmd->sidemove = (cmd->command_number % 2) == 0 ? -400.f : 400.f;
     }

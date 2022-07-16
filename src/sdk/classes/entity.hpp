@@ -65,6 +65,11 @@ public:
 		return getVirtualFunc<Fn>(this, 157)(this);
 	}
 
+	Entity* GetWeapon() {
+		typedef Entity* (*Fn)(void*);
+		return getVirtualFunc<Fn>(this, 331)(this);
+	}
+
 	NETVAR("DT_BaseEntity", "m_Collision", collideable, ICollideable);
 	NETVAR("DT_BaseEntity", "m_iTeamNum", team, int);
 	NETVAR("DT_BaseEntity", "m_bSpotted", spotted, bool);
@@ -86,6 +91,7 @@ public:
     NETVAR("DT_CSPlayer", "m_angEyeAngles[0]", eyeAngles, QAngle);
 	NETVAR("DT_CSPlayer", "m_flLowerBodyYawTarget", lbyTarget, float);
 	NETVAR("DT_CSPlayer", "m_bIsScoped", scoped, bool);
+	NETVAR("DT_CSPlayer", "m_bGunGameImmunity", gumGameImmunity, bool);
 	NETVAR("DT_BasePlayer", "deadflag", deadflag, bool);
     NETVAR("DT_CSPlayer", "m_flFlashDuration", flashDuration, float);
 	NETVAR("DT_CSPlayer", "m_flFlashMaxAlpha", maxFlashAlpha, float);
@@ -138,6 +144,59 @@ public:
 	NETVAR("DT_BaseAttributableItem", "m_iItemDefinitionIndex", itemIndex, ItemIndex);
 };
 
+enum class WeaponType {
+  Knife = 0,
+  Pistol,
+  SubMachinegun,
+  Rifle,
+  Shotgun,
+  SniperRifle,
+  Machinegun,
+  C4,
+  Placeholder,
+  Grenade,
+  Unknown,
+  StackableItem,
+  Fists,
+  BreachCharge,
+  BumpMine,
+  Tablet,
+  Melee
+};
+struct WeaponInfo {
+  std::byte pad[32];
+  int maxClip;
+  std::byte pad1[204];
+  const char *name;
+  std::byte pad2[72];
+  WeaponType type;
+  std::byte pad3[4];
+  int price;
+  std::byte pad4[12];
+  float cycletime;
+  std::byte pad5[12];
+  bool fullAuto;
+  std::byte pad6[3];
+  int damage;
+  float headshotMultiplier;
+  float armorRatio;
+  int bullets;
+  float penetration;
+  std::byte pad7[8];
+  float range;
+  float rangeModifier;
+  std::byte pad8[16];
+  bool silencer;
+  std::byte pad9[23];
+  float maxSpeed;
+  float maxSpeedAlt;
+  std::byte pad10[100];
+  float recoilMagnitude;
+  float recoilMagnitudeAlt;
+  std::byte pad11[16];
+  float recoveryTimeStand;
+};
+
 class Weapon : public Item {
 public:
 	NETVAR("DT_BaseCombatWeapon", "m_hOwner", owner, int);
@@ -146,7 +205,9 @@ public:
 	NETVAR("DT_BaseCombatWeapon", "m_iAccountID", accountID, int);
 	NETVAR("DT_BaseCombatWeapon", "m_nFallbackPaintKit", paintKit, int);
 	NETVAR("DT_BaseCombatWeapon", "m_flFallbackWear", wear, float);
+	NETVAR("DT_BaseCombatWeapon", "m_iClip1", clip, int);
 	NETVAR("DT_BaseCombatWeapon", "m_nFallbackStatTrak", statTrack, int);
+	NETVAR("DT_BaseCombatWeapon", "m_flNextPrimaryAttack", nextPrimaryAttack, float);
 
 	float GetSpread() {
 		typedef float (*Fn)(void*);
@@ -157,6 +218,26 @@ public:
 		typedef float (*Fn)(void*);
 		return getVirtualFunc<Fn>(this, 551)(this);
 	}
+
+	WeaponType getWeaponType() {
+		typedef WeaponType (*Fn)(void*);
+		return getVirtualFunc<Fn>(this, 523)(this);
+	}
+
+	WeaponInfo* GetWeaponInfo() {
+		typedef WeaponInfo* (*Fn)(void*);
+		return getVirtualFunc<Fn>(this, 529)(this);
+	}
+
+    auto isSniperRifle() noexcept { return getWeaponType() == WeaponType::SniperRifle; }
+
+	auto requiresRecoilControl() noexcept
+    {
+        const auto weaponData = GetWeaponInfo();
+        if (weaponData)
+            return weaponData->recoilMagnitude < 35.0f && weaponData->recoveryTimeStand > weaponData->cycletime;
+        return false;
+    }
 };
 
 class PlantedC4 : public Item {

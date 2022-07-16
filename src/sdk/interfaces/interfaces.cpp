@@ -27,7 +27,8 @@ bool Interfaces::init() {
     materialSystem = getInterface<IMaterialSystem>("./bin/linux64/materialsystem_client.so", "VMaterialSystem");
     sound = getInterface<IEngineSound>("./bin/linux64/engine_client.so", "IEngineSoundClient");
     trace = getInterface<IEngineTrace>("./bin/linux64/engine_client.so", "EngineTraceClient");
-	movement = getInterface<IGameMovement>("./csgo/bin/linux64/client_client.so", "GameMovement");
+	physicsSurfaceProps = getInterface<IPhysicsSurfaceProps>("./bin/linux64/vphysics_client.so", "VPhysicsSurfaceProps");
+    movement = getInterface<IGameMovement>("./csgo/bin/linux64/client_client.so", "GameMovement");
     prediction = getInterface<IPrediction>("./csgo/bin/linux64/client_client.so", "VClientPrediction001", true);
     eventManager = getInterface<IGameEventManager2>("./bin/linux64/engine_client.so", "GAMEEVENTSMANAGER002", true);
 

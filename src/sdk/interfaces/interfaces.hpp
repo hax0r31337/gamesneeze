@@ -41,7 +41,8 @@ namespace Interfaces {
     inline IEngineSound* sound;
     inline IEngineTrace* trace;
     inline IGameMovement* movement;
-    inline IMoveHelper* moveHelper;
+    inline IMoveHelper *moveHelper;
+    inline IPhysicsSurfaceProps *physicsSurfaceProps;
     inline IPrediction* prediction;
     inline IGameEventManager2* eventManager;
     inline ICvar* convar;

@@ -1,5 +1,6 @@
 #pragma once
 #include "iclientmode.hpp"
+#include "ienginetrace.hpp"
 
 class Entity;
 class CMoveData;
@@ -27,6 +28,35 @@ public:
 	void SetHost(Entity* host) {
 		typedef void (*Fn)(void* , Entity* );
 		return getVirtualFunc<Fn>(this, 1)(this, host);
+	}
+};
+
+struct surfacephysicsparams_t {
+  float friction;
+  float elasticity;
+  float density;
+  float thickness;
+  float dampening;
+};
+
+struct surfacegameprops_t {
+public:
+  float flPenetrationModifier;
+  float flDamageModifier;
+  unsigned short material;
+};
+
+struct SurfaceData {
+  surfacephysicsparams_t physics;
+  char __kisakSucks[68];
+  surfacegameprops_t game;
+};
+
+class IPhysicsSurfaceProps {
+public:
+	SurfaceData* GetSurfaceData(int index) {
+		typedef SurfaceData* (*Fn)(void* , int index);
+		return getVirtualFunc<Fn>(this, 5)(this, index);
 	}
 };
 

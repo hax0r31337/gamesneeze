@@ -160,6 +160,29 @@ public:
 			y > -tolerance && y < tolerance &&
 			z > -tolerance && z < tolerance);
 	}
+    constexpr auto notNull() const noexcept
+    {
+        return x || y || z;
+    }
+	Vector toAngle() const
+	{
+		return Vector{RAD2DEG(std::atan2(-z, std::hypot(x, y))), RAD2DEG(std::atan2(y, x)), 0.f};
+	}
+
+    auto length() const noexcept
+    {
+        return std::sqrt(x * x + y * y + z * z);
+    }
+
+    constexpr auto dotProduct(const Vector& v) const noexcept
+    {
+        return x * v.x + y * v.y + z * v.z;
+    }
+
+    constexpr auto squareLength() const noexcept
+    {
+        return x * x + y * y + z * z;
+    }
 	Vector	Normalize();
 	float	NormalizeInPlace();
 	inline float	DistTo(const Vector &vOther) const;
@@ -1286,6 +1309,11 @@ public:
 				y > -tolerance && y < tolerance &&
 				z > -tolerance && z < tolerance);
 	}
+
+    constexpr auto notNull() const noexcept
+    {
+        return x || y || z;
+    }
 
 	// arithmetic operations
 	QAngle& operator+=(const QAngle &v);

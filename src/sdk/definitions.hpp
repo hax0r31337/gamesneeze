@@ -470,17 +470,49 @@ const ItemIndex smgs[] = {
 	WEAPON_MP7,
 	WEAPON_MP9
 };
+
 enum HitGroups {
-	HITGROUP_GENERIC = 0,
-	HITGROUP_HEAD,
-	HITGROUP_CHEST,
-	HITGROUP_STOMACH,
-	HITGROUP_LEFTARM,
-	HITGROUP_RIGHTARM,
-	HITGROUP_LEFTLEG,
-	HITGROUP_RIGHTLEG,
-	HITGROUP_GEAR
+  HITGROUP_GENERIC = 0,
+  HITGROUP_HEAD,
+  HITGROUP_CHEST,
+  HITGROUP_STOMACH,
+  HITGROUP_LEFTARM,
+  HITGROUP_RIGHTARM,
+  HITGROUP_LEFTLEG,
+  HITGROUP_RIGHTLEG,
+  HITGROUP_GEAR
 };
+namespace HitGroupsHelper {
+
+constexpr float getDamageMultiplier(int hitGroup) noexcept {
+  switch (hitGroup) {
+  case HITGROUP_HEAD:
+    return 4.0f;
+  case HITGROUP_STOMACH:
+    return 1.25f;
+  case HITGROUP_LEFTLEG:
+  case HITGROUP_RIGHTLEG:
+    return 0.75f;
+  default:
+    return 1.0f;
+  }
+}
+
+constexpr bool isArmored(int hitGroup, bool helmet) noexcept {
+  switch (hitGroup) {
+  case HITGROUP_HEAD:
+    return helmet;
+
+  case HITGROUP_CHEST:
+  case HITGROUP_STOMACH:
+  case HITGROUP_LEFTLEG:
+  case HITGROUP_RIGHTLEG:
+    return true;
+  default:
+    return false;
+  }
+}
+}
 
 enum MoveType_t
 {
