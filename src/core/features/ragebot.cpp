@@ -3,7 +3,7 @@
 
 int aimTarget = -1;
 
-static bool traceToExit(const Trace &enterTrace, const Vector &start,
+bool Features::RageBot::traceToExit(const Trace &enterTrace, const Vector &start,
                         const Vector &direction, Vector &end,
                         Trace &exitTrace) {
   float distance = 0.0f;
@@ -72,10 +72,10 @@ static bool traceToExit(const Trace &enterTrace, const Vector &start,
   return false;
 }
 
-static float handleBulletPenetration(SurfaceData *enterSurfaceData,
+float Features::RageBot::handleBulletPenetration(SurfaceData *enterSurfaceData,
                                      const Trace &enterTrace,
                                      const Vector &direction, Vector &result,
-                                     float penetration, float damage) noexcept {
+                                     float penetration, float damage) {
   Vector end;
   Trace exitTrace;
 
@@ -115,64 +115,69 @@ static float handleBulletPenetration(SurfaceData *enterSurfaceData,
   return damage;
 }
 
-static bool canScan(Entity *entity, const Vector &destination,
-                    const WeaponInfo *weaponData, int minDamage,
-                    bool allowFriendlyFire) noexcept {
+bool Features::RageBot::canScan(Entity *entity, const Vector &destination,
+                    WeaponInfo *weaponData, int minDamage,
+                    bool allowFriendlyFire) {
   if (!Globals::localPlayer)
     return false;
 
-  return true;
-  // float damage{static_cast<float>(weaponData->damage)};
+  float damage{static_cast<float>(weaponData->GetDamage())};
 
-  // Vector start{Globals::localPlayer->eyePos()};
-  // Vector direction{destination - start};
-  // direction /= direction.length();
+  Vector start{Globals::localPlayer->eyePos()};
+  Vector direction{destination - start};
+  direction /= direction.length();
 
-  // int hitsLeft = 4;
+  int hitsLeft = 4;
 
-  // while (damage >= 1.0f && hitsLeft) {
-  //   Trace trace;
-  //   Ray ray = Ray{};
-  //   ray.Init(start, destination);
-  //   TraceFilter traceFilter;
-  //   traceFilter.pSkip = Globals::localPlayer;
-  //   Interfaces::trace->TraceRay(ray, 0x4600400B, &traceFilter, &trace);
+  while (damage >= 1.0f && hitsLeft > 0) {
+    Trace trace;
+    Ray ray;
+    ray.Init(start, destination);
+    TraceFilter traceFilter;
+    traceFilter.pSkip = Globals::localPlayer;
+    Interfaces::trace->TraceRay(ray, 0x4600400B, &traceFilter, &trace);
 
-  //   if (!allowFriendlyFire && trace.m_pEntityHit &&
-  //       trace.m_pEntityHit->isPlayer() && trace.m_pEntityHit->isEnemy())
-  //     return false;
+    Features::Notifications::addNotification(ImColor(255, 255, 255),
+                                                   "TRACE");
 
-  //   if (trace.fraction == 1.0f)
-  //     break;
+    if (!allowFriendlyFire && trace.m_pEntityHit &&
+        trace.m_pEntityHit->isPlayer() && !trace.m_pEntityHit->isEnemy()) {
+      return false;
+    }
 
-  //   if (trace.m_pEntityHit == entity &&
-  //       trace.hitgroup > HitGroups::HITGROUP_GENERIC &&
-  //       trace.hitgroup <= HitGroups::HITGROUP_RIGHTLEG) {
-  //     damage = HitGroupsHelper::getDamageMultiplier(trace.hitgroup) * damage *
-  //              std::pow(weaponData->rangeModifier,
-  //                       trace.fraction * weaponData->range / 500.0f);
+    if (trace.fraction == 1.0f) {
+      return false;
+    }
 
-  //     if (float armorRatio{weaponData->armorRatio / 2.0f};
-  //         HitGroupsHelper::isArmored(trace.hitgroup,
-  //                                    trace.m_pEntityHit->helmet()))
-  //       damage -= (trace.m_pEntityHit->armor() < damage * armorRatio / 2.0f
-  //                      ? trace.m_pEntityHit->armor() * 4.0f
-  //                      : damage) *
-  //                 (1.0f - armorRatio);
+    if (trace.m_pEntityHit == entity &&
+        trace.hitgroup > HitGroups::HITGROUP_GENERIC &&
+        trace.hitgroup <= HitGroups::HITGROUP_RIGHTLEG) {
+      damage = HitGroupsHelper::getDamageMultiplier(trace.hitgroup) * damage *
+               std::pow(weaponData->GetRangeModifier(),
+                        trace.fraction * weaponData->GetRange() / 500.0f);
 
-  //     return damage >= minDamage;
-  //   }
-  //   const auto surfaceData = Interfaces::physicsSurfaceProps->GetSurfaceData(
-  //       trace.surface.surfaceProps);
+      if (float armorRatio{weaponData->GetWeaponArmorRatio() / 2.0f};
+          HitGroupsHelper::isArmored(trace.hitgroup,
+                                     trace.m_pEntityHit->helmet()))
+        damage -= (trace.m_pEntityHit->armor() < damage * armorRatio / 2.0f
+                       ? trace.m_pEntityHit->armor() * 4.0f
+                       : damage) *
+                  (1.0f - armorRatio);
 
-  //   if (surfaceData->game.flPenetrationModifier < 0.1f)
-  //     break;
+      return damage >= minDamage;
+    }
+    const auto surfaceData = Interfaces::physicsSurfaceProps->GetSurfaceData(
+        trace.surface.surfaceProps);
 
-  //   damage = handleBulletPenetration(surfaceData, trace, direction, start,
-  //                                    weaponData->penetration, damage);
-  //   hitsLeft--;
-  // }
-  // return false;
+    if (surfaceData->game.flPenetrationModifier < 0.1f) {
+      break;
+    }
+
+    damage = handleBulletPenetration(surfaceData, trace, direction, start,
+                                     weaponData->GetPenetration(), damage);
+    hitsLeft--;
+  }
+  return false;
 }
 
 void Features::RageBot::createMove(CUserCmd *cmd) {
@@ -188,7 +193,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
   if (!activeWeapon || !activeWeapon->clip())
     return;
 
-  if (Globals::localPlayer->shotsFired() > 0 && !activeWeapon->isFullAuto())
+  if (Globals::localPlayer->shotsFired() > 0 && !activeWeapon->GetWeaponInfo()->GetFullAuto())
     return;
 
   int hitboxes = CONFIGINT("Rage>RageBot>Default>Hitboxes");
@@ -205,7 +210,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
   bool scopedOnly = CONFIGBOOL("Rage>RageBot>Default>Scoped Only");
   bool autoShot = CONFIGBOOL("Rage>RageBot>Default>Auto Shot");
   bool autoScope = CONFIGBOOL("Rage>RageBot>Default>Auto Scope");
-  bool silentShot = CONFIGBOOL("Rage>RageBot>Default>Silent Shot");
   bool visibleOnly = CONFIGBOOL("Rage>RageBot>Default>Visible Only");
   bool killShot = CONFIGBOOL("Rage>RageBot>Default>Kill Shot");
 
@@ -226,7 +230,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     scopedOnly = CONFIGBOOL("Rage>RageBot>Pistol>Scoped Only");
     autoShot = CONFIGBOOL("Rage>RageBot>Pistol>Auto Shot");
     autoScope = CONFIGBOOL("Rage>RageBot>Pistol>Auto Scope");
-    silentShot = CONFIGBOOL("Rage>RageBot>Pistol>Silent Shot");
     visibleOnly = CONFIGBOOL("Rage>RageBot>Pistol>Visible Only");
     killShot = CONFIGBOOL("Rage>RageBot>Pistol>Kill Shot");
   } else if ((std::find(std::begin(heavyPistols), std::end(heavyPistols),
@@ -246,7 +249,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     scopedOnly = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Scoped Only");
     autoShot = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Shot");
     autoScope = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Scope");
-    silentShot = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Silent Shot");
     visibleOnly = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Visible Only");
     killShot = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Kill Shot");
   } else if ((std::find(std::begin(rifles), std::end(rifles),
@@ -266,7 +268,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     scopedOnly = CONFIGBOOL("Rage>RageBot>Rifle>Scoped Only");
     autoShot = CONFIGBOOL("Rage>RageBot>Rifle>Auto Shot");
     autoScope = CONFIGBOOL("Rage>RageBot>Rifle>Auto Scope");
-    silentShot = CONFIGBOOL("Rage>RageBot>Rifle>Silent Shot");
     visibleOnly = CONFIGBOOL("Rage>RageBot>Rifle>Visible Only");
     killShot = CONFIGBOOL("Rage>RageBot>Rifle>Kill Shot");
   } else if ((std::find(std::begin(smgs), std::end(smgs),
@@ -284,7 +285,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     scopedOnly = CONFIGBOOL("Rage>RageBot>SMG>Scoped Only");
     autoShot = CONFIGBOOL("Rage>RageBot>SMG>Auto Shot");
     autoScope = CONFIGBOOL("Rage>RageBot>SMG>Auto Scope");
-    silentShot = CONFIGBOOL("Rage>RageBot>SMG>Silent Shot");
     visibleOnly = CONFIGBOOL("Rage>RageBot>SMG>Visible Only");
     killShot = CONFIGBOOL("Rage>RageBot>SMG>Kill Shot");
   } else if (((activeWeapon->itemIndex() & 0xFFF) == WEAPON_SSG08) &&
@@ -302,7 +302,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     scopedOnly = CONFIGBOOL("Rage>RageBot>Scout>Scoped Only");
     autoShot = CONFIGBOOL("Rage>RageBot>Scout>Auto Shot");
     autoScope = CONFIGBOOL("Rage>RageBot>Scout>Auto Scope");
-    silentShot = CONFIGBOOL("Rage>RageBot>Scout>Silent Shot");
     visibleOnly = CONFIGBOOL("Rage>RageBot>Scout>Visible Only");
     killShot = CONFIGBOOL("Rage>RageBot>Scout>Kill Shot");
   } else if (((activeWeapon->itemIndex() & 0xFFF) == WEAPON_AWP) &&
@@ -319,7 +318,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     scopedOnly = CONFIGBOOL("Rage>RageBot>AWP>Scoped Only");
     autoShot = CONFIGBOOL("Rage>RageBot>AWP>Auto Shot");
     autoScope = CONFIGBOOL("Rage>RageBot>AWP>Auto Scope");
-    silentShot = CONFIGBOOL("Rage>RageBot>AWP>Silent Shot");
     visibleOnly = CONFIGBOOL("Rage>RageBot>AWP>Visible Only");
     killShot = CONFIGBOOL("Rage>RageBot>AWP>Kill Shot");
   } else if ((std::find(std::begin(heavyWeapons), std::end(heavyWeapons),
@@ -339,7 +337,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     scopedOnly = CONFIGBOOL("Rage>RageBot>Heavy>Scoped Only");
     autoShot = CONFIGBOOL("Rage>RageBot>Heavy>Auto Shot");
     autoScope = CONFIGBOOL("Rage>RageBot>Heavy>Auto Scope");
-    silentShot = CONFIGBOOL("Rage>RageBot>Heavy>Silent Shot");
     visibleOnly = CONFIGBOOL("Rage>RageBot>Heavy>Visible Only");
     killShot = CONFIGBOOL("Rage>RageBot>Heavy>Kill Shot");
   }
@@ -357,9 +354,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     Vector bestTarget{};
     const auto eyePos = Globals::localPlayer->eyePos();
 
-    const auto aimPunch = activeWeapon->requiresRecoilControl()
-                              ? Globals::localPlayer->aimPunch() * 2
-                              : QAngle{};
+    const auto aimPunch = Globals::localPlayer->aimPunch() * 2;
 
     for (int i = 1; i <= Interfaces::globals->maxClients; i++) {
       Player *entity = (Player *)Interfaces::entityList->GetClientEntity(i);
@@ -391,9 +386,9 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
                                           bonePosition, 1))
           continue;
 
-        if ((!entity->visible() && visibleOnly)/* ||
+        if ((!entity->visible() && visibleOnly) ||
             !canScan(entity, bonePosition, activeWeapon->GetWeaponInfo(),
-                     killShot ? entity->health() : minDamage, friendlyFire)*/)
+                     killShot ? entity->health() : minDamage, friendlyFire))
           continue;
 
         if (fov < FOV) {
@@ -410,8 +405,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
       static QAngle lastAngles{cmd->viewangles};
       static int lastCommand{};
 
-      if (lastCommand == cmd->command_number - 1 && lastAngles.notNull() &&
-          silentShot)
+      if (lastCommand == cmd->command_number - 1 && lastAngles.notNull())
         cmd->viewangles = lastAngles;
 
       auto angle = calcAngle(Globals::localPlayer->eyePos(), bestTarget) - cmd->viewangles - aimPunch;
@@ -426,8 +420,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
 
       angle /= smoothing;
       cmd->viewangles += angle;
-      if (!silentShot)
-        Interfaces::engine->GetViewAngles(cmd->viewangles);
 
       if (autoScope &&
           activeWeapon->nextPrimaryAttack() <=

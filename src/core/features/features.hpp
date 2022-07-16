@@ -126,6 +126,15 @@ namespace Features {
     }
     namespace RageBot {
         void createMove(CUserCmd* cmd);
+        bool traceToExit(const Trace &enterTrace, const Vector &start,
+                         const Vector &direction, Vector &end, Trace &exitTrace);
+        float handleBulletPenetration(SurfaceData *enterSurfaceData,
+                                      const Trace &enterTrace,
+                                      const Vector &direction, Vector &result,
+                                      float penetration, float damage);
+        bool canScan(Entity *entity, const Vector &destination,
+                WeaponInfo *weaponData, int minDamage,
+                bool allowFriendlyFire);
     }
     namespace AntiAim {
         inline matrix3x4_t fakeBones[128];

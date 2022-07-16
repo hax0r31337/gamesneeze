@@ -144,9 +144,8 @@ namespace Config {
         // Default {
 
         CONFIGITEM("Rage>Resolver", false),
-        
-        CONFIGITEM("Rage>Enabled", false),
-        CONFIGITEM("Rage>RageBot>Key", 0),
+
+        CONFIGITEM("Rage>Enabled", false), CONFIGITEM("Rage>RageBot>Key", 0),
         CONFIGITEM("Rage>RageBot>Always on", false),
         // CONFIGITEM("Rage>RageBot>Default>FOV", 0),
 
@@ -162,7 +161,6 @@ namespace Config {
         CONFIGITEM("Rage>RageBot>Default>Scoped Only", false),
         CONFIGITEM("Rage>RageBot>Default>Auto Shot", false),
         CONFIGITEM("Rage>RageBot>Default>Auto Scope", false),
-        CONFIGITEM("Rage>RageBot>Default>Silent Shot", false),
         CONFIGITEM("Rage>RageBot>Default>Visible Only", false),
         CONFIGITEM("Rage>RageBot>Default>Kill Shot", false),
 
@@ -179,7 +177,6 @@ namespace Config {
         CONFIGITEM("Rage>RageBot>Pistol>Scoped Only", false),
         CONFIGITEM("Rage>RageBot>Pistol>Auto Shot", false),
         CONFIGITEM("Rage>RageBot>Pistol>Auto Scope", false),
-        CONFIGITEM("Rage>RageBot>Pistol>Silent Shot", false),
         CONFIGITEM("Rage>RageBot>Pistol>Visible Only", false),
         CONFIGITEM("Rage>RageBot>Pistol>Kill Shot", false),
 
@@ -196,7 +193,6 @@ namespace Config {
         CONFIGITEM("Rage>RageBot>Heavy Pistol>Scoped Only", false),
         CONFIGITEM("Rage>RageBot>Heavy Pistol>Auto Shot", false),
         CONFIGITEM("Rage>RageBot>Heavy Pistol>Auto Scope", false),
-        CONFIGITEM("Rage>RageBot>Heavy Pistol>Silent Shot", false),
         CONFIGITEM("Rage>RageBot>Heavy Pistol>Visible Only", false),
         CONFIGITEM("Rage>RageBot>Heavy Pistol>Kill Shot", false),
 
@@ -213,7 +209,6 @@ namespace Config {
         CONFIGITEM("Rage>RageBot>Rifle>Scoped Only", false),
         CONFIGITEM("Rage>RageBot>Rifle>Auto Shot", false),
         CONFIGITEM("Rage>RageBot>Rifle>Auto Scope", false),
-        CONFIGITEM("Rage>RageBot>Rifle>Silent Shot", false),
         CONFIGITEM("Rage>RageBot>Rifle>Visible Only", false),
         CONFIGITEM("Rage>RageBot>Rifle>Kill Shot", false),
 
@@ -230,7 +225,6 @@ namespace Config {
         CONFIGITEM("Rage>RageBot>SMG>Scoped Only", false),
         CONFIGITEM("Rage>RageBot>SMG>Auto Shot", false),
         CONFIGITEM("Rage>RageBot>SMG>Auto Scope", false),
-        CONFIGITEM("Rage>RageBot>SMG>Silent Shot", false),
         CONFIGITEM("Rage>RageBot>SMG>Visible Only", false),
         CONFIGITEM("Rage>RageBot>SMG>Kill Shot", false),
 
@@ -247,7 +241,6 @@ namespace Config {
         CONFIGITEM("Rage>RageBot>Scout>Scoped Only", false),
         CONFIGITEM("Rage>RageBot>Scout>Auto Shot", false),
         CONFIGITEM("Rage>RageBot>Scout>Auto Scope", false),
-        CONFIGITEM("Rage>RageBot>Scout>Silent Shot", false),
         CONFIGITEM("Rage>RageBot>Scout>Visible Only", false),
         CONFIGITEM("Rage>RageBot>Scout>Kill Shot", false),
 
@@ -264,7 +257,6 @@ namespace Config {
         CONFIGITEM("Rage>RageBot>AWP>Scoped Only", false),
         CONFIGITEM("Rage>RageBot>AWP>Auto Shot", false),
         CONFIGITEM("Rage>RageBot>AWP>Auto Scope", false),
-        CONFIGITEM("Rage>RageBot>AWP>Silent Shot", false),
         CONFIGITEM("Rage>RageBot>AWP>Visible Only", false),
         CONFIGITEM("Rage>RageBot>AWP>Kill Shot", false),
 
@@ -281,7 +273,6 @@ namespace Config {
         CONFIGITEM("Rage>RageBot>Heavy>Scoped Only", false),
         CONFIGITEM("Rage>RageBot>Heavy>Auto Shot", false),
         CONFIGITEM("Rage>RageBot>Heavy>Auto Scope", false),
-        CONFIGITEM("Rage>RageBot>Heavy>Silent Shot", false),
         CONFIGITEM("Rage>RageBot>Heavy>Visible Only", false),
         CONFIGITEM("Rage>RageBot>Heavy>Kill Shot", false),
 
@@ -536,6 +527,7 @@ namespace Config {
         CONFIGITEM("Misc>Misc>Misc>Use Spam Key", 0),
         CONFIGITEM("Misc>Misc>Misc>Disable Setting Cvars", false),
         CONFIGITEM("Misc>Misc>Misc>Disable Post Processing", false),
+        CONFIGITEM("Misc>Misc>Misc>No Movement Fix", false),
 
         CONFIGITEM("Misc>Skins>Skins>PaintKit", 0),
         CONFIGITEM("Misc>Skins>Skins>Wear", 0),

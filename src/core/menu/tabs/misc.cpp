@@ -37,6 +37,7 @@ void Menu::drawMiscTab() {
                 ImGui::Checkbox("Use Spam", &CONFIGBOOL("Misc>Misc>Misc>Use Spam"));
                 ImGui::Checkbox("Disable Setting Cvars", &CONFIGBOOL("Misc>Misc>Misc>Disable Setting Cvars"));
                 ImGui::Checkbox("Disable Post Processing", &CONFIGBOOL("Misc>Misc>Misc>Disable Post Processing"));
+                ImGui::Checkbox("No Movement Fix", &CONFIGBOOL("Misc>Misc>Misc>No Movement Fix"));
                 ImGui::EndChild();
             }
 

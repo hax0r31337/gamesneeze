@@ -16,42 +16,42 @@ bool Hooks::CreateMove::hook(void* thisptr, float flInputSampleTime, CUserCmd* c
                 mat_postprocess_enable->SetValue(!CONFIGBOOL("Misc>Misc>Misc>Disable Post Processing"));
             }
         }
+        bool noMovementFix = CONFIGBOOL("Misc>Misc>Misc>No Movement Fix");
         Globals::serverTime(cmd);
 
-        startMovementFix(cmd);
-            Features::RankReveal::createMove(cmd);
-            Features::FastDuck::createMove(cmd);
-            Features::UseSpam::createMove(cmd);
-            Features::Movement::prePredCreateMove(cmd);
+        if (!noMovementFix) { startMovementFix(cmd); }
+        Features::RankReveal::createMove(cmd);
+        Features::FastDuck::createMove(cmd);
+        Features::UseSpam::createMove(cmd);
+        Features::Movement::prePredCreateMove(cmd);
 
-            Features::Prediction::start(cmd);
-                if (CONFIGBOOL("Rage>Enabled")) {
-                    Features::RageBot::createMove(cmd);
-                    Features::AntiAim::createMove(cmd);
-                }
-                else {
-                    Features::LegitBot::createMove(cmd);
-                    Features::Triggerbot::createMove(cmd);
-                    Features::Backtrack::store(cmd);
-                    Features::Backtrack::createMove(cmd);
-                    Features::Forwardtrack::createMove(cmd);
-                }
-            Features::Prediction::end();
+        Features::Prediction::start(cmd);
+        if (CONFIGBOOL("Rage>Enabled")) {
+          Features::RageBot::createMove(cmd);
+          Features::AntiAim::createMove(cmd);
+        } else {
+          Features::LegitBot::createMove(cmd);
+          Features::Triggerbot::createMove(cmd);
+          Features::Backtrack::store(cmd);
+          Features::Backtrack::createMove(cmd);
+          Features::Forwardtrack::createMove(cmd);
+        }
+        Features::Prediction::end();
 
-            Features::Movement::postPredCreateMove(cmd);
+        Features::Movement::postPredCreateMove(cmd);
 
-            if (Features::AutoDefuse::shouldDefuse) {
-                cmd->buttons |= (1 << 5);
-            }
-        endMovementFix(cmd);
+        if (Features::AutoDefuse::shouldDefuse) {
+          cmd->buttons |= (1 << 5);
+        }
+        if (!noMovementFix) { endMovementFix(cmd); }
         Features::QuickPeek::createMove(cmd);
 	    Features::SlowWalk::createMove(cmd);
 
         auto view_backup = cmd->viewangles;
         Features::Movement::edgeBugPredictor(cmd);
-        startMovementFix(cmd);
+        if (!noMovementFix) { startMovementFix(cmd); }
         cmd->viewangles = view_backup;
-        endMovementFix(cmd);
+        if (!noMovementFix) { endMovementFix(cmd); }
 
         cmd->forwardmove = std::clamp(cmd->forwardmove, -450.0f, 450.0f);
         cmd->sidemove = std::clamp(cmd->sidemove, -450.0f, 450.0f);

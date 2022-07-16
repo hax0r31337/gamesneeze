@@ -164,38 +164,43 @@ enum class WeaponType {
   Tablet,
   Melee
 };
-struct WeaponInfo {
-  std::byte pad[32];
-  int maxClip;
-  std::byte pad1[204];
-  const char *name;
-  std::byte pad2[72];
-  WeaponType type;
-  std::byte pad3[4];
-  int price;
-  std::byte pad4[12];
-  float cycletime;
-  std::byte pad5[12];
-  bool fullAuto;
-  std::byte pad6[3];
-  int damage;
-  float headshotMultiplier;
-  float armorRatio;
-  int bullets;
-  float penetration;
-  std::byte pad7[8];
-  float range;
-  float rangeModifier;
-  std::byte pad8[16];
-  bool silencer;
-  std::byte pad9[23];
-  float maxSpeed;
-  float maxSpeedAlt;
-  std::byte pad10[100];
-  float recoilMagnitude;
-  float recoilMagnitudeAlt;
-  std::byte pad11[16];
-  float recoveryTimeStand;
+
+class WeaponInfo {
+public:
+  char *GetConsoleName() { return *(char **)((uintptr_t)this + 0x8); }
+
+  int GetClipSize() { return *(int *)((uintptr_t)this + 0x20); }
+
+  WeaponType GetWeaponType() {
+    return *(WeaponType *)((uintptr_t)this + 0x140);
+  }
+
+  void SetWeaponType(WeaponType type) {
+    *(WeaponType *)((uintptr_t)this + 0x140) = type;
+  }
+
+  bool GetFullAuto() { return *(bool *)((uintptr_t)this + 0x168); }
+
+  int GetDamage() { return *(int *)((uintptr_t)this + 0x16C); }
+
+  float GetWeaponArmorRatio() { return *(float *)((uintptr_t)this + 0x174); }
+
+  float GetPenetration() { return *(float *)((uintptr_t)this + 0x17C); }
+
+  float GetRange() { return *(float *)((uintptr_t)this + 0x188); }
+
+  float GetRangeModifier() { return *(float *)((uintptr_t)this + 0x18C); }
+
+  float GetMaxPlayerSpeed() { return *(float *)((uintptr_t)this + 0x1B8); }
+
+  int GetZoomLevels() { // Doesn't work correctly on some weapons.
+    return *(int *)((uintptr_t)this +
+                    0x23C); // DT_WeaponCSBaseGun.m_zoomLevel ?
+  }
+
+  char *GetTracerEffect() { return *(char **)((uintptr_t)this + 0x290); }
+
+  int *GetTracerFrequency() { return (int *)((uintptr_t)this + 0x298); }
 };
 
 class Weapon : public Item {
@@ -231,18 +236,6 @@ public:
 	}
 
     auto isSniperRifle() noexcept { return getWeaponType() == WeaponType::SniperRifle; }
-
-	auto isFullAuto() {
-		return GetWeaponInfo()->fullAuto;
-	}
-
-	auto requiresRecoilControl() noexcept
-    {
-        const auto weaponData = GetWeaponInfo();
-        if (weaponData)
-            return weaponData->recoilMagnitude < 35.0f && weaponData->recoveryTimeStand > weaponData->cycletime;
-        return false;
-    }
 };
 
 class PlantedC4 : public Item {

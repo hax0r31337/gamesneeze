@@ -78,7 +78,6 @@ void Menu::drawRageTab() {
                 ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>Default>Scoped Only"));
                 ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Default>Auto Shot"));
                 ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Default>Auto Scope"));
-                ImGui::Checkbox("Silent Shot", &CONFIGBOOL("Rage>RageBot>Default>Silent Shot"));
                 ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Default>Visible Only"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Default>Kill Shot"));
 
@@ -108,7 +107,6 @@ void Menu::drawRageTab() {
                 ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>Pistol>Scoped Only"));
                 ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Pistol>Auto Shot"));
                 ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Pistol>Auto Scope"));
-                ImGui::Checkbox("Silent Shot", &CONFIGBOOL("Rage>RageBot>Pistol>Silent Shot"));
                 ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Pistol>Visible Only"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Pistol>Kill Shot"));
               ImGui::EndTabItem();
@@ -137,7 +135,6 @@ void Menu::drawRageTab() {
                 ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Scoped Only"));
                 ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Shot"));
                 ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Scope"));
-                ImGui::Checkbox("Silent Shot", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Silent Shot"));
                 ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Visible Only"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Kill Shot"));
               ImGui::EndTabItem();
@@ -166,7 +163,6 @@ void Menu::drawRageTab() {
                 ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>Rifle>Scoped Only"));
                 ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Rifle>Auto Shot"));
                 ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Rifle>Auto Scope"));
-                ImGui::Checkbox("Silent Shot", &CONFIGBOOL("Rage>RageBot>Rifle>Silent Shot"));
                 ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Rifle>Visible Only"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Rifle>Kill Shot"));
               ImGui::EndTabItem();
@@ -195,7 +191,6 @@ void Menu::drawRageTab() {
                 ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>SMG>Scoped Only"));
                 ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>SMG>Auto Shot"));
                 ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>SMG>Auto Scope"));
-                ImGui::Checkbox("Silent Shot", &CONFIGBOOL("Rage>RageBot>SMG>Silent Shot"));
                 ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>SMG>Visible Only"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>SMG>Kill Shot"));
               ImGui::EndTabItem();
@@ -224,7 +219,6 @@ void Menu::drawRageTab() {
                 ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>Scout>Scoped Only"));
                 ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Scout>Auto Shot"));
                 ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Scout>Auto Scope"));
-                ImGui::Checkbox("Silent Shot", &CONFIGBOOL("Rage>RageBot>Scout>Silent Shot"));
                 ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Scout>Visible Only"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Scout>Kill Shot"));
               ImGui::EndTabItem();
@@ -253,7 +247,6 @@ void Menu::drawRageTab() {
                 ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>AWP>Scoped Only"));
                 ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>AWP>Auto Shot"));
                 ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>AWP>Auto Scope"));
-                ImGui::Checkbox("Silent Shot", &CONFIGBOOL("Rage>RageBot>AWP>Silent Shot"));
                 ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>AWP>Visible Only"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>AWP>Kill Shot"));
               ImGui::EndTabItem();
@@ -282,7 +275,6 @@ void Menu::drawRageTab() {
                 ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>Heavy>Scoped Only"));
                 ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Heavy>Auto Shot"));
                 ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Heavy>Auto Scope"));
-                ImGui::Checkbox("Silent Shot", &CONFIGBOOL("Rage>RageBot>Heavy>Silent Shot"));
                 ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Heavy>Visible Only"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Heavy>Kill Shot"));
               ImGui::EndTabItem();
