@@ -91,17 +91,18 @@ public:
     NETVAR("DT_CSPlayer", "m_angEyeAngles[0]", eyeAngles, QAngle);
 	NETVAR("DT_CSPlayer", "m_flLowerBodyYawTarget", lbyTarget, float);
 	NETVAR("DT_CSPlayer", "m_bIsScoped", scoped, bool);
-	NETVAR("DT_CSPlayer", "m_bGunGameImmunity", gumGameImmunity, bool);
+	NETVAR("DT_CSPlayer", "m_bGunGameImmunity", gunGameImmunity, bool);
 	NETVAR("DT_BasePlayer", "deadflag", deadflag, bool);
     NETVAR("DT_CSPlayer", "m_flFlashDuration", flashDuration, float);
-	NETVAR("DT_CSPlayer", "m_flFlashMaxAlpha", maxFlashAlpha, float);
-	NETVAR("DT_CSPlayer", "m_bHasHelmet", helmet, bool);
-	NETVAR("DT_CSPlayer", "m_ArmorValue", armor, int);
-	NETVAR("DT_CSPlayer", "m_nSurvivalTeam", survivalTeam, int);
+    NETVAR("DT_CSPlayer", "m_flFlashMaxAlpha", maxFlashAlpha, float);
+    NETVAR("DT_CSPlayer", "m_iShotsFired", shotsFired, float);
+    NETVAR("DT_CSPlayer", "m_bHasHelmet", helmet, bool);
+    NETVAR("DT_CSPlayer", "m_ArmorValue", armor, int);
+    NETVAR("DT_CSPlayer", "m_nSurvivalTeam", survivalTeam, int);
 
-	AnimState* animState() {
-		return *reinterpret_cast<AnimState **>((uintptr_t)
-		this + Offsets::animState);
+    AnimState *animState() {
+      return *reinterpret_cast<AnimState **>((uintptr_t)this +
+                                             Offsets::animState);
 	}
 
 	QAngle* viewAngles() {
@@ -230,6 +231,10 @@ public:
 	}
 
     auto isSniperRifle() noexcept { return getWeaponType() == WeaponType::SniperRifle; }
+
+	auto isFullAuto() {
+		return GetWeaponInfo()->fullAuto;
+	}
 
 	auto requiresRecoilControl() noexcept
     {

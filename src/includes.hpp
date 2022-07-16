@@ -13,6 +13,7 @@
 #include "core/menu/imgui/imgui_impl_opengl3.h"
 
 #include "core/menu/config.hpp"
+#include "sdk/interfaces/iclientmode.hpp"
 #include "utils/utils.hpp"
 #include "sdk/sdk.hpp"
 #include "core/features/features.hpp"
@@ -29,4 +30,6 @@ namespace Globals {
 
     inline Player* localPlayer;
     inline QAngle oldViewangles;
+
+    float serverTime(CUserCmd *cmd = nullptr);
 }

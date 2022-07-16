@@ -1,40 +1,6 @@
 #include "../menu.hpp"
 #include <sstream>
 
-void hitboxSelectBox(const char* configVarName) {
-    ImGui::Text("Hitboxes");
-    ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-
-    int curSelected = CONFIGINT(configVarName);
-
-    std::stringstream selectedHitboxes;
-    selectedHitboxes << (curSelected & (int)HitBoxes::HEAD ? "Head, " : "")
-                     << (curSelected & (int)HitBoxes::NECK ? "Neck, " : "")
-                     << (curSelected & (int)HitBoxes::CHEST ? "Chest, " : "")
-                     << (curSelected & (int)HitBoxes::STOMACH ? "Stomach, " : "")
-                     << (curSelected & (int)HitBoxes::PELVIS ? "Pelvis, " : "");
-
-    if (ImGui::BeginCombo("##HitBoxes", selectedHitboxes.str().c_str())) {
-
-        if (ImGui::Selectable("Head", curSelected & (int)HitBoxes::HEAD, ImGuiSelectableFlags_DontClosePopups))
-            CONFIGINT(configVarName) ^= (int)HitBoxes::HEAD;
-
-        if (ImGui::Selectable("Neck", curSelected & (int)HitBoxes::NECK, ImGuiSelectableFlags_DontClosePopups))
-            CONFIGINT(configVarName) ^= (int)HitBoxes::NECK;
-
-        if (ImGui::Selectable("Chest", curSelected & (int)HitBoxes::CHEST, ImGuiSelectableFlags_DontClosePopups))
-            CONFIGINT(configVarName) ^= (int)HitBoxes::CHEST;
-
-        if (ImGui::Selectable("Stomach", curSelected & (int)HitBoxes::STOMACH, ImGuiSelectableFlags_DontClosePopups))
-            CONFIGINT(configVarName) ^= (int)HitBoxes::STOMACH;
-
-        if (ImGui::Selectable("Pelvis", curSelected & (int)HitBoxes::PELVIS, ImGuiSelectableFlags_DontClosePopups))
-            CONFIGINT(configVarName) ^= (int)HitBoxes::PELVIS;
-
-        ImGui::EndCombo();
-    }
-}
-
 void Menu::drawLegitTab() {
     ImGui::BeginChild("LegitBot", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.65f, 260), true); {
         ImGui::Text("LegitBot");

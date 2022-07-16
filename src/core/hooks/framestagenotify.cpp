@@ -20,15 +20,12 @@ void Hooks::FrameStageNotify::hook(void* thisptr, FrameStage frame) {
     if (frame == FRAME_RENDER_START) {
         cachePlayers();
         if (Globals::localPlayer && Globals::localPlayer->health() > 0 && Interfaces::input->m_fCameraInThirdPerson) {
-            QAngle viewAngles;
-            Interfaces::engine->GetViewAngles(viewAngles);
-            bool rageEnabled = CONFIGINT("Rage>AntiAim>Type") != 0 && CONFIGBOOL("Rage>Enabled");
-            Globals::localPlayer->viewAngles()->y = rageEnabled ? Features::AntiAim::fakeYaw : viewAngles.y;
-            Globals::localPlayer->viewAngles()->x = rageEnabled ? CONFIGINT("Rage>AntiAim>Pitch") : viewAngles.x;
+          Globals::localPlayer->viewAngles()->y = Globals::oldViewangles.y;
+          Globals::localPlayer->viewAngles()->x = Globals::oldViewangles.x;
         }
     }
 
-    if (frame == FRAME_NET_UPDATE_POSTDATAUPDATE_START && CONFIGBOOL("Rage>RageBot>Default>Resolver")) {
+    if (frame == FRAME_NET_UPDATE_POSTDATAUPDATE_START && CONFIGBOOL("Rage>Resolver")) {
         for (int i = 1; i < Interfaces::globals->maxClients; i++) {
             Player* p = (Player*)Interfaces::entityList->GetClientEntity(i);
             if (p && p != Globals::localPlayer && p->health() > 0 && !p->dormant() && p->isEnemy()) {

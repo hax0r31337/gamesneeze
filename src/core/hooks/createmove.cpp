@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <cstdint>
 
-
-
 bool Hooks::CreateMove::hook(void* thisptr, float flInputSampleTime, CUserCmd* cmd) {
     original(thisptr, flInputSampleTime, cmd);
     if (cmd->tick_count != 0) {
@@ -18,6 +16,7 @@ bool Hooks::CreateMove::hook(void* thisptr, float flInputSampleTime, CUserCmd* c
                 mat_postprocess_enable->SetValue(!CONFIGBOOL("Misc>Misc>Misc>Disable Post Processing"));
             }
         }
+        Globals::serverTime(cmd);
 
         startMovementFix(cmd);
             Features::RankReveal::createMove(cmd);
