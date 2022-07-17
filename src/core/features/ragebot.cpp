@@ -388,17 +388,17 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
                         Globals::localPlayer->eyePos(), targetBonePos, 1))
                   continue;
 
-                QAngle angle = calcAngle(localPlayerEyePos, targetBonePos) - aimPunch;
-                normalizeAngles(angle);
                 auto damageDeal = getDamageDeal(p, targetBonePos, weapon->GetWeaponInfo(), friendlyFire);
                 if (damageDeal <= 0 || damageDeal < (killShot ? p->health() : minDamage)) {
                   continue;
                 }
 
-                QAngle angleTarget = bestPlayerAngle - cmd->viewangles;
+                QAngle angle = calcAngle(localPlayerEyePos, targetBonePos) - aimPunch;
+                QAngle angleTarget = angle - cmd->viewangles;
+                normalizeAngles(angle);
                 normalizeAngles(angleTarget);
 
-                if (angleTarget.Length() < FOV) {
+                if (angleTarget.Length() > FOV) {
                   continue;
                 }
 
