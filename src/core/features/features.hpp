@@ -135,7 +135,7 @@ namespace Features {
         bool canScan(Entity *entity, const Vector &destination,
                 WeaponInfo *weaponData, int minDamage,
                 bool allowFriendlyFire);
-        bool canShoot(CUserCmd *cmd, Player *localplayer, Weapon *activeWeapon,
+        bool canShoot(CUserCmd *cmd, Weapon *activeWeapon,
                       Vector &bestSpot, Player *enemy, int hitChance);
     }
     namespace AntiAim {

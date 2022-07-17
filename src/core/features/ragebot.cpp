@@ -179,8 +179,7 @@ bool Features::RageBot::canScan(Entity *entity, const Vector &destination,
   return false;
 }
 
-bool Features::RageBot::canShoot(CUserCmd *cmd, Player *localplayer,
-              Weapon *activeWeapon, Vector &bestSpot,
+bool Features::RageBot::canShoot(CUserCmd *cmd, Weapon *activeWeapon, Vector &bestSpot,
               Player *enemy, int hitChance) {
   if (hitChance == 0)
     return true;
@@ -192,7 +191,7 @@ bool Features::RageBot::canShoot(CUserCmd *cmd, Player *localplayer,
   //     fabs(localplayer->GetVelocity().z) < 5.0f &&
   //     localplayer->GetVelocity().Length2D() < 5.0f)
   //   return true;
-  Vector src = localplayer->eyePos();
+  Vector src = Globals::localPlayer->eyePos();
   QAngle angle = calcAngle(src, bestSpot);
   normalizeAngles(angle);
 
@@ -220,8 +219,7 @@ bool Features::RageBot::canShoot(CUserCmd *cmd, Player *localplayer,
                       (sin(b) * inaccuracy) + (sin(d) * spread), 0);
     direction.Init(forward.x + (spreadView.x * right.x) + (spreadView.y * up.x),
                    forward.y + (spreadView.x * right.y) + (spreadView.y * up.y),
-                   forward.z + (spreadView.x * right.z) +
-                       (spreadView.y * up.z));
+                   forward.z + (spreadView.x * right.z) + (spreadView.y * up.z));
 
     QAngle viewAnglesSpread;
     vectorAngles(direction, up, viewAnglesSpread);
@@ -236,22 +234,25 @@ bool Features::RageBot::canShoot(CUserCmd *cmd, Player *localplayer,
 
     Trace tr;
     Ray ray;
-
     ray.Init(src, viewForward);
-    Interfaces::trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, enemy, &tr);
+    // Interfaces::trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, enemy, &tr);
+
+    TraceFilter traceFilter;
+    traceFilter.pSkip = Globals::localPlayer;
+    Interfaces::trace->TraceRay(ray, 0x4600400B, &traceFilter, &tr);
 
     if (tr.m_pEntityHit == enemy) {
-      Notifications::addNotification(ImColor(255, 255, 255), "HITS++");
+      // Notifications::addNotification(ImColor(255, 255, 255), "HITS++");
       hitCount++;
     }
 
     if (static_cast<int>((hitCount / 255.f) * 100.f) >= hitChance) {
-      Notifications::addNotification(ImColor(255, 255, 255), "HITS OK");
+      // Notifications::addNotification(ImColor(255, 255, 255), "HITS OK");
       return true;
     }
 
     if ((255 - i + hitCount) < NeededHits) {
-      Notifications::addNotification(ImColor(255, 255, 255), "FAILED HITS");
+      // Notifications::addNotification(ImColor(255, 255, 255), "FAILED HITS");
       return false;
     }
   }
@@ -465,13 +466,12 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (bestTarget.notNull() && bestTarget.x != 0 && bestTarget.y != 0 &&
         bestTarget.z != 0) {
       if (!canShoot(
-              cmd, Globals::localPlayer, activeWeapon, bestTarget,
-              (Player *)Interfaces::entityList->GetClientEntity(aimTarget),
-              hitChance)) {
+              cmd, activeWeapon, bestTarget,
+              (Player *)Interfaces::entityList->GetClientEntity(aimTarget), hitChance)) {
           return;
       }
 
-      auto angle = calcAngle(Globals::localPlayer->eyePos(), bestTarget) - cmd->viewangles - Globals::localPlayer->aimPunch();
+      auto angle = calcAngle(Globals::localPlayer->eyePos(), bestTarget) - cmd->viewangles - aimPunch;
       normalizeAngles(angle);
 
       angle /= smoothing;
