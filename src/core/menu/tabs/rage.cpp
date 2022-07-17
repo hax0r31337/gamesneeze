@@ -56,19 +56,23 @@ void Menu::drawRageTab() {
                 ImGui::SameLine();
                 ImGui::Checkbox("Always On", &CONFIGBOOL("Rage>RageBot>Always on"));
 
+                ImGui::Separator();
+
                 hitboxSelectBox("Rage>RageBot>Default>Hitboxes");
                 ImGui::Text("FOV (x10)");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##FOV", &CONFIGINT("Rage>RageBot>Default>FOV"), 0, 1800);
-                ImGui::Text("Smoothing");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Smoothing", &CONFIGINT("Rage>RageBot>Default>Smoothing"), 0, 30);
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Default>Hit Chance"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>Default>Min Damage"), 1, 100);
+                ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Default>Auto Slow"));
+                ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Default>Kill Shot"));
+
+                ImGui::Separator();
+
                 ImGui::Checkbox("Friendly Fire", &CONFIGBOOL("Rage>RageBot>Default>Friendly Fire"));
                 ImGui::Checkbox("Ignore Blind", &CONFIGBOOL("Rage>RageBot>Default>Ignore Blind"));
                 ImGui::Checkbox("Ignore Smoke", &CONFIGBOOL("Rage>RageBot>Default>Ignore Smoke"));
@@ -76,184 +80,99 @@ void Menu::drawRageTab() {
                 ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Default>Auto Shot"));
                 ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Default>Auto Scope"));
                 ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Default>Visible Only"));
-                ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Default>Kill Shot"));
 
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Pistol")) {
                 ImGui::Checkbox("Override", &CONFIGBOOL("Rage>RageBot>Pistol>Override"));
                 hitboxSelectBox("Rage>RageBot>Pistol>Hitboxes");
-                ImGui::Text("FOV (x10)");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##FOV", &CONFIGINT("Rage>RageBot>Pistol>FOV"), 0, 1800);
-                ImGui::Text("Smoothing");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Smoothing", &CONFIGINT("Rage>RageBot>Pistol>Smoothing"), 0, 30);
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Pistol>Hit Chance"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>Pistol>Min Damage"), 1, 100);
-                ImGui::Checkbox("Friendly Fire", &CONFIGBOOL("Rage>RageBot>Pistol>Friendly Fire"));
-                ImGui::Checkbox("Ignore Blind", &CONFIGBOOL("Rage>RageBot>Pistol>Ignore Blind"));
-                ImGui::Checkbox("Ignore Smoke", &CONFIGBOOL("Rage>RageBot>Pistol>Ignore Smoke"));
-                ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>Pistol>Scoped Only"));
-                ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Pistol>Auto Shot"));
-                ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Pistol>Auto Scope"));
-                ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Pistol>Visible Only"));
+                ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Pistol>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Pistol>Kill Shot"));
-              ImGui::EndTabItem();
+                ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Heavy Pistol")) {
                 ImGui::Checkbox("Override", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Override"));
                 hitboxSelectBox("Rage>RageBot>Heavy Pistol>Hitboxes");
-                ImGui::Text("FOV (x10)");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##FOV", &CONFIGINT("Rage>RageBot>Heavy Pistol>FOV"), 0, 1800);
-                ImGui::Text("Smoothing");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Smoothing", &CONFIGINT("Rage>RageBot>Heavy Pistol>Smoothing"), 0, 30);
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Heavy Pistol>Hit Chance"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>Heavy Pistol>Min Damage"), 1, 100);
-                ImGui::Checkbox("Friendly Fire", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Friendly Fire"));
-                ImGui::Checkbox("Ignore Blind", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Ignore Blind"));
-                ImGui::Checkbox("Ignore Smoke", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Ignore Smoke"));
-                ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Scoped Only"));
-                ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Shot"));
-                ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Scope"));
-                ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Visible Only"));
+                ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Kill Shot"));
-              ImGui::EndTabItem();
+                ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Rifle")) {
                 ImGui::Checkbox("Override", &CONFIGBOOL("Rage>RageBot>Rifle>Override"));
                 hitboxSelectBox("Rage>RageBot>Rifle>Hitboxes");
-                ImGui::Text("FOV (x10)");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##FOV", &CONFIGINT("Rage>RageBot>Rifle>FOV"), 0, 1800);
-                ImGui::Text("Smoothing");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Smoothing", &CONFIGINT("Rage>RageBot>Rifle>Smoothing"), 0, 30);
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Rifle>Hit Chance"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>Rifle>Min Damage"), 1, 100);
-                ImGui::Checkbox("Friendly Fire", &CONFIGBOOL("Rage>RageBot>Rifle>Friendly Fire"));
-                ImGui::Checkbox("Ignore Blind", &CONFIGBOOL("Rage>RageBot>Rifle>Ignore Blind"));
-                ImGui::Checkbox("Ignore Smoke", &CONFIGBOOL("Rage>RageBot>Rifle>Ignore Smoke"));
-                ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>Rifle>Scoped Only"));
-                ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Rifle>Auto Shot"));
-                ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Rifle>Auto Scope"));
-                ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Rifle>Visible Only"));
+                ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Rifle>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Rifle>Kill Shot"));
-              ImGui::EndTabItem();
+                ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("SMG")) {
                 ImGui::Checkbox("Override", &CONFIGBOOL("Rage>RageBot>SMG>Override"));
                 hitboxSelectBox("Rage>RageBot>SMG>Hitboxes");
-                ImGui::Text("FOV (x10)");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##FOV", &CONFIGINT("Rage>RageBot>SMG>FOV"), 0, 1800);
-                ImGui::Text("Smoothing");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Smoothing", &CONFIGINT("Rage>RageBot>SMG>Smoothing"), 0, 30);
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>SMG>Hit Chance"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>SMG>Min Damage"), 1, 100);
-                ImGui::Checkbox("Friendly Fire", &CONFIGBOOL("Rage>RageBot>SMG>Friendly Fire"));
-                ImGui::Checkbox("Ignore Blind", &CONFIGBOOL("Rage>RageBot>SMG>Ignore Blind"));
-                ImGui::Checkbox("Ignore Smoke", &CONFIGBOOL("Rage>RageBot>SMG>Ignore Smoke"));
-                ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>SMG>Scoped Only"));
-                ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>SMG>Auto Shot"));
-                ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>SMG>Auto Scope"));
-                ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>SMG>Visible Only"));
+                ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>SMG>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>SMG>Kill Shot"));
-              ImGui::EndTabItem();
+                ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Scout")) {
                 ImGui::Checkbox("Override", &CONFIGBOOL("Rage>RageBot>Scout>Override"));
                 hitboxSelectBox("Rage>RageBot>Scout>Hitboxes");
-                ImGui::Text("FOV (x10)");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##FOV", &CONFIGINT("Rage>RageBot>Scout>FOV"), 0, 1800);
-                ImGui::Text("Smoothing");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Smoothing", &CONFIGINT("Rage>RageBot>Scout>Smoothing"), 0, 30);
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Scout>Hit Chance"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>Scout>Min Damage"), 1, 100);
-                ImGui::Checkbox("Friendly Fire", &CONFIGBOOL("Rage>RageBot>Scout>Friendly Fire"));
-                ImGui::Checkbox("Ignore Blind", &CONFIGBOOL("Rage>RageBot>Scout>Ignore Blind"));
-                ImGui::Checkbox("Ignore Smoke", &CONFIGBOOL("Rage>RageBot>Scout>Ignore Smoke"));
-                ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>Scout>Scoped Only"));
-                ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Scout>Auto Shot"));
-                ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Scout>Auto Scope"));
-                ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Scout>Visible Only"));
+                ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Scout>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Scout>Kill Shot"));
-              ImGui::EndTabItem();
+                ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("AWP")) {
                 ImGui::Checkbox("Override", &CONFIGBOOL("Rage>RageBot>AWP>Override"));
                 hitboxSelectBox("Rage>RageBot>AWP>Hitboxes");
-                ImGui::Text("FOV (x10)");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##FOV", &CONFIGINT("Rage>RageBot>AWP>FOV"), 0, 1800);
-                ImGui::Text("Smoothing");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Smoothing", &CONFIGINT("Rage>RageBot>AWP>Smoothing"), 0, 30);
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>AWP>Hit Chance"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>AWP>Min Damage"), 1, 100);
-                ImGui::Checkbox("Friendly Fire", &CONFIGBOOL("Rage>RageBot>AWP>Friendly Fire"));
-                ImGui::Checkbox("Ignore Blind", &CONFIGBOOL("Rage>RageBot>AWP>Ignore Blind"));
-                ImGui::Checkbox("Ignore Smoke", &CONFIGBOOL("Rage>RageBot>AWP>Ignore Smoke"));
-                ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>AWP>Scoped Only"));
-                ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>AWP>Auto Shot"));
-                ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>AWP>Auto Scope"));
-                ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>AWP>Visible Only"));
+                ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>AWP>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>AWP>Kill Shot"));
-              ImGui::EndTabItem();
+                ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Heavy")) {
                 ImGui::Checkbox("Override", &CONFIGBOOL("Rage>RageBot>Heavy>Override"));
                 hitboxSelectBox("Rage>RageBot>Heavy>Hitboxes");
-                ImGui::Text("FOV (x10)");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##FOV", &CONFIGINT("Rage>RageBot>Heavy>FOV"), 0, 1800);
-                ImGui::Text("Smoothing");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Smoothing", &CONFIGINT("Rage>RageBot>Heavy>Smoothing"), 0, 30);
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Heavy>Hit Chance"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>Heavy>Min Damage"), 1, 100);
-                ImGui::Checkbox("Friendly Fire", &CONFIGBOOL("Rage>RageBot>Heavy>Friendly Fire"));
-                ImGui::Checkbox("Ignore Blind", &CONFIGBOOL("Rage>RageBot>Heavy>Ignore Blind"));
-                ImGui::Checkbox("Ignore Smoke", &CONFIGBOOL("Rage>RageBot>Heavy>Ignore Smoke"));
-                ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>Heavy>Scoped Only"));
-                ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Heavy>Auto Shot"));
-                ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Heavy>Auto Scope"));
-                ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Heavy>Visible Only"));
+                ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Heavy>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Heavy>Kill Shot"));
-              ImGui::EndTabItem();
+                ImGui::EndTabItem();
             }
             ImGui::EndTabBar();
         }

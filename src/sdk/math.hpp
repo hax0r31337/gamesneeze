@@ -77,32 +77,51 @@ inline void vectorAngles(const Vector &forward, const Vector &up, QAngle &angles
   float forwardDist = forward.Length2D();
 
   if (forwardDist > 0.001f) {
-    angles.Init(atan2f(-forward.z, forwardDist) * 180 / M_PI_F,
-                atan2f(forward.y, forward.x) * 180 / M_PI_F,
-                atan2f(left.z, (left.y * forward.x) - (left.x * forward.y)) * 180 / M_PI_F);
+    angles.x = atan2f(-forward.z, forwardDist) * 180 / M_PI_F;
+    angles.y = atan2f(forward.y, forward.x) * 180 / M_PI_F;
+
+    float upZ = (left.y * forward.x) - (left.x * forward.y);
+    angles.z = atan2f(left.z, upZ) * 180 / M_PI_F;
   } else {
-    angles.Init(atan2f(-forward.z, forwardDist) * 180 / M_PI_F, atan2f(-left.x, left.y) * 180 / M_PI_F, 0);
+    angles.x = atan2f(-forward.z, forwardDist) * 180 / M_PI_F;
+    angles.y = atan2f(-left.x, left.y) * 180 / M_PI_F;
+    angles.z = 0;
   }
+}
+
+inline void SinCos(float radians, float *sine, float *cosine) {
+  double __cosr, __sinr;
+  __asm("fsincos" : "=t"(__cosr), "=u"(__sinr) : "0"(radians));
+
+  *sine = __sinr;
+  *cosine = __cosr;
 }
 
 inline void angleVectors(const QAngle &angles, Vector *forward, Vector *right,
                          Vector *up) {
+
   float sr, sp, sy, cr, cp, cy;
 
-  sincosf(DEG2RAD(angles[1]), &sy, &cy);
-  sincosf(DEG2RAD(angles[0]), &sp, &cp);
-  sincosf(DEG2RAD(angles[2]), &sr, &cr);
+  SinCos(DEG2RAD(angles[1]), &sy, &cy);
+  SinCos(DEG2RAD(angles[0]), &sp, &cp);
+  SinCos(DEG2RAD(angles[2]), &sr, &cr);
 
   if (forward) {
-    forward->Init(cp * cy, cp * sy, -sp);
+    forward->x = cp * cy;
+    forward->y = cp * sy;
+    forward->z = -sp;
   }
 
   if (right) {
-    right->Init(-1 * sr * sp * cy + -1 * cr * -sy, -1 * sr * sp * sy + -1 * cr * cy, -1 * sr * cp);
+    right->x = (-1 * sr * sp * cy + -1 * cr * -sy);
+    right->y = (-1 * sr * sp * sy + -1 * cr * cy);
+    right->z = -1 * sr * cp;
   }
 
   if (up) {
-    up->Init(cr * sp * cy + -sr * -sy, cr * sp * sy + -sr * cy, cr * cp);
+    up->x = (cr * sp * cy + -sr * -sy);
+    up->y = (cr * sp * sy + -sr * cy);
+    up->z = cr * cp;
   }
 }
 

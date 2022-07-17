@@ -1,12 +1,11 @@
 #include "../../includes.hpp"
 #include "features.hpp"
 
-int aimTarget = -1;
 
 bool Features::RageBot::traceToExit(const Trace &enterTrace,
                                     const Vector &start,
                                     const Vector &direction, Vector &end,
-                                    Trace &exitTrace) {
+                                    Trace &exitTrace, Entity *target) {
   float distance = 0.0f;
 
   while (distance <= 90.0f) {
@@ -47,9 +46,7 @@ bool Features::RageBot::traceToExit(const Trace &enterTrace,
           exitTrace.startsolid) ||
         exitTrace.startsolid) {
       if (exitTrace.m_pEntityHit) {
-        if (enterTrace.m_pEntityHit &&
-            (uintptr_t)enterTrace.m_pEntityHit ==
-                Interfaces::entityList->GetClientEntity(aimTarget)) {
+        if (enterTrace.m_pEntityHit && enterTrace.m_pEntityHit == target) {
           return true;
         }
       }
@@ -75,11 +72,11 @@ bool Features::RageBot::traceToExit(const Trace &enterTrace,
 
 float Features::RageBot::handleBulletPenetration(
     SurfaceData *enterSurfaceData, const Trace &enterTrace,
-    const Vector &direction, Vector &result, float penetration, float damage) {
+    const Vector &direction, Vector &result, float penetration, float damage, Entity *target) {
   Vector end;
   Trace exitTrace;
 
-  if (!traceToExit(enterTrace, enterTrace.endpos, direction, end, exitTrace))
+  if (!traceToExit(enterTrace, enterTrace.endpos, direction, end, exitTrace, target))
     return -1.0f;
 
   SurfaceData *exitSurfaceData =
@@ -117,11 +114,10 @@ float Features::RageBot::handleBulletPenetration(
   return damage;
 }
 
-bool Features::RageBot::canScan(Entity *entity, const Vector &destination,
-                                WeaponInfo *weaponData, int minDamage,
-                                bool allowFriendlyFire) {
+int Features::RageBot::getDamageDeal(Player *entity, const Vector &destination,
+                                     WeaponInfo *weaponData, bool allowFriendlyFire) {
   if (!Globals::localPlayer)
-    return false;
+    return -1;
 
   float damage{static_cast<float>(weaponData->GetDamage())};
 
@@ -141,11 +137,11 @@ bool Features::RageBot::canScan(Entity *entity, const Vector &destination,
 
     if (!allowFriendlyFire && trace.m_pEntityHit &&
         trace.m_pEntityHit->isPlayer() && !trace.m_pEntityHit->isEnemy()) {
-      return false;
+      return -1;
     }
 
     if (trace.fraction == 1.0f) {
-      return false;
+      return -1;
     }
 
     if (trace.m_pEntityHit == entity &&
@@ -163,7 +159,7 @@ bool Features::RageBot::canScan(Entity *entity, const Vector &destination,
                        : damage) *
                   (1.0f - armorRatio);
 
-      return damage >= minDamage;
+      return damage;
     }
     const auto surfaceData = Interfaces::physicsSurfaceProps->GetSurfaceData(
         trace.surface.surfaceProps);
@@ -173,30 +169,20 @@ bool Features::RageBot::canScan(Entity *entity, const Vector &destination,
     }
 
     damage = handleBulletPenetration(surfaceData, trace, direction, start,
-                                     weaponData->GetPenetration(), damage);
+                                     weaponData->GetPenetration(), damage, entity);
     hitsLeft--;
   }
-  return false;
+  return 0;
 }
 
-bool Features::RageBot::canShoot(CUserCmd *cmd, Weapon *activeWeapon, Vector &bestSpot,
+bool Features::RageBot::canShoot(Weapon *activeWeapon, QAngle *angle, 
               Player *enemy, int hitChance) {
   if (hitChance == 0)
     return true;
-  // if ((*csGameRules)->IsFreezeTime())
-  //   return false;
-  // if (*activeWeapon->GetItemDefinitionIndex() ==
-  //         ItemDefinitionIndex::WEAPON_SSG08 &&
-  //     !(localplayer->GetFlags() & FL_ONGROUND) &&
-  //     fabs(localplayer->GetVelocity().z) < 5.0f &&
-  //     localplayer->GetVelocity().Length2D() < 5.0f)
-  //   return true;
-  Vector src = Globals::localPlayer->eyePos();
-  QAngle angle = calcAngle(src, bestSpot);
-  normalizeAngles(angle);
 
+  Vector src = Globals::localPlayer->eyePos();
   Vector forward, right, up;
-  angleVectors(angle, &forward, &right, &up);
+  angleVectors(*angle, &forward, &right, &up);
 
   int hitCount = 0;
   int NeededHits =
@@ -214,12 +200,14 @@ bool Features::RageBot::canShoot(CUserCmd *cmd, Weapon *activeWeapon, Vector &be
     double d = randFloat(0.f, 1.0f);
     double inaccuracy = weap_inaccuracy * randFloat(0.f, 1.0f);
 
-    Vector spreadView, direction;
-    spreadView.Init((cos(b) * inaccuracy) + (cos(d) * spread),
-                      (sin(b) * inaccuracy) + (sin(d) * spread), 0);
-    direction.Init(forward.x + (spreadView.x * right.x) + (spreadView.y * up.x),
-                   forward.y + (spreadView.x * right.y) + (spreadView.y * up.y),
-                   forward.z + (spreadView.x * right.z) + (spreadView.y * up.z));
+    Vector spreadView((cos(b) * inaccuracy) + (cos(d) * spread),
+                      (sin(b) * inaccuracy) + (sin(d) * spread), 0),
+        direction;
+
+    direction.x = forward.x + (spreadView.x * right.x) + (spreadView.y * up.x);
+    direction.y = forward.y + (spreadView.x * right.y) + (spreadView.y * up.y);
+    direction.z = forward.z + (spreadView.x * right.z) + (spreadView.y * up.z);
+    direction.Normalize();
 
     QAngle viewAnglesSpread;
     vectorAngles(direction, up, viewAnglesSpread);
@@ -235,11 +223,11 @@ bool Features::RageBot::canShoot(CUserCmd *cmd, Weapon *activeWeapon, Vector &be
     Trace tr;
     Ray ray;
     ray.Init(src, viewForward);
-    // Interfaces::trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, enemy, &tr);
+    Interfaces::trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, enemy, &tr);
 
-    TraceFilter traceFilter;
-    traceFilter.pSkip = Globals::localPlayer;
-    Interfaces::trace->TraceRay(ray, 0x4600400B, &traceFilter, &tr);
+    // TraceFilter traceFilter;
+    // traceFilter.pSkip = Globals::localPlayer;
+    // Interfaces::trace->TraceRay(ray, 0x4600400B, &traceFilter, &tr);
 
     if (tr.m_pEntityHit == enemy) {
       // Notifications::addNotification(ImColor(255, 255, 255), "HITS++");
@@ -277,7 +265,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     return;
 
   int hitboxes = CONFIGINT("Rage>RageBot>Default>Hitboxes");
-  float smoothing = 1.f + (CONFIGINT("Rage>RageBot>Default>Smoothing") / 5.f);
   float FOV = CONFIGINT("Rage>RageBot>Default>FOV") / 10.f;
   int hitChance = CONFIGINT("Rage>RageBot>Default>Hit Chance");
   float minDamage = CONFIGINT("Rage>RageBot>Default>Min Damage") * 1.f;
@@ -288,120 +275,65 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
   bool autoShot = CONFIGBOOL("Rage>RageBot>Default>Auto Shot");
   bool autoScope = CONFIGBOOL("Rage>RageBot>Default>Auto Scope");
   bool visibleOnly = CONFIGBOOL("Rage>RageBot>Default>Visible Only");
+  bool autoSlow = CONFIGBOOL("Rage>RageBot>Default>Auto Slow");
   bool killShot = CONFIGBOOL("Rage>RageBot>Default>Kill Shot");
 
   if ((std::find(std::begin(pistols), std::end(pistols),
                  activeWeapon->itemIndex() & 0xFFF) != std::end(pistols)) &&
       CONFIGBOOL("Rage>RageBot>Pistol>Override")) {
     hitboxes = CONFIGINT("Rage>RageBot>Pistol>Hitboxes");
-    smoothing = 1.f + (CONFIGINT("Rage>RageBot>Pistol>Smoothing") / 5.f);
-    FOV = CONFIGINT("Rage>RageBot>Pistol>FOV") / 10.f;
     hitChance = CONFIGINT("Rage>RageBot>Pistol>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>Pistol>Min Damage") * 1.f;
-    friendlyFire = CONFIGBOOL("Rage>RageBot>Pistol>Friendly Fire");
-    aimWhileBlind = CONFIGBOOL("Rage>RageBot>Pistol>Ignore Blind");
-    ignoreSmoke = CONFIGBOOL("Rage>RageBot>Pistol>Ignore Smoke");
-    scopedOnly = CONFIGBOOL("Rage>RageBot>Pistol>Scoped Only");
-    autoShot = CONFIGBOOL("Rage>RageBot>Pistol>Auto Shot");
-    autoScope = CONFIGBOOL("Rage>RageBot>Pistol>Auto Scope");
-    visibleOnly = CONFIGBOOL("Rage>RageBot>Pistol>Visible Only");
+    autoSlow = CONFIGBOOL("Rage>RageBot>Pistol>Auto Slow");
     killShot = CONFIGBOOL("Rage>RageBot>Pistol>Kill Shot");
   } else if ((std::find(std::begin(heavyPistols), std::end(heavyPistols),
                         activeWeapon->itemIndex() & 0xFFF) !=
               std::end(heavyPistols)) &&
              CONFIGBOOL("Rage>RageBot>Heavy Pistol>Override")) {
     hitboxes = CONFIGINT("Rage>RageBot>Heavy Pistol>Hitboxes");
-    smoothing = 1.f + (CONFIGINT("Rage>RageBot>Heavy Pistol>Smoothing") / 5.f);
-    FOV = CONFIGINT("Rage>RageBot>Heavy Pistol>FOV") / 10.f;
     hitChance = CONFIGINT("Rage>RageBot>Heavy Pistol>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>Heavy Pistol>Min Damage") * 1.f;
-    friendlyFire = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Friendly Fire");
-    aimWhileBlind = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Ignore Blind");
-    ignoreSmoke = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Ignore Smoke");
-    scopedOnly = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Scoped Only");
-    autoShot = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Shot");
-    autoScope = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Scope");
-    visibleOnly = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Visible Only");
+    autoSlow = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Slow");
     killShot = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Kill Shot");
   } else if ((std::find(std::begin(rifles), std::end(rifles),
                         activeWeapon->itemIndex() & 0xFFF) !=
               std::end(rifles)) &&
              CONFIGBOOL("Rage>RageBot>Rifle>Override")) {
     hitboxes = CONFIGINT("Rage>RageBot>Rifle>Hitboxes");
-    smoothing = 1.f + (CONFIGINT("Rage>RageBot>Rifle>Smoothing") / 5.f);
-    FOV = CONFIGINT("Rage>RageBot>Rifle>FOV") / 10.f;
     hitChance = CONFIGINT("Rage>RageBot>Rifle>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>Rifle>Min Damage") * 1.f;
-    friendlyFire = CONFIGBOOL("Rage>RageBot>Rifle>Friendly Fire");
-    aimWhileBlind = CONFIGBOOL("Rage>RageBot>Rifle>Ignore Blind");
-    ignoreSmoke = CONFIGBOOL("Rage>RageBot>Rifle>Ignore Smoke");
-    scopedOnly = CONFIGBOOL("Rage>RageBot>Rifle>Scoped Only");
-    autoShot = CONFIGBOOL("Rage>RageBot>Rifle>Auto Shot");
-    autoScope = CONFIGBOOL("Rage>RageBot>Rifle>Auto Scope");
-    visibleOnly = CONFIGBOOL("Rage>RageBot>Rifle>Visible Only");
+    autoSlow = CONFIGBOOL("Rage>RageBot>Rifle>Auto Slow");
     killShot = CONFIGBOOL("Rage>RageBot>Rifle>Kill Shot");
   } else if ((std::find(std::begin(smgs), std::end(smgs),
                         activeWeapon->itemIndex() & 0xFFF) != std::end(smgs)) &&
              CONFIGBOOL("Rage>RageBot>SMG>Override")) {
     hitboxes = CONFIGINT("Rage>RageBot>SMG>Hitboxes");
-    smoothing = 1.f + (CONFIGINT("Rage>RageBot>SMG>Smoothing") / 5.f);
-    FOV = CONFIGINT("Rage>RageBot>SMG>FOV") / 10.f;
     hitChance = CONFIGINT("Rage>RageBot>SMG>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>SMG>Min Damage") * 1.f;
-    friendlyFire = CONFIGBOOL("Rage>RageBot>SMG>Friendly Fire");
-    aimWhileBlind = CONFIGBOOL("Rage>RageBot>SMG>Ignore Blind");
-    ignoreSmoke = CONFIGBOOL("Rage>RageBot>SMG>Ignore Smoke");
-    scopedOnly = CONFIGBOOL("Rage>RageBot>SMG>Scoped Only");
-    autoShot = CONFIGBOOL("Rage>RageBot>SMG>Auto Shot");
-    autoScope = CONFIGBOOL("Rage>RageBot>SMG>Auto Scope");
-    visibleOnly = CONFIGBOOL("Rage>RageBot>SMG>Visible Only");
+    autoSlow = CONFIGBOOL("Rage>RageBot>SMG>Auto Slow");
     killShot = CONFIGBOOL("Rage>RageBot>SMG>Kill Shot");
   } else if (((activeWeapon->itemIndex() & 0xFFF) == WEAPON_SSG08) &&
              CONFIGBOOL("Rage>RageBot>Scout>Override")) {
     hitboxes = CONFIGINT("Rage>RageBot>Scout>Hitboxes");
-    smoothing = 1.f + (CONFIGINT("Rage>RageBot>Scout>Smoothing") / 5.f);
-    FOV = CONFIGINT("Rage>RageBot>Scout>FOV") / 10.f;
     hitChance = CONFIGINT("Rage>RageBot>Scout>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>Scout>Min Damage") * 1.f;
-    friendlyFire = CONFIGBOOL("Rage>RageBot>Scout>Friendly Fire");
-    aimWhileBlind = CONFIGBOOL("Rage>RageBot>Scout>Ignore Blind");
-    ignoreSmoke = CONFIGBOOL("Rage>RageBot>Scout>Ignore Smoke");
-    scopedOnly = CONFIGBOOL("Rage>RageBot>Scout>Scoped Only");
-    autoShot = CONFIGBOOL("Rage>RageBot>Scout>Auto Shot");
-    autoScope = CONFIGBOOL("Rage>RageBot>Scout>Auto Scope");
-    visibleOnly = CONFIGBOOL("Rage>RageBot>Scout>Visible Only");
+    autoSlow = CONFIGBOOL("Rage>RageBot>Scout>Auto Slow");
     killShot = CONFIGBOOL("Rage>RageBot>Scout>Kill Shot");
   } else if (((activeWeapon->itemIndex() & 0xFFF) == WEAPON_AWP) &&
              CONFIGBOOL("Rage>RageBot>AWP>Override")) {
     hitboxes = CONFIGINT("Rage>RageBot>AWP>Hitboxes");
-    smoothing = 1.f + (CONFIGINT("Rage>RageBot>AWP>Smoothing") / 5.f);
-    FOV = CONFIGINT("Rage>RageBot>AWP>FOV") / 10.f;
     hitChance = CONFIGINT("Rage>RageBot>AWP>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>AWP>Min Damage") * 1.f;
-    friendlyFire = CONFIGBOOL("Rage>RageBot>AWP>Friendly Fire");
-    aimWhileBlind = CONFIGBOOL("Rage>RageBot>AWP>Ignore Blind");
-    ignoreSmoke = CONFIGBOOL("Rage>RageBot>AWP>Ignore Smoke");
-    scopedOnly = CONFIGBOOL("Rage>RageBot>AWP>Scoped Only");
-    autoShot = CONFIGBOOL("Rage>RageBot>AWP>Auto Shot");
-    autoScope = CONFIGBOOL("Rage>RageBot>AWP>Auto Scope");
-    visibleOnly = CONFIGBOOL("Rage>RageBot>AWP>Visible Only");
+    autoSlow = CONFIGBOOL("Rage>RageBot>AWP>Auto Slow");
     killShot = CONFIGBOOL("Rage>RageBot>AWP>Kill Shot");
   } else if ((std::find(std::begin(heavyWeapons), std::end(heavyWeapons),
                         activeWeapon->itemIndex() & 0xFFF) !=
               std::end(heavyWeapons)) &&
              CONFIGBOOL("Rage>RageBot>Heavy>Override")) {
     hitboxes = CONFIGINT("Rage>RageBot>Heavy>Hitboxes");
-    smoothing = 1.f + (CONFIGINT("Rage>RageBot>Heavy>Smoothing") / 5.f);
-    FOV = CONFIGINT("Rage>RageBot>Heavy>FOV") / 10.f;
     hitChance = CONFIGINT("Rage>RageBot>Heavy>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>Heavy>Min Damage") * 1.f;
-    friendlyFire = CONFIGBOOL("Rage>RageBot>Heavy>Friendly Fire");
-    aimWhileBlind = CONFIGBOOL("Rage>RageBot>Heavy>Ignore Blind");
-    ignoreSmoke = CONFIGBOOL("Rage>RageBot>Heavy>Ignore Smoke");
-    scopedOnly = CONFIGBOOL("Rage>RageBot>Heavy>Scoped Only");
-    autoShot = CONFIGBOOL("Rage>RageBot>Heavy>Auto Shot");
-    autoScope = CONFIGBOOL("Rage>RageBot>Heavy>Auto Scope");
-    visibleOnly = CONFIGBOOL("Rage>RageBot>Heavy>Visible Only");
+    autoSlow = CONFIGBOOL("Rage>RageBot>Heavy>Auto Slow");
     killShot = CONFIGBOOL("Rage>RageBot>Heavy>Kill Shot");
   }
 
@@ -409,86 +341,96 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     return;
 
   if (cmd->buttons & (1 << 0) || autoShot) {
-
     if (scopedOnly && activeWeapon->isSniperRifle() &&
         !Globals::localPlayer->scoped())
       return;
 
-    Vector bestTarget{};
-    const auto eyePos = Globals::localPlayer->eyePos();
+    Weapon *weapon = (Weapon *)Interfaces::entityList->GetClientEntity(
+        (uintptr_t)Globals::localPlayer->activeWeapon() &
+        0xFFF); // GetClientEntityFromHandle is being gay
+    if (weapon) {
+      int bestDamage = -1;
+      QAngle bestPlayerAngle = {0, 0, 0};
+      Player *bestPlayer = nullptr;
+      QAngle aimPunch = weapon->requiresRecoilControl() ?  Globals::localPlayer->aimPunch() * 2 : QAngle{0, 0, 0};
 
-    const auto aimPunch = activeWeapon->requiresRecoilControl()
-        ? Globals::localPlayer->aimPunch() : QAngle{0.f, 0.f, 0.f};
+      // Enumerate over players and get angle to the closest player to crosshair
+      for (int i = 1; i < Interfaces::globals->maxClients; i++) {
+        Player *p = (Player *)Interfaces::entityList->GetClientEntity(i);
+        if (p && p != Globals::localPlayer) {
+          if (p->health() > 0 && !p->dormant() && (p->isEnemy() || friendlyFire) && (p->visible() || !visibleOnly)) {
+            matrix3x4_t boneMatrix[128];
+            if (p->getAnythingBones(boneMatrix)) {
+              Vector localPlayerEyePos = Globals::localPlayer->eyePos();
+              Vector targetBonePos;
 
-    for (int i = 1; i <= Interfaces::globals->maxClients; i++) {
-      Player *entity = (Player *)Interfaces::entityList->GetClientEntity(i);
-      if (!entity || i == Globals::localPlayer->index() || entity->dormant() ||
-          entity->health() <= 0 || (!entity->isEnemy() && !friendlyFire) ||
-          entity->gunGameImmunity())
-        continue;
+              // TODO check which bone would be exposed sooner with engine
+              // prediction and which would do more damage.
+              for (int i = 0; i < 5; i++) {
+                if (!(hitboxes & 1 << i))
+                  continue;
+                // map hitboxes enum to "actual" hitboxes
+                int bone = (1 << i & (int)HitBoxes::HEAD)      ? 8
+                           : (1 << i & (int)HitBoxes::NECK)    ? 7
+                           : (1 << i & (int)HitBoxes::CHEST)   ? 6
+                           : (1 << i & (int)HitBoxes::STOMACH) ? 5
+                           : (1 << i & (int)HitBoxes::PELVIS)  ? 3
+                                                               : 5;
+                targetBonePos = p->getBonePos(bone);
+                // if (!canScan(p, targetBonePos, weapon->GetWeaponInfo(),
+                //              killShot ? p->health() : minDamage,
+                //              friendlyFire)) {
+                //               continue;
+                // }
 
-      for (int i = 0; i < 5; i++) {
-        if (!(hitboxes & 1 << i))
-          continue;
-        // map hitboxes enum to "actual" hitboxes
-        int bone = (1 << i & (int)HitBoxes::HEAD)      ? 8
-                   : (1 << i & (int)HitBoxes::NECK)    ? 7
-                   : (1 << i & (int)HitBoxes::CHEST)   ? 6
-                   : (1 << i & (int)HitBoxes::STOMACH) ? 5
-                   : (1 << i & (int)HitBoxes::PELVIS)  ? 3
-                                                       : 5; // fallback
-        auto bonePosition = entity->getBonePos(bone);
-        auto angle = calcAngle(eyePos, bonePosition) - cmd->viewangles - aimPunch;
-        normalizeAngles(angle);
+                if (!ignoreSmoke &&
+                    Offsets::lineGoesThroughSmoke(
+                        Globals::localPlayer->eyePos(), targetBonePos, 1))
+                  continue;
 
-        const auto fov = angle.Length();
-        if (fov > FOV)
-          continue;
+                QAngle angle = calcAngle(localPlayerEyePos, targetBonePos) - aimPunch;
+                normalizeAngles(angle);
+                auto damageDeal = getDamageDeal(p, targetBonePos, weapon->GetWeaponInfo(), friendlyFire);
+                if (damageDeal <= 0 || damageDeal < (killShot ? p->health() : minDamage)) {
+                  continue;
+                }
 
-        if (!ignoreSmoke &&
-            Offsets::lineGoesThroughSmoke(Globals::localPlayer->eyePos(),
-                                          bonePosition, 1))
-          continue;
+                QAngle angleTarget = bestPlayerAngle - cmd->viewangles;
+                normalizeAngles(angleTarget);
 
-        if ((!entity->visible() && visibleOnly) ||
-            !canScan(entity, bonePosition, activeWeapon->GetWeaponInfo(),
-                     killShot ? entity->health() : minDamage, friendlyFire))
-          continue;
+                if (angleTarget.Length() < FOV) {
+                  continue;
+                }
 
-        if (fov < FOV) {
-          FOV = fov;
-          bestTarget = bonePosition;
-          aimTarget = i;
+                if (damageDeal > bestDamage) {
+                  bestDamage = damageDeal;
+                  bestPlayerAngle = angle;
+                  bestPlayer = p;
+                }
+              }
+            }
+          }
         }
       }
-    }
-
-    if (bestTarget.notNull() && bestTarget.x != 0 && bestTarget.y != 0 &&
-        bestTarget.z != 0) {
-      if (!canShoot(
-              cmd, activeWeapon, bestTarget,
-              (Player *)Interfaces::entityList->GetClientEntity(aimTarget), hitChance)) {
+      if (bestDamage > 0 && bestPlayer != nullptr) {
+        if (autoScope &&
+            activeWeapon->nextPrimaryAttack() <= Globals::serverTime() &&
+            activeWeapon->isSniperRifle() && !Globals::localPlayer->scoped()) {
+          cmd->buttons |= IN_ATTACK2;
           return;
+        }
+        if (!canShoot(weapon, &bestPlayerAngle, bestPlayer, hitChance)) {
+          return;
+        }
+        if (autoShot &&
+            activeWeapon->nextPrimaryAttack() <= Globals::serverTime()) {
+          cmd->buttons |= IN_ATTACK;
+        }
+
+        QAngle angleTarget = bestPlayerAngle - cmd->viewangles;
+        normalizeAngles(angleTarget);
+        cmd->viewangles += angleTarget;
       }
-
-      auto angle = calcAngle(Globals::localPlayer->eyePos(), bestTarget) - cmd->viewangles - aimPunch;
-      normalizeAngles(angle);
-
-      angle /= smoothing;
-      cmd->viewangles += angle;
-
-      if (autoScope &&
-          activeWeapon->nextPrimaryAttack() <=
-              Globals::serverTime() &&
-          activeWeapon->isSniperRifle() && !Globals::localPlayer->scoped()) {
-        cmd->buttons |= IN_ATTACK2;
-        return;
-      }
-
-      if (autoShot &&
-          activeWeapon->nextPrimaryAttack() <=
-              Globals::serverTime())
-        cmd->buttons |= IN_ATTACK;
     }
   }
 }
