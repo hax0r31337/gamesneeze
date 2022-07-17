@@ -45,13 +45,14 @@ bool Hooks::CreateMove::hook(void* thisptr, float flInputSampleTime, CUserCmd* c
         }
         if (!noMovementFix) { endMovementFix(cmd); }
         Features::QuickPeek::createMove(cmd);
-	    Features::SlowWalk::createMove(cmd);
+        Features::SlowWalk::createMove(cmd);
 
         auto view_backup = cmd->viewangles;
         Features::Movement::edgeBugPredictor(cmd);
         if (!noMovementFix) { startMovementFix(cmd); }
         cmd->viewangles = view_backup;
         if (!noMovementFix) { endMovementFix(cmd); }
+        Features::Movement::moveCheatz(cmd);
 
         cmd->forwardmove = std::clamp(cmd->forwardmove, -450.0f, 450.0f);
         cmd->sidemove = std::clamp(cmd->sidemove, -450.0f, 450.0f);

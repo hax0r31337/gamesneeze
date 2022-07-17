@@ -135,6 +135,8 @@ namespace Features {
         bool canScan(Entity *entity, const Vector &destination,
                 WeaponInfo *weaponData, int minDamage,
                 bool allowFriendlyFire);
+        bool canShoot(CUserCmd *cmd, Player *localplayer, Weapon *activeWeapon,
+                      Vector &bestSpot, Player *enemy, int hitChance);
     }
     namespace AntiAim {
         inline matrix3x4_t fakeBones[128];
@@ -177,6 +179,7 @@ namespace Features {
         void prePredCreateMove(CUserCmd* cmd);
         void postPredCreateMove(CUserCmd* cmd);
         void edgeBugPredictor(CUserCmd* cmd);
+        void moveCheatz(CUserCmd* cmd);
         void draw();
     }
 }

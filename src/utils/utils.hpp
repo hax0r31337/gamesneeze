@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include <string.h>
 #include <link.h>
 #include <vector>
@@ -26,7 +27,7 @@ inline T getVirtualFunc(void* c, size_t i, size_t offset = 0) {
 }
 
 inline float randFloat(float min, float max) {
-    return min + ((((float)rand()) / (float)RAND_MAX) * (max - min));
+    return min + (static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * (max - min));
 }
 
 namespace PatternScan {

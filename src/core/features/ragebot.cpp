@@ -3,9 +3,10 @@
 
 int aimTarget = -1;
 
-bool Features::RageBot::traceToExit(const Trace &enterTrace, const Vector &start,
-                        const Vector &direction, Vector &end,
-                        Trace &exitTrace) {
+bool Features::RageBot::traceToExit(const Trace &enterTrace,
+                                    const Vector &start,
+                                    const Vector &direction, Vector &end,
+                                    Trace &exitTrace) {
   float distance = 0.0f;
 
   while (distance <= 90.0f) {
@@ -72,10 +73,9 @@ bool Features::RageBot::traceToExit(const Trace &enterTrace, const Vector &start
   return false;
 }
 
-float Features::RageBot::handleBulletPenetration(SurfaceData *enterSurfaceData,
-                                     const Trace &enterTrace,
-                                     const Vector &direction, Vector &result,
-                                     float penetration, float damage) {
+float Features::RageBot::handleBulletPenetration(
+    SurfaceData *enterSurfaceData, const Trace &enterTrace,
+    const Vector &direction, Vector &result, float penetration, float damage) {
   Vector end;
   Trace exitTrace;
 
@@ -91,7 +91,8 @@ float Features::RageBot::handleBulletPenetration(SurfaceData *enterSurfaceData,
                                exitSurfaceData->game.flPenetrationModifier) /
                               2.0f;
 
-  if (enterSurfaceData->game.material == 71 || enterSurfaceData->game.material == 89) {
+  if (enterSurfaceData->game.material == 71 ||
+      enterSurfaceData->game.material == 89) {
     damageModifier = 0.05f;
     penetrationModifier = 3.0f;
   } else if (enterTrace.contents >> 3 & 1 ||
@@ -100,7 +101,8 @@ float Features::RageBot::handleBulletPenetration(SurfaceData *enterSurfaceData,
   }
 
   if (enterSurfaceData->game.material == exitSurfaceData->game.material) {
-    if (exitSurfaceData->game.material == 85 || exitSurfaceData->game.material == 87)
+    if (exitSurfaceData->game.material == 85 ||
+        exitSurfaceData->game.material == 87)
       penetrationModifier = 3.0f;
     else if (exitSurfaceData->game.material == 76)
       penetrationModifier = 2.0f;
@@ -116,8 +118,8 @@ float Features::RageBot::handleBulletPenetration(SurfaceData *enterSurfaceData,
 }
 
 bool Features::RageBot::canScan(Entity *entity, const Vector &destination,
-                    WeaponInfo *weaponData, int minDamage,
-                    bool allowFriendlyFire) {
+                                WeaponInfo *weaponData, int minDamage,
+                                bool allowFriendlyFire) {
   if (!Globals::localPlayer)
     return false;
 
@@ -136,9 +138,6 @@ bool Features::RageBot::canScan(Entity *entity, const Vector &destination,
     TraceFilter traceFilter;
     traceFilter.pSkip = Globals::localPlayer;
     Interfaces::trace->TraceRay(ray, 0x4600400B, &traceFilter, &trace);
-
-    Features::Notifications::addNotification(ImColor(255, 255, 255),
-                                                   "TRACE");
 
     if (!allowFriendlyFire && trace.m_pEntityHit &&
         trace.m_pEntityHit->isPlayer() && !trace.m_pEntityHit->isEnemy()) {
@@ -180,6 +179,86 @@ bool Features::RageBot::canScan(Entity *entity, const Vector &destination,
   return false;
 }
 
+bool Features::RageBot::canShoot(CUserCmd *cmd, Player *localplayer,
+              Weapon *activeWeapon, Vector &bestSpot,
+              Player *enemy, int hitChance) {
+  if (hitChance == 0)
+    return true;
+  // if ((*csGameRules)->IsFreezeTime())
+  //   return false;
+  // if (*activeWeapon->GetItemDefinitionIndex() ==
+  //         ItemDefinitionIndex::WEAPON_SSG08 &&
+  //     !(localplayer->GetFlags() & FL_ONGROUND) &&
+  //     fabs(localplayer->GetVelocity().z) < 5.0f &&
+  //     localplayer->GetVelocity().Length2D() < 5.0f)
+  //   return true;
+  Vector src = localplayer->eyePos();
+  QAngle angle = calcAngle(src, bestSpot);
+  normalizeAngles(angle);
+
+  Vector forward, right, up;
+  angleVectors(angle, &forward, &right, &up);
+
+  int hitCount = 0;
+  int NeededHits =
+      static_cast<int>(255.f * (hitChance / 100.f));
+
+  activeWeapon->UpdateAccuracyPenalty();
+  float weap_spread = activeWeapon->GetSpread();
+  float weap_inaccuracy = activeWeapon->GetInaccuracy();
+
+  for (int i = 0; i < 255; i++) {
+    static float val1 = (2.0 * M_PI);
+
+    double b = randFloat(0.f, val1);
+    double spread = weap_spread * randFloat(0.f, 1.0f);
+    double d = randFloat(0.f, 1.0f);
+    double inaccuracy = weap_inaccuracy * randFloat(0.f, 1.0f);
+
+    Vector spreadView, direction;
+    spreadView.Init((cos(b) * inaccuracy) + (cos(d) * spread),
+                      (sin(b) * inaccuracy) + (sin(d) * spread), 0);
+    direction.Init(forward.x + (spreadView.x * right.x) + (spreadView.y * up.x),
+                   forward.y + (spreadView.x * right.y) + (spreadView.y * up.y),
+                   forward.z + (spreadView.x * right.z) +
+                       (spreadView.y * up.z));
+
+    QAngle viewAnglesSpread;
+    vectorAngles(direction, up, viewAnglesSpread);
+    normalizeAngles(viewAnglesSpread);
+
+    Vector viewForward;
+    angleVectors(viewAnglesSpread, viewForward);
+    viewForward.NormalizeInPlace();
+
+    viewForward =
+        src + (viewForward * activeWeapon->GetWeaponInfo()->GetRange());
+
+    Trace tr;
+    Ray ray;
+
+    ray.Init(src, viewForward);
+    Interfaces::trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, enemy, &tr);
+
+    if (tr.m_pEntityHit == enemy) {
+      Notifications::addNotification(ImColor(255, 255, 255), "HITS++");
+      hitCount++;
+    }
+
+    if (static_cast<int>((hitCount / 255.f) * 100.f) >= hitChance) {
+      Notifications::addNotification(ImColor(255, 255, 255), "HITS OK");
+      return true;
+    }
+
+    if ((255 - i + hitCount) < NeededHits) {
+      Notifications::addNotification(ImColor(255, 255, 255), "FAILED HITS");
+      return false;
+    }
+  }
+
+  return false;
+}
+
 void Features::RageBot::createMove(CUserCmd *cmd) {
   if (!CONFIGBOOL("Rage>Enabled"))
     return;
@@ -199,10 +278,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
   int hitboxes = CONFIGINT("Rage>RageBot>Default>Hitboxes");
   float smoothing = 1.f + (CONFIGINT("Rage>RageBot>Default>Smoothing") / 5.f);
   float FOV = CONFIGINT("Rage>RageBot>Default>FOV") / 10.f;
-  float maxShotInaccuracy =
-      CONFIGINT("Rage>RageBot>Default>Max Shot Inaccuracy") * 1.f;
-  float maxAimInaccuracy =
-      CONFIGINT("Rage>RageBot>Default>Max Aim Inaccuracy") * 1.f;
+  int hitChance = CONFIGINT("Rage>RageBot>Default>Hit Chance");
   float minDamage = CONFIGINT("Rage>RageBot>Default>Min Damage") * 1.f;
   bool friendlyFire = CONFIGBOOL("Rage>RageBot>Default>Friendly Fire");
   bool aimWhileBlind = CONFIGBOOL("Rage>RageBot>Default>Ignore Blind");
@@ -219,10 +295,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     hitboxes = CONFIGINT("Rage>RageBot>Pistol>Hitboxes");
     smoothing = 1.f + (CONFIGINT("Rage>RageBot>Pistol>Smoothing") / 5.f);
     FOV = CONFIGINT("Rage>RageBot>Pistol>FOV") / 10.f;
-    maxShotInaccuracy =
-        CONFIGINT("Rage>RageBot>Pistol>Max Shot Inaccuracy") * 1.f;
-    maxAimInaccuracy =
-        CONFIGINT("Rage>RageBot>Pistol>Max Aim Inaccuracy") * 1.f;
+    hitChance = CONFIGINT("Rage>RageBot>Pistol>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>Pistol>Min Damage") * 1.f;
     friendlyFire = CONFIGBOOL("Rage>RageBot>Pistol>Friendly Fire");
     aimWhileBlind = CONFIGBOOL("Rage>RageBot>Pistol>Ignore Blind");
@@ -239,9 +312,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     hitboxes = CONFIGINT("Rage>RageBot>Heavy Pistol>Hitboxes");
     smoothing = 1.f + (CONFIGINT("Rage>RageBot>Heavy Pistol>Smoothing") / 5.f);
     FOV = CONFIGINT("Rage>RageBot>Heavy Pistol>FOV") / 10.f;
-    maxShotInaccuracy =
-        CONFIGINT("Rage>RageBot>Heavy Pistol>Max Shot Inaccuracy") * 1.f;
-    maxAimInaccuracy = CONFIGINT("Rage>RageBot>Heavy>Max Aim Inaccuracy") * 1.f;
+    hitChance = CONFIGINT("Rage>RageBot>Heavy Pistol>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>Heavy Pistol>Min Damage") * 1.f;
     friendlyFire = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Friendly Fire");
     aimWhileBlind = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Ignore Blind");
@@ -258,9 +329,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     hitboxes = CONFIGINT("Rage>RageBot>Rifle>Hitboxes");
     smoothing = 1.f + (CONFIGINT("Rage>RageBot>Rifle>Smoothing") / 5.f);
     FOV = CONFIGINT("Rage>RageBot>Rifle>FOV") / 10.f;
-    maxShotInaccuracy =
-        CONFIGINT("Rage>RageBot>Rifle>Max Shot Inaccuracy") * 1.f;
-    maxAimInaccuracy = CONFIGINT("Rage>RageBot>Rifle>Max Aim Inaccuracy") * 1.f;
+    hitChance = CONFIGINT("Rage>RageBot>Rifle>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>Rifle>Min Damage") * 1.f;
     friendlyFire = CONFIGBOOL("Rage>RageBot>Rifle>Friendly Fire");
     aimWhileBlind = CONFIGBOOL("Rage>RageBot>Rifle>Ignore Blind");
@@ -276,8 +345,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     hitboxes = CONFIGINT("Rage>RageBot>SMG>Hitboxes");
     smoothing = 1.f + (CONFIGINT("Rage>RageBot>SMG>Smoothing") / 5.f);
     FOV = CONFIGINT("Rage>RageBot>SMG>FOV") / 10.f;
-    maxShotInaccuracy = CONFIGINT("Rage>RageBot>SMG>Max Shot Inaccuracy") * 1.f;
-    maxAimInaccuracy = CONFIGINT("Rage>RageBot>SMG>Max Aim Inaccuracy") * 1.f;
+    hitChance = CONFIGINT("Rage>RageBot>SMG>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>SMG>Min Damage") * 1.f;
     friendlyFire = CONFIGBOOL("Rage>RageBot>SMG>Friendly Fire");
     aimWhileBlind = CONFIGBOOL("Rage>RageBot>SMG>Ignore Blind");
@@ -292,9 +360,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     hitboxes = CONFIGINT("Rage>RageBot>Scout>Hitboxes");
     smoothing = 1.f + (CONFIGINT("Rage>RageBot>Scout>Smoothing") / 5.f);
     FOV = CONFIGINT("Rage>RageBot>Scout>FOV") / 10.f;
-    maxShotInaccuracy =
-        CONFIGINT("Rage>RageBot>Scout>Max Shot Inaccuracy") * 1.f;
-    maxAimInaccuracy = CONFIGINT("Rage>RageBot>Scout>Max Aim Inaccuracy") * 1.f;
+    hitChance = CONFIGINT("Rage>RageBot>Scout>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>Scout>Min Damage") * 1.f;
     friendlyFire = CONFIGBOOL("Rage>RageBot>Scout>Friendly Fire");
     aimWhileBlind = CONFIGBOOL("Rage>RageBot>Scout>Ignore Blind");
@@ -309,8 +375,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     hitboxes = CONFIGINT("Rage>RageBot>AWP>Hitboxes");
     smoothing = 1.f + (CONFIGINT("Rage>RageBot>AWP>Smoothing") / 5.f);
     FOV = CONFIGINT("Rage>RageBot>AWP>FOV") / 10.f;
-    maxShotInaccuracy = CONFIGINT("Rage>RageBot>AWP>Max Shot Inaccuracy") * 1.f;
-    maxAimInaccuracy = CONFIGINT("Rage>RageBot>AWP>Max Aim Inaccuracy") * 1.f;
+    hitChance = CONFIGINT("Rage>RageBot>AWP>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>AWP>Min Damage") * 1.f;
     friendlyFire = CONFIGBOOL("Rage>RageBot>AWP>Friendly Fire");
     aimWhileBlind = CONFIGBOOL("Rage>RageBot>AWP>Ignore Blind");
@@ -327,9 +392,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     hitboxes = CONFIGINT("Rage>RageBot>Heavy>Hitboxes");
     smoothing = 1.f + (CONFIGINT("Rage>RageBot>Heavy>Smoothing") / 5.f);
     FOV = CONFIGINT("Rage>RageBot>Heavy>FOV") / 10.f;
-    maxShotInaccuracy =
-        CONFIGINT("Rage>RageBot>Heavy>Max Shot Inaccuracy") * 1.f;
-    maxAimInaccuracy = CONFIGINT("Rage>RageBot>Heavy>Max Aim Inaccuracy") * 1.f;
+    hitChance = CONFIGINT("Rage>RageBot>Heavy>Hit Chance");
     minDamage = CONFIGINT("Rage>RageBot>Heavy>Min Damage") * 1.f;
     friendlyFire = CONFIGBOOL("Rage>RageBot>Heavy>Friendly Fire");
     aimWhileBlind = CONFIGBOOL("Rage>RageBot>Heavy>Ignore Blind");
@@ -344,8 +407,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
   if (!aimWhileBlind && Globals::localPlayer->maxFlashAlpha() > 75.f)
     return;
 
-  if ((cmd->buttons & (1 << 0) || autoShot) &&
-      activeWeapon->GetInaccuracy() <= maxAimInaccuracy) {
+  if (cmd->buttons & (1 << 0) || autoShot) {
 
     if (scopedOnly && activeWeapon->isSniperRifle() &&
         !Globals::localPlayer->scoped())
@@ -354,7 +416,8 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     Vector bestTarget{};
     const auto eyePos = Globals::localPlayer->eyePos();
 
-    const auto aimPunch = Globals::localPlayer->aimPunch() * 2;
+    const auto aimPunch = activeWeapon->requiresRecoilControl()
+        ? Globals::localPlayer->aimPunch() : QAngle{0.f, 0.f, 0.f};
 
     for (int i = 1; i <= Interfaces::globals->maxClients; i++) {
       Player *entity = (Player *)Interfaces::entityList->GetClientEntity(i);
@@ -395,28 +458,21 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
           FOV = fov;
           bestTarget = bonePosition;
           aimTarget = i;
-          // Features::Notifications::addNotification(ImColor(255, 255, 255),
-          //                                          "SELECTED BONE");
         }
       }
     }
 
-    if (bestTarget.notNull() && bestTarget.x != 0 && bestTarget.y != 0 && bestTarget.z != 0) {
-      static QAngle lastAngles{cmd->viewangles};
-      static int lastCommand{};
-
-      if (lastCommand == cmd->command_number - 1 && lastAngles.notNull())
-        cmd->viewangles = lastAngles;
-
-      auto angle = calcAngle(Globals::localPlayer->eyePos(), bestTarget) - cmd->viewangles - aimPunch;
-      normalizeAngles(angle);
-      bool clamped{false};
-
-      if (std::abs(angle.x) > 255.f || std::abs(angle.y) > 255.f) {
-        angle.x = std::clamp(angle.x, -255.f, 255.f);
-        angle.y = std::clamp(angle.y, -255.f, 255.f);
-        clamped = true;
+    if (bestTarget.notNull() && bestTarget.x != 0 && bestTarget.y != 0 &&
+        bestTarget.z != 0) {
+      if (!canShoot(
+              cmd, Globals::localPlayer, activeWeapon, bestTarget,
+              (Player *)Interfaces::entityList->GetClientEntity(aimTarget),
+              hitChance)) {
+          return;
       }
+
+      auto angle = calcAngle(Globals::localPlayer->eyePos(), bestTarget) - cmd->viewangles - Globals::localPlayer->aimPunch();
+      normalizeAngles(angle);
 
       angle /= smoothing;
       cmd->viewangles += angle;
@@ -431,19 +487,8 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
 
       if (autoShot &&
           activeWeapon->nextPrimaryAttack() <=
-              Globals::serverTime() &&
-          !clamped && activeWeapon->GetInaccuracy() <= maxShotInaccuracy)
+              Globals::serverTime())
         cmd->buttons |= IN_ATTACK;
-
-      if (clamped)
-        cmd->buttons &= ~IN_ATTACK;
-
-      if (clamped || smoothing > 1.0f)
-        lastAngles = cmd->viewangles;
-      else
-        lastAngles = QAngle{};
-
-      lastCommand = cmd->command_number;
     }
   }
 }

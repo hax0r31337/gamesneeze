@@ -183,6 +183,8 @@ public:
 
   int GetDamage() { return *(int *)((uintptr_t)this + 0x16C); }
 
+  float GetCycleTime() { return *(float *)((uintptr_t)this + 0x158); }
+
   float GetWeaponArmorRatio() { return *(float *)((uintptr_t)this + 0x174); }
 
   float GetPenetration() { return *(float *)((uintptr_t)this + 0x17C); }
@@ -198,9 +200,13 @@ public:
                     0x23C); // DT_WeaponCSBaseGun.m_zoomLevel ?
   }
 
+  int *GetTracerFrequency() { return (int *)((uintptr_t)this + 0x298); }
+
   char *GetTracerEffect() { return *(char **)((uintptr_t)this + 0x290); }
 
-  int *GetTracerFrequency() { return (int *)((uintptr_t)this + 0x298); }
+  float GetRecoilMagnitude() { return *(float *)((uintptr_t)this + 0x224); }
+
+  float GetRecoveryTimeStand() { return *(float *)((uintptr_t)this + 0x232); }
 };
 
 class Weapon : public Item {
@@ -234,6 +240,19 @@ public:
 		typedef WeaponInfo* (*Fn)(void*);
 		return getVirtualFunc<Fn>(this, 529)(this);
 	}
+
+	void UpdateAccuracyPenalty() {
+		typedef void (*Fn)(void*);
+		return getVirtualFunc<Fn>(this, 552)(this);
+	}
+
+    auto requiresRecoilControl() noexcept
+    {
+        const auto weaponData = GetWeaponInfo();
+        if (weaponData)
+            return weaponData->GetRecoveryTimeStand() > weaponData->GetCycleTime();
+        return false;
+    }
 
     auto isSniperRifle() noexcept { return getWeaponType() == WeaponType::SniperRifle; }
 };

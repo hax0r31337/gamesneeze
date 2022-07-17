@@ -102,12 +102,14 @@ void Features::Movement::prePredCreateMove(CUserCmd *cmd) {
 
     flagsBackup = Globals::localPlayer->flags();
     velBackup = Globals::localPlayer->velocity();
-
     bhop(cmd);
-    autoStrafe(cmd);
 
     if (shouldEdgebug && shouldDuckNext)
         cmd->buttons |= IN_DUCK;
+}
+
+void Features::Movement::moveCheatz(CUserCmd *cmd) {
+  autoStrafe(cmd);
 }
 
 void Features::Movement::postPredCreateMove(CUserCmd *cmd) {

@@ -247,11 +247,14 @@ public:
 
 class IEngineTrace {
 public:
-// VIRTUAL_METHOD(int, getPointContents, 0, (const Vector &absPosition, int contentsMask), (this, std::cref(absPosition), contentsMask, nullptr))
-    
 	int GetPointContents(Vector &absPosition, int contentsMask) {
 		typedef int (*Fn)(void*, Vector&, int, Entity*);
 		return getVirtualFunc<Fn>(this, 0)(this, absPosition, contentsMask, nullptr);
+	}
+    void ClipRayToEntity(Ray &ray, unsigned int fMask,
+                                     Entity *pEnt, Trace *pTrace) {
+		typedef void (*Fn)(void*, Ray&, unsigned int, Entity*, Trace*);
+		getVirtualFunc<Fn>(this, 3)(this, ray, fMask, pEnt, pTrace);
 	}
 	const char* TraceRay(Ray &ray, unsigned int fMask, ITraceFilter *pTraceFilter,  Trace  *pTrace) {
 		typedef const char* (*Fn)(void*, Ray&, unsigned int, ITraceFilter*, Trace*);

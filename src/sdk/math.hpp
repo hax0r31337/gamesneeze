@@ -1,5 +1,7 @@
 #pragma once
+#include "classes/vector.h"
 #include "sdk.hpp"
+#include <math.h>
 
 inline QAngle originalAngle;
 inline float originalForwardMove, originalSideMove;
@@ -66,6 +68,42 @@ inline QAngle calcAngle(const Vector& src, const Vector& dst) {
 		vAngle.y += 180.0f;
 
 	return vAngle;
+}
+
+inline void vectorAngles(const Vector &forward, const Vector &up, QAngle &angles) {
+  Vector left = up * forward;
+  left.NormalizeInPlace();
+
+  float forwardDist = forward.Length2D();
+
+  if (forwardDist > 0.001f) {
+    angles.Init(atan2f(-forward.z, forwardDist) * 180 / M_PI_F,
+                atan2f(forward.y, forward.x) * 180 / M_PI_F,
+                atan2f(left.z, (left.y * forward.x) - (left.x * forward.y)) * 180 / M_PI_F);
+  } else {
+    angles.Init(atan2f(-forward.z, forwardDist) * 180 / M_PI_F, atan2f(-left.x, left.y) * 180 / M_PI_F, 0);
+  }
+}
+
+inline void angleVectors(const QAngle &angles, Vector *forward, Vector *right,
+                         Vector *up) {
+  float sr, sp, sy, cr, cp, cy;
+
+  sincosf(DEG2RAD(angles[1]), &sy, &cy);
+  sincosf(DEG2RAD(angles[0]), &sp, &cp);
+  sincosf(DEG2RAD(angles[2]), &sr, &cr);
+
+  if (forward) {
+    forward->Init(cp * cy, cp * sy, -sp);
+  }
+
+  if (right) {
+    right->Init(-1 * sr * sp * cy + -1 * cr * -sy, -1 * sr * sp * sy + -1 * cr * cy, -1 * sr * cp);
+  }
+
+  if (up) {
+    up->Init(cr * sp * cy + -sr * -sy, cr * sp * sy + -sr * cy, cr * cp);
+  }
 }
 
 inline void angleVectors(const QAngle &angles, Vector& forward) {
