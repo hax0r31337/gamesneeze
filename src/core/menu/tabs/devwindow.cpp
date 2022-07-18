@@ -2,8 +2,6 @@
 #include <map>
 #include <vector>
 
-
-
 std::map<std::string_view, std::vector<RecvProp>> netvars;
 
 uintptr_t getNetvars() {
@@ -22,7 +20,6 @@ void Menu::drawDevWindow() {
     ImGui::Text("developer");
     ImGui::Separator();
 
-    ImGui::Checkbox("Demo window", &demoWindow);
     if (ImGui::Button("Send test notification")) {
         Features::Notifications::addNotification(ImColor(30, 255, 30), "[gs] Test notification! %f", Interfaces::globals->realtime);
     }

@@ -102,14 +102,9 @@ void Menu::onSwapWindow(SDL_Window* window) {
         if (devWindow) {
             drawDevWindow();
         }
-        if (demoWindow) {
-            ImGui::ShowDemoWindow();
-        }
-    }
-    else {
+    } else {
         io.MouseDrawCursor = false;
     }
-
 
     if (ImGui::IsKeyPressed(SDL_SCANCODE_INSERT, false)) {
         Config::reloadCfgList();
