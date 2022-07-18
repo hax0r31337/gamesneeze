@@ -65,6 +65,9 @@ void Menu::drawRageTab() {
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Default>Hit Chance"), 0, 100);
+                ImGui::Text("Hit Chance Body");
+                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+                ImGui::SliderInt("##Hit Chance Body", &CONFIGINT("Rage>RageBot>Default>Hit Chance Body"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>Default>Min Damage"), 1, 100);
@@ -89,6 +92,9 @@ void Menu::drawRageTab() {
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Pistol>Hit Chance"), 0, 100);
+                ImGui::Text("Hit Chance Body");
+                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+                ImGui::SliderInt("##Hit Chance Body", &CONFIGINT("Rage>RageBot>Pistol>Hit Chance Body"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>Pistol>Min Damage"), 1, 100);
@@ -102,6 +108,9 @@ void Menu::drawRageTab() {
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Heavy Pistol>Hit Chance"), 0, 100);
+                ImGui::Text("Hit Chance Body");
+                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+                ImGui::SliderInt("##Hit Chance Body", &CONFIGINT("Rage>RageBot>Heavy Pistol>Hit Chance Body"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>Heavy Pistol>Min Damage"), 1, 100);
@@ -115,6 +124,9 @@ void Menu::drawRageTab() {
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Rifle>Hit Chance"), 0, 100);
+                ImGui::Text("Hit Chance Body");
+                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+                ImGui::SliderInt("##Hit Chance Body", &CONFIGINT("Rage>RageBot>Rifle>Hit Chance Body"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>Rifle>Min Damage"), 1, 100);
@@ -128,6 +140,9 @@ void Menu::drawRageTab() {
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>SMG>Hit Chance"), 0, 100);
+                ImGui::Text("Hit Chance Body");
+                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+                ImGui::SliderInt("##Hit Chance Body", &CONFIGINT("Rage>RageBot>SMG>Hit Chance Body"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>SMG>Min Damage"), 1, 100);
@@ -141,6 +156,9 @@ void Menu::drawRageTab() {
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Scout>Hit Chance"), 0, 100);
+                ImGui::Text("Hit Chance Body");
+                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+                ImGui::SliderInt("##Hit Chance Body", &CONFIGINT("Rage>RageBot>Scout>Hit Chance Body"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>Scout>Min Damage"), 1, 100);
@@ -154,6 +172,9 @@ void Menu::drawRageTab() {
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>AWP>Hit Chance"), 0, 100);
+                ImGui::Text("Hit Chance Body");
+                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+                ImGui::SliderInt("##Hit Chance Body", &CONFIGINT("Rage>RageBot>AWP>Hit Chance Body"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>AWP>Min Damage"), 1, 100);
@@ -167,6 +188,9 @@ void Menu::drawRageTab() {
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Heavy>Hit Chance"), 0, 100);
+                ImGui::Text("Hit Chance Body");
+                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+                ImGui::SliderInt("##Hit Chance Body", &CONFIGINT("Rage>RageBot>Heavy>Hit Chance Body"), 0, 100);
                 ImGui::Text("Min Damage");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Min Damage", &CONFIGINT("Rage>RageBot>Heavy>Min Damage"), 1, 100);

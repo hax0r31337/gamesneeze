@@ -249,8 +249,8 @@ bool Features::RageBot::canShoot(Weapon *activeWeapon, QAngle *angle,
 }
 
 void Features::RageBot::createMove(CUserCmd *cmd) {
-  if (!CONFIGBOOL("Rage>Enabled"))
-    return;
+  // if (!CONFIGBOOL("Rage>Enabled"))
+  //   return;
   if (!((Menu::CustomWidgets::isKeyDown(CONFIGINT("Rage>RageBot>Key")) ||
          CONFIGBOOL("Rage>RageBot>Always on")) &&
         Interfaces::engine->IsInGame() && Globals::localPlayer &&
@@ -267,9 +267,10 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
   int hitboxes = CONFIGINT("Rage>RageBot>Default>Hitboxes");
   float FOV = CONFIGINT("Rage>RageBot>Default>FOV") / 10.f;
   int hitChance = CONFIGINT("Rage>RageBot>Default>Hit Chance");
+  int hitChanceBody = CONFIGINT("Rage>RageBot>Default>Hit Chance Body");
   float minDamage = CONFIGINT("Rage>RageBot>Default>Min Damage") * 1.f;
   bool friendlyFire = CONFIGBOOL("Rage>RageBot>Default>Friendly Fire");
-  bool aimWhileBlind = CONFIGBOOL("Rage>RageBot>Default>Ignore Blind");
+  bool ignoreBlind = CONFIGBOOL("Rage>RageBot>Default>Ignore Blind");
   bool ignoreSmoke = CONFIGBOOL("Rage>RageBot>Default>Ignore Smoke");
   bool scopedOnly = CONFIGBOOL("Rage>RageBot>Default>Scoped Only");
   bool autoShot = CONFIGBOOL("Rage>RageBot>Default>Auto Shot");
@@ -278,66 +279,90 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
   bool autoSlow = CONFIGBOOL("Rage>RageBot>Default>Auto Slow");
   bool killShot = CONFIGBOOL("Rage>RageBot>Default>Kill Shot");
 
+  bool useableWeapon = false;
+
   if ((std::find(std::begin(pistols), std::end(pistols),
-                 activeWeapon->itemIndex() & 0xFFF) != std::end(pistols)) &&
-      CONFIGBOOL("Rage>RageBot>Pistol>Override")) {
-    hitboxes = CONFIGINT("Rage>RageBot>Pistol>Hitboxes");
-    hitChance = CONFIGINT("Rage>RageBot>Pistol>Hit Chance");
-    minDamage = CONFIGINT("Rage>RageBot>Pistol>Min Damage") * 1.f;
-    autoSlow = CONFIGBOOL("Rage>RageBot>Pistol>Auto Slow");
-    killShot = CONFIGBOOL("Rage>RageBot>Pistol>Kill Shot");
+                 activeWeapon->itemIndex() & 0xFFF) != std::end(pistols))) {
+    useableWeapon = true;
+    if (CONFIGBOOL("Rage>RageBot>Pistol>Override")) {
+      hitboxes = CONFIGINT("Rage>RageBot>Pistol>Hitboxes");
+      hitChance = CONFIGINT("Rage>RageBot>Pistol>Hit Chance");
+      hitChanceBody = CONFIGINT("Rage>RageBot>Pistol>Hit Chance Body");
+      minDamage = CONFIGINT("Rage>RageBot>Pistol>Min Damage") * 1.f;
+      autoSlow = CONFIGBOOL("Rage>RageBot>Pistol>Auto Slow");
+      killShot = CONFIGBOOL("Rage>RageBot>Pistol>Kill Shot");
+    }
   } else if ((std::find(std::begin(heavyPistols), std::end(heavyPistols),
-                        activeWeapon->itemIndex() & 0xFFF) !=
-              std::end(heavyPistols)) &&
-             CONFIGBOOL("Rage>RageBot>Heavy Pistol>Override")) {
-    hitboxes = CONFIGINT("Rage>RageBot>Heavy Pistol>Hitboxes");
-    hitChance = CONFIGINT("Rage>RageBot>Heavy Pistol>Hit Chance");
-    minDamage = CONFIGINT("Rage>RageBot>Heavy Pistol>Min Damage") * 1.f;
-    autoSlow = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Slow");
-    killShot = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Kill Shot");
+                        activeWeapon->itemIndex() & 0xFFF) != std::end(heavyPistols))) {
+    useableWeapon = true;
+    if (CONFIGBOOL("Rage>RageBot>Heavy Pistol>Override")) {
+      hitboxes = CONFIGINT("Rage>RageBot>Heavy Pistol>Hitboxes");
+      hitChance = CONFIGINT("Rage>RageBot>Heavy Pistol>Hit Chance");
+      hitChanceBody = CONFIGINT("Rage>RageBot>Heavy Pistol>Hit Chance Body");
+      minDamage = CONFIGINT("Rage>RageBot>Heavy Pistol>Min Damage") * 1.f;
+      autoSlow = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Slow");
+      killShot = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Kill Shot");
+    }
   } else if ((std::find(std::begin(rifles), std::end(rifles),
-                        activeWeapon->itemIndex() & 0xFFF) !=
-              std::end(rifles)) &&
-             CONFIGBOOL("Rage>RageBot>Rifle>Override")) {
-    hitboxes = CONFIGINT("Rage>RageBot>Rifle>Hitboxes");
-    hitChance = CONFIGINT("Rage>RageBot>Rifle>Hit Chance");
-    minDamage = CONFIGINT("Rage>RageBot>Rifle>Min Damage") * 1.f;
-    autoSlow = CONFIGBOOL("Rage>RageBot>Rifle>Auto Slow");
-    killShot = CONFIGBOOL("Rage>RageBot>Rifle>Kill Shot");
+                        activeWeapon->itemIndex() & 0xFFF) != std::end(rifles))) {
+    useableWeapon = true;
+    if (CONFIGBOOL("Rage>RageBot>Rifle>Override")) {
+      hitboxes = CONFIGINT("Rage>RageBot>Rifle>Hitboxes");
+      hitChance = CONFIGINT("Rage>RageBot>Rifle>Hit Chance");
+      hitChanceBody = CONFIGINT("Rage>RageBot>Rifle>Hit Chance Body");
+      minDamage = CONFIGINT("Rage>RageBot>Rifle>Min Damage") * 1.f;
+      autoSlow = CONFIGBOOL("Rage>RageBot>Rifle>Auto Slow");
+      killShot = CONFIGBOOL("Rage>RageBot>Rifle>Kill Shot");
+    }
   } else if ((std::find(std::begin(smgs), std::end(smgs),
-                        activeWeapon->itemIndex() & 0xFFF) != std::end(smgs)) &&
-             CONFIGBOOL("Rage>RageBot>SMG>Override")) {
-    hitboxes = CONFIGINT("Rage>RageBot>SMG>Hitboxes");
-    hitChance = CONFIGINT("Rage>RageBot>SMG>Hit Chance");
-    minDamage = CONFIGINT("Rage>RageBot>SMG>Min Damage") * 1.f;
-    autoSlow = CONFIGBOOL("Rage>RageBot>SMG>Auto Slow");
-    killShot = CONFIGBOOL("Rage>RageBot>SMG>Kill Shot");
-  } else if (((activeWeapon->itemIndex() & 0xFFF) == WEAPON_SSG08) &&
-             CONFIGBOOL("Rage>RageBot>Scout>Override")) {
-    hitboxes = CONFIGINT("Rage>RageBot>Scout>Hitboxes");
-    hitChance = CONFIGINT("Rage>RageBot>Scout>Hit Chance");
-    minDamage = CONFIGINT("Rage>RageBot>Scout>Min Damage") * 1.f;
-    autoSlow = CONFIGBOOL("Rage>RageBot>Scout>Auto Slow");
-    killShot = CONFIGBOOL("Rage>RageBot>Scout>Kill Shot");
-  } else if (((activeWeapon->itemIndex() & 0xFFF) == WEAPON_AWP) &&
-             CONFIGBOOL("Rage>RageBot>AWP>Override")) {
-    hitboxes = CONFIGINT("Rage>RageBot>AWP>Hitboxes");
-    hitChance = CONFIGINT("Rage>RageBot>AWP>Hit Chance");
-    minDamage = CONFIGINT("Rage>RageBot>AWP>Min Damage") * 1.f;
-    autoSlow = CONFIGBOOL("Rage>RageBot>AWP>Auto Slow");
-    killShot = CONFIGBOOL("Rage>RageBot>AWP>Kill Shot");
+                        activeWeapon->itemIndex() & 0xFFF) != std::end(smgs))) {
+    useableWeapon = true;
+    if (CONFIGBOOL("Rage>RageBot>SMG>Override")) {
+      hitboxes = CONFIGINT("Rage>RageBot>SMG>Hitboxes");
+      hitChance = CONFIGINT("Rage>RageBot>SMG>Hit Chance");
+      hitChanceBody = CONFIGINT("Rage>RageBot>SMG>Hit Chance Body");
+      minDamage = CONFIGINT("Rage>RageBot>SMG>Min Damage") * 1.f;
+      autoSlow = CONFIGBOOL("Rage>RageBot>SMG>Auto Slow");
+      killShot = CONFIGBOOL("Rage>RageBot>SMG>Kill Shot");
+    }
+  } else if (((activeWeapon->itemIndex() & 0xFFF) == WEAPON_SSG08)) {
+    useableWeapon = true;
+    if (CONFIGBOOL("Rage>RageBot>Scout>Override")) {
+      hitboxes = CONFIGINT("Rage>RageBot>Scout>Hitboxes");
+      hitChance = CONFIGINT("Rage>RageBot>Scout>Hit Chance");
+      hitChanceBody = CONFIGINT("Rage>RageBot>Scout>Hit Chance Body");
+      minDamage = CONFIGINT("Rage>RageBot>Scout>Min Damage") * 1.f;
+      autoSlow = CONFIGBOOL("Rage>RageBot>Scout>Auto Slow");
+      killShot = CONFIGBOOL("Rage>RageBot>Scout>Kill Shot");
+    }
+  } else if (((activeWeapon->itemIndex() & 0xFFF) == WEAPON_AWP)) {
+    useableWeapon = true;
+    if (CONFIGBOOL("Rage>RageBot>AWP>Override")) {
+      hitboxes = CONFIGINT("Rage>RageBot>AWP>Hitboxes");
+      hitChance = CONFIGINT("Rage>RageBot>AWP>Hit Chance");
+      hitChanceBody = CONFIGINT("Rage>RageBot>AWP>Hit Chance Body");
+      minDamage = CONFIGINT("Rage>RageBot>AWP>Min Damage") * 1.f;
+      autoSlow = CONFIGBOOL("Rage>RageBot>AWP>Auto Slow");
+      killShot = CONFIGBOOL("Rage>RageBot>AWP>Kill Shot");
+    }
   } else if ((std::find(std::begin(heavyWeapons), std::end(heavyWeapons),
                         activeWeapon->itemIndex() & 0xFFF) !=
-              std::end(heavyWeapons)) &&
-             CONFIGBOOL("Rage>RageBot>Heavy>Override")) {
-    hitboxes = CONFIGINT("Rage>RageBot>Heavy>Hitboxes");
-    hitChance = CONFIGINT("Rage>RageBot>Heavy>Hit Chance");
-    minDamage = CONFIGINT("Rage>RageBot>Heavy>Min Damage") * 1.f;
-    autoSlow = CONFIGBOOL("Rage>RageBot>Heavy>Auto Slow");
-    killShot = CONFIGBOOL("Rage>RageBot>Heavy>Kill Shot");
+              std::end(heavyWeapons))) {
+    useableWeapon = true;
+    if (CONFIGBOOL("Rage>RageBot>Heavy>Override")) {
+      hitboxes = CONFIGINT("Rage>RageBot>Heavy>Hitboxes");
+      hitChance = CONFIGINT("Rage>RageBot>Heavy>Hit Chance");
+      hitChanceBody = CONFIGINT("Rage>RageBot>Heavy>Hit Chance Body");
+      minDamage = CONFIGINT("Rage>RageBot>Heavy>Min Damage") * 1.f;
+      autoSlow = CONFIGBOOL("Rage>RageBot>Heavy>Auto Slow");
+      killShot = CONFIGBOOL("Rage>RageBot>Heavy>Kill Shot");
+    }
   }
 
-  if (!aimWhileBlind && Globals::localPlayer->maxFlashAlpha() > 75.f)
+  if (!useableWeapon)
+    return;
+
+  if (!ignoreBlind && Globals::localPlayer->maxFlashAlpha() > 75.f)
     return;
 
   if (cmd->buttons & (1 << 0) || autoShot) {
@@ -352,7 +377,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
       int bestDamage = -1;
       QAngle bestPlayerAngle = {0, 0, 0};
       Player *bestPlayer = nullptr;
-      QAngle aimPunch = weapon->requiresRecoilControl() ?  Globals::localPlayer->aimPunch() * 2 : QAngle{0, 0, 0};
+      QAngle aimPunch = weapon->requiresRecoilControl() ?  Globals::localPlayer->aimPunch() : QAngle{0, 0, 0};
 
       // Enumerate over players and get angle to the closest player to crosshair
       for (int i = 1; i < Interfaces::globals->maxClients; i++) {
@@ -403,6 +428,10 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
                 }
 
                 if (damageDeal > bestDamage) {
+                  if (!canShoot(weapon, &angle, p,
+                                bone == 8 ? hitChance : hitChanceBody)) {
+                    continue;
+                  }
                   bestDamage = damageDeal;
                   bestPlayerAngle = angle;
                   bestPlayer = p;
@@ -413,14 +442,16 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
         }
       }
       if (bestDamage > 0 && bestPlayer != nullptr) {
+        if (activeWeapon->nextPrimaryAttack() > Globals::serverTime())
+          return;
         if (autoScope &&
-            activeWeapon->nextPrimaryAttack() <= Globals::serverTime() &&
             activeWeapon->isSniperRifle() && !Globals::localPlayer->scoped()) {
           cmd->buttons |= IN_ATTACK2;
           return;
         }
-        if (!canShoot(weapon, &bestPlayerAngle, bestPlayer, hitChance)) {
-          return;
+        if (autoSlow) {
+          cmd->forwardmove = 0;
+          cmd->sidemove = 0;
         }
         if (autoShot &&
             activeWeapon->nextPrimaryAttack() <= Globals::serverTime()) {

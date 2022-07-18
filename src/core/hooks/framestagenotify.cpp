@@ -9,7 +9,7 @@ void Hooks::FrameStageNotify::hook(void* thisptr, FrameStage frame) {
     }
 
     Features::ClantagChanger::frameStageNotify(frame);
-    Features::NameStealer::frameStageNotify();
+    Features::NameStealer::frameStageNotify(frame);
     Features::SkyboxChanger::frameStageNotify(frame);
     Features::RecoilCrosshair::frameStageNotify(frame);
     Features::SkinChanger::frameStageNotify(frame);

@@ -68,7 +68,7 @@ namespace Features {
         bool changeName(bool reconnect, const char* newName);
         void setName(const char* name);
         void setBannedName(const char *name);
-        void frameStageNotify();
+        void frameStageNotify(FrameStage frame);
         enum class Colors {
           WHITE = 1,
           DARK_RED,

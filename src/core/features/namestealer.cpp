@@ -48,14 +48,18 @@ void Features::NameStealer::setBannedName(const char *name) {
     changeName(false, res.c_str());
 }
 
-void Features::NameStealer::frameStageNotify() {
-  if (!CONFIGBOOL("Misc>Misc>Name>Name Stealer")) {
+void Features::NameStealer::frameStageNotify(FrameStage frame) {
+  if (!CONFIGBOOL("Misc>Misc>Name>Name Stealer") || frame != FRAME_NET_UPDATE_POSTDATAUPDATE_END) {
     return;
   }
 
   if (!Interfaces::engine->IsInGame())
     return;
+  
   if (!Globals::localPlayer)
+    return;
+
+  if (TICKCOUNTWITHPING() % 16 != 0)
     return;
 
   static std::vector<int> stolenIds;

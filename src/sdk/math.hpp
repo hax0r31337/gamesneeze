@@ -15,6 +15,7 @@ inline void startMovementFix(CUserCmd* cmd) {
 inline void endMovementFix(CUserCmd* cmd) {
     // this was just taken from designer bc im lazy
     // https://github.com/designer1337/csgo-cheat-base/blob/09fa2ba8de52eef482bbc82f682976e369191077/dependencies/math/math.cpp#L4
+    if (cmd->forwardmove == 0 && cmd->sidemove == 0) { return; }
     float deltaViewAngles;
 	float f1;
 	float f2;
