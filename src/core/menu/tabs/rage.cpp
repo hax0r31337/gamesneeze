@@ -1,6 +1,6 @@
 #include "../menu.hpp"
 
-const char* antiAimTypes[] = {"None", "Static", "Jitter", "Fake Jitter", "Real Jitter", "SpingBot (p100)"};
+const char* antiAimTypes[] = {"None", "Static", "Jitter", "Fake Jitter", "Real Jitter", "SpingBot (p100)", "Legit"};
 
 void Menu::hitboxSelectBox(const char *configVarName) {
   ImGui::Text("Hitboxes");

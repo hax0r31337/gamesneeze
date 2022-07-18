@@ -23,7 +23,10 @@ namespace Menu {
     void drawDevWindow();
     void drawOverlay(ImDrawList* drawList);
     void onPollEvent(SDL_Event* event, const int result);
-    void onSwapWindow(SDL_Window* window);
+    void onSwapWindow(SDL_Window *window);
+
+    void drawWaterMarkOverlay();
+    // void drawBombTimerOverlay();
 
     void hitboxSelectBox(const char *configVarName);
     namespace CustomWidgets {

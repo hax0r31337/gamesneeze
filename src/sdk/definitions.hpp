@@ -619,7 +619,9 @@ public:
 	char pad_012C[4]; //0x012C
 	float runningAccelProgress; //0x0130 0 - 1.0, Only affected by Running, reaches 1.0 when you are at full speed (ex: 250 w/ knife )
 	char pad_0134[68]; //0x0134
-	char unkown[572];// Overall Size should be 0x3B0(+4), padding the end here.
+	char unkown[464];
+	float velocitySubY;
+	char unkown1[104];// Overall Size should be 0x3B0(+4), padding the end here.
 }; //Size: 0x0178
 
 

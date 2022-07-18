@@ -377,7 +377,8 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
       int bestDamage = -1;
       QAngle bestPlayerAngle = {0, 0, 0};
       Player *bestPlayer = nullptr;
-      QAngle aimPunch = weapon->requiresRecoilControl() ?  Globals::localPlayer->aimPunch() : QAngle{0, 0, 0};
+      QAngle aimPunch = Globals::localPlayer->aimPunch() * 2;
+      bool hasTarget = false;
 
       // Enumerate over players and get angle to the closest player to crosshair
       for (int i = 1; i < Interfaces::globals->maxClients; i++) {
@@ -420,7 +421,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
 
                 QAngle angle = calcAngle(localPlayerEyePos, targetBonePos) - aimPunch;
                 QAngle angleTarget = angle - cmd->viewangles;
-                normalizeAngles(angle);
+                // normalizeAngles(angle);
                 normalizeAngles(angleTarget);
 
                 if (angleTarget.Length() > FOV) {
@@ -430,6 +431,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
                 if (damageDeal > bestDamage) {
                   if (!canShoot(weapon, &angle, p,
                                 bone == 8 ? hitChance : hitChanceBody)) {
+                    hasTarget = true;
                     continue;
                   }
                   bestDamage = damageDeal;
@@ -444,14 +446,14 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
       if (bestDamage > 0 && bestPlayer != nullptr) {
         if (activeWeapon->nextPrimaryAttack() > Globals::serverTime())
           return;
+        if (autoSlow) {
+          cmd->forwardmove = 0;
+          cmd->sidemove = 0;
+        }
         if (autoScope &&
             activeWeapon->isSniperRifle() && !Globals::localPlayer->scoped()) {
           cmd->buttons |= IN_ATTACK2;
           return;
-        }
-        if (autoSlow) {
-          cmd->forwardmove = 0;
-          cmd->sidemove = 0;
         }
         if (autoShot &&
             activeWeapon->nextPrimaryAttack() <= Globals::serverTime()) {
@@ -461,6 +463,9 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
         QAngle angleTarget = bestPlayerAngle - cmd->viewangles;
         normalizeAngles(angleTarget);
         cmd->viewangles += angleTarget;
+      } else if (hasTarget && autoSlow) {
+        cmd->forwardmove = 0;
+        cmd->sidemove = 0;
       }
     }
   }

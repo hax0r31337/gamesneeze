@@ -11,7 +11,7 @@ struct Notification {
 std::vector<Notification> notifications = {};
 
 void Features::Notifications::draw() {
-    int yOffset = 20;
+    int yOffset = 0;
     for (Notification &notif : notifications) {
         float slideValue = Interfaces::globals->realtime - (notif.openTime + 8.f);
         ImColor shadowColor = ImColor(0, 0, 0, 255);

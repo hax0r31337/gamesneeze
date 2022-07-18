@@ -3,19 +3,38 @@
 
 bool updatingLby() {
     // cred: Somewhere from UC, can't remember
-    AnimState* animState = Globals::localPlayer->animState();
-    float curtime = Globals::localPlayer->tickbase() * Interfaces::globals->interval_per_tick;
-    static float lbyTime;
+    // AnimState* animState = Globals::localPlayer->animState();
+    // float curtime = Globals::localPlayer->tickbase() * Interfaces::globals->interval_per_tick;
+    // static float lbyTime;
      
-    if (animState->verticalVelocity > 0.1f || fabs(animState->horizontalVelocity) > 100.0f) {
-        lbyTime = curtime + 0.22f;
-        return false;
+    // if (animState->verticalVelocity > 0.1f || fabs(animState->horizontalVelocity) > 100.0f) {
+    //     lbyTime = curtime + 0.22f;
+    //     return false;
+    // }
+    // else if (curtime > lbyTime) {
+    //     lbyTime = curtime + 1.1f;
+    //     return true;
+    // }
+    // return false;
+
+    // cred: https://github.com/danielkrupinski/Osiris/pull/2065/
+    auto serverTime = Globals::serverTime();
+    static float nextLby, lastLby;
+
+    if (!(Globals::localPlayer->flags() & FL_ONGROUND)) {
+      return false;
     }
-    else if (curtime > lbyTime) {
-        lbyTime = curtime + 1.1f;
-        return true;
+    if (Globals::localPlayer->velocity().notNull() > 0.1f) {
+      nextLby = 0.22f;
+      return false;
     }
-    return false;
+    if (serverTime - lastLby - nextLby >= 0) {
+      nextLby = 1.125f;
+      lastLby = serverTime;
+      return true;
+    } else {
+      return false;
+    }
 }
 
 void Features::AntiAim::createMove(CUserCmd* cmd) {
@@ -63,6 +82,30 @@ void Features::AntiAim::createMove(CUserCmd* cmd) {
                                         real = cmd->viewangles.y + (cmd->tick_count * CONFIGINT("Rage>AntiAim>Offset"));
                                         fake = CONFIGINT("Rage>AntiAim>Spin>Desync");
                                         break;
+                                    }
+                                    case 6: { // Legit
+                                      float delta = Globals::localPlayer->getMaxDesyncAngle();
+                                      static bool invert = true;
+                                      auto realtime = Interfaces::globals->realtime;
+                                      static float lastTime{0.0f};
+
+                                      if (realtime - lastTime > 0.5f) {
+                                        invert = !invert;
+                                        lastTime = realtime;
+                                      }
+
+                                      if (updatingLby()) {
+                                        *Globals::sendPacket = false;
+                                        invert ? cmd->viewangles.y -= delta
+                                               : cmd->viewangles.y += delta;
+                                        return;
+                                      }
+
+                                      if (!Globals::sendPacket) {
+                                        invert ? cmd->viewangles.y += delta
+                                               : cmd->viewangles.y -= delta;
+                                      }
+                                      return;
                                     }
                                 }
 

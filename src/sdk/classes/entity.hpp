@@ -133,7 +133,25 @@ public:
 		Offsets::onPostRestoreData(this);
 	}
 
-	bool isEnemy();
+    float getMaxDesyncAngle() noexcept {
+        auto state = animState();
+        if (!state)
+           return 0.0f;
+
+          float yawModifier =
+              (state->runningAccelProgress * -0.3f - 0.2f) *
+                  std::clamp(state->feetShuffleSpeed, 0.0f, 1.0f) +
+              1.0f;
+
+          if (state->duckProgress > 0.0f)
+            yawModifier += (state->duckProgress *
+                            std::clamp(state->feetShuffleSpeed2, 0.0f, 1.0f) *
+                            (0.5f - yawModifier));
+
+        return state->velocitySubY * yawModifier;
+    }
+
+    bool isEnemy();
 	bool getHitboxBones(matrix3x4_t* boneMatrix);
 	bool getAnythingBones(matrix3x4_t* boneMatrix);
 	Vector getBonePos(int bone);
@@ -246,13 +264,13 @@ public:
 		return getVirtualFunc<Fn>(this, 552)(this);
 	}
 
-    auto requiresRecoilControl() noexcept
-    {
-        const auto weaponData = GetWeaponInfo();
-        if (weaponData)
-            return weaponData->GetRecoveryTimeStand() > weaponData->GetCycleTime();
-        return false;
-    }
+    // auto requiresRecoilControl() noexcept
+    // {
+    //     const auto weaponData = GetWeaponInfo();
+    //     if (weaponData)
+    //         return weaponData->GetRecoveryTimeStand() > weaponData->GetCycleTime();
+    //     return false;
+    // }
 
     auto isSniperRifle() noexcept { return getWeaponType() == WeaponType::SniperRifle; }
 };

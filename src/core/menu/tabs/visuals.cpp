@@ -290,6 +290,7 @@ void Menu::drawVisualsTab() {
                 }
                 ImGui::Checkbox("Planted C4 Box", &CONFIGBOOL("Visuals>World>Items>Planted C4 Box"));
                 ImGui::Checkbox("Planted C4 Label", &CONFIGBOOL("Visuals>World>Items>Planted C4 Label"));
+                // ImGui::Checkbox("Bomb Timer", &CONFIGBOOL("Visuals>World>Items>Bomb Timer"));
                 ImGui::Separator();
                 if (CONFIGBOOL("Visuals>World>Items>Chicken Box")) {
                     ImGui::ColorEdit4("Chicken Box Color", (float*)&CONFIGCOL("Visuals>World>Items>Chicken Box Color"), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_PickerHueWheel);

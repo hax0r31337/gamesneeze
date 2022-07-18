@@ -417,6 +417,7 @@ namespace Config {
         CONFIGITEM("Visuals>World>Items>Planted C4 Box Color",
                    ImColor(255, 255, 255, 255)),
         CONFIGITEM("Visuals>World>Items>Planted C4 Label", false),
+        CONFIGITEM("Visuals>World>Items>Bomb Timer", false),
 
         CONFIGITEM("Visuals>World>Items>Chicken Box", false),
         CONFIGITEM("Visuals>World>Items>Chicken Box Color",
