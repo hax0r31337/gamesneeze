@@ -54,6 +54,10 @@ function load() {
     sudo killall -19 steam
     sudo killall -19 steamwebhelper
 
+    # disable crash dumps
+    # https://github.com/seksea/gamesneeze/pull/117
+    sysctl kernel.core_pattern=core
+
     sudo cp $libraryname /usr/lib/$tlibname
     gdbOut=$(
       $gdb -n -q -batch \

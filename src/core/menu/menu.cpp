@@ -190,10 +190,10 @@ void Menu::onSwapWindow(SDL_Window* window) {
     } else {
         io.MouseDrawCursor = false;
     }
-
-    if (ImGui::IsKeyPressed(SDL_SCANCODE_INSERT, false)) {
-        Config::reloadCfgList();
-        Menu::open = !Menu::open;
+    if (ImGui::IsKeyPressed(SDL_SCANCODE_INSERT, false) ||
+        (ImGui::IsKeyPressed(SDL_SCANCODE_ESCAPE, false) && Menu::open)) {
+      Config::reloadCfgList();
+      Menu::open = !Menu::open;
     }
 
     ImGui::Render();
