@@ -27,6 +27,12 @@ namespace Menu {
     void drawWaterMarkOverlay();
     // void drawBombTimerOverlay();
 
+    std::vector<char> loadBinaryFile(const std::string &path);
+    bool decodeVFONT(std::vector<char> &buffer);
+    ImWchar *getFontGlyphRanges();
+    ImFont *addFontFromVFONT(const std::string &path, float size,
+                         const ImWchar *glyphRanges, bool merge);
+
     void hitboxSelectBox(const char *configVarName);
     namespace CustomWidgets {
         void drawKeyBinder(const char* label, int* key, bool* toggled);

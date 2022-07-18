@@ -1,6 +1,5 @@
 #include "menu.hpp"
 #include "imgui/imgui.h"
-#include "roboto.hpp"
 
 void style() {
     ImVec4* colors = ImGui::GetStyle().Colors;
@@ -70,6 +69,83 @@ void Menu::onPollEvent(SDL_Event* event, const int result) {
     }
 }
 
+std::vector<char> Menu::loadBinaryFile(const std::string &path) {
+  std::vector<char> result;
+  std::ifstream in{path, std::ios::binary};
+  if (!in)
+    return result;
+  in.seekg(0, std::ios_base::end);
+  result.resize(static_cast<std::size_t>(in.tellg()));
+  in.seekg(0, std::ios_base::beg);
+  in.read(result.data(), result.size());
+  return result;
+}
+
+bool Menu::decodeVFONT(std::vector<char> &buffer) {
+  constexpr std::string_view tag = "VFONT1";
+  unsigned char magic = 0xA7;
+
+  if (buffer.size() <= tag.length())
+    return false;
+
+  const auto tagIndex = buffer.size() - tag.length();
+  if (std::memcmp(tag.data(), &buffer[tagIndex], tag.length()))
+    return false;
+
+  unsigned char saltBytes = buffer[tagIndex - 1];
+  const auto saltIndex = tagIndex - saltBytes;
+  --saltBytes;
+
+  for (std::size_t i = 0; i < saltBytes; ++i)
+    magic ^= (buffer[saltIndex + i] + 0xA7) % 0x100;
+
+  for (std::size_t i = 0; i < saltIndex; ++i) {
+    unsigned char xored = buffer[i] ^ magic;
+    magic = (buffer[i] + 0xA7) % 0x100;
+    buffer[i] = xored;
+  }
+
+  buffer.resize(saltIndex);
+  return true;
+}
+
+ImWchar *Menu::getFontGlyphRanges() {
+  static ImVector<ImWchar> ranges;
+  if (ranges.empty()) {
+    ImFontGlyphRangesBuilder builder;
+    constexpr ImWchar baseRanges[]{
+        0x0100, 0x024F, // Latin Extended-A + Latin Extended-B
+        0x0300, 0x03FF, // Combining Diacritical Marks + Greek/Coptic
+        0x0600, 0x06FF, // Arabic
+        0x0E00, 0x0E7F, // Thai
+        0};
+    builder.AddRanges(baseRanges);
+    builder.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
+    builder.AddRanges(
+        ImGui::GetIO().Fonts->GetGlyphRangesChineseSimplifiedCommon());
+    builder.AddText("\u9F8D\u738B\u2122");
+    builder.BuildRanges(&ranges);
+  }
+  return ranges.Data;
+}
+
+ImFont *Menu::addFontFromVFONT(const std::string &path, float size,
+                         const ImWchar *glyphRanges, bool merge) {
+  auto file = loadBinaryFile(path);
+  if (!decodeVFONT(file))
+    return nullptr;
+
+  ImFontConfig cfg;
+  cfg.FontData = file.data();
+  cfg.FontDataSize = file.size();
+  cfg.FontDataOwnedByAtlas = false;
+  cfg.MergeMode = merge;
+  cfg.GlyphRanges = glyphRanges;
+  cfg.SizePixels = size;
+
+  return ImGui::GetIO().Fonts->AddFont(&cfg);
+}
+
 void Menu::onSwapWindow(SDL_Window* window) {
     if (!initialised) {
         gl3wInit();
@@ -79,7 +155,16 @@ void Menu::onSwapWindow(SDL_Window* window) {
         ImGui_ImplOpenGL3_Init("#version 100");
         ImGui_ImplSDL2_InitForOpenGL(window, nullptr);
         style();
-        ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Roboto_compressed_data, Roboto_compressed_size, 14.f);
+
+        ImFont *normalFont = addFontFromVFONT("csgo/panorama/fonts/notosans-regular.vfont", 15.0f, getFontGlyphRanges(), false);
+        if (!normalFont) {
+          ImFontConfig cfg;
+          cfg.SizePixels = 14.0f;
+          ImGui::GetIO().Fonts->AddFontDefault(&cfg);
+        }
+        addFontFromVFONT("csgo/panorama/fonts/notosanskr-regular.vfont", 15.0f, ImGui::GetIO().Fonts->GetGlyphRangesKorean(), true);
+        addFontFromVFONT("csgo/panorama/fonts/notosanssc-regular.vfont", 17.0f, ImGui::GetIO().Fonts->GetGlyphRangesChineseFull(), true);
+
         initialised = true;
     }
 
