@@ -415,7 +415,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
                   continue;
 
                 auto damageDeal = getDamageDeal(p, targetBonePos, weapon->GetWeaponInfo(), friendlyFire);
-                if (damageDeal <= 0 || damageDeal < (killShot ? p->health() : minDamage)) {
+                if (damageDeal <= 0 || damageDeal < (killShot ? p->health() : (p->health() < minDamage ? p->health() : minDamage))) {
                   continue;
                 }
 

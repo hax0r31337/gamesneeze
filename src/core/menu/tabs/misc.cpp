@@ -113,6 +113,10 @@ void Menu::drawMiscTab() {
                 ImGui::Separator();
                 ImGui::Checkbox("Bunny Hop", &CONFIGBOOL("Misc>Misc>Movement>Bunny Hop"));
                 ImGui::Checkbox("Auto Strafe", &CONFIGBOOL("Misc>Misc>Movement>Auto Strafe"));
+                ImGui::SameLine();
+                ImGui::TextDisabled("?");
+                if (ImGui::IsItemHovered())
+                  ImGui::SetTooltip("May cause untrusted, use at own risk!");
                 if (CONFIGBOOL("Misc>Misc>Movement>Edge Jump")) {
                     static bool toggled = false;
                     Menu::CustomWidgets::drawKeyBinder("Key", &CONFIGINT("Misc>Misc>Movement>Edge Jump Key"), &toggled);
