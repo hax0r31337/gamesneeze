@@ -55,6 +55,12 @@ inline std::map<std::pair<std::string_view, std::string_view>, uintptr_t>
 
         /* Bomb */
         {std::make_pair("DT_PlantedC4", "m_flC4Blow"), 0},
+        {std::make_pair("DT_PlantedC4", "m_flTimerLength"), 0},
+        {std::make_pair("DT_PlantedC4", "m_nBombSite"), 0},
+        {std::make_pair("DT_PlantedC4", "m_bBombTicking"), 0},
+        {std::make_pair("DT_PlantedC4", "m_flDefuseCountDown"), 0},
+        {std::make_pair("DT_PlantedC4", "m_flDefuseLength"), 0},
+        {std::make_pair("DT_PlantedC4", "m_hBombDefuser"), 0},
 
         /* Tonemap Controller */
         {std::make_pair("DT_EnvTonemapController",
@@ -70,6 +76,8 @@ inline std::map<std::pair<std::string_view, std::string_view>, uintptr_t>
 
         /* Player Resource */
         {std::make_pair("DT_PlayerResource", "m_iPing"), 0},
+        {std::make_pair("DT_PlayerResource", "m_bombsiteCenterA"), 0},
+        {std::make_pair("DT_PlayerResource", "m_bombsiteCenterB"), 0},
 
         /* Fog Controller */
         {std::make_pair("DT_FogController", "m_fog.enable"), 0},

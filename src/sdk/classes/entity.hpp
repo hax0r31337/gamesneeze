@@ -277,7 +277,13 @@ public:
 
 class PlantedC4 : public Item {
 public:
-	NETVAR("DT_PlantedC4", "m_flC4Blow", time, float);
+  NETVAR("DT_PlantedC4", "m_flC4Blow", time, float);
+  NETVAR("DT_PlantedC4", "m_flTimerLength", timerLength, float);
+  NETVAR("DT_PlantedC4", "m_nBombSite", site, int);
+  NETVAR("DT_PlantedC4", "m_bBombTicking", ticking, bool);
+  NETVAR("DT_PlantedC4", "m_flDefuseCountDown", defuseCountDown, float);
+  NETVAR("DT_PlantedC4", "m_flDefuseLength", defuseLength, float);
+  NETVAR("DT_PlantedC4", "m_hBombDefuser", defuser, int);
 };
 
 class TonemapController {

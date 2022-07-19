@@ -5,6 +5,17 @@
 #include <filesystem>
 #include <string>
 
+struct BombData {
+  void update() noexcept;
+
+  float blowTime;
+  float timerLength;
+  int defuserHandle;
+  float defuseCountDown;
+  float defuseLength;
+  int bombsite;
+};
+
 namespace Menu {
     inline bool open = true;
     inline bool initialised = false;
@@ -14,6 +25,7 @@ namespace Menu {
 
     inline char clantag[128] = "gamesneeze";
     inline char playerName[128] = "NachoNeko";
+    inline BombData bombData;
     void drawMenu();
     void drawLegitTab();
     void drawRageTab();
@@ -25,7 +37,7 @@ namespace Menu {
     void onSwapWindow(SDL_Window *window);
 
     void drawWaterMarkOverlay();
-    // void drawBombTimerOverlay();
+    void drawBombTimerOverlay();
 
     std::vector<char> loadBinaryFile(const std::string &path);
     bool decodeVFONT(std::vector<char> &buffer);

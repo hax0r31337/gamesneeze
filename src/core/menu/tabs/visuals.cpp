@@ -220,9 +220,9 @@ void Menu::drawVisualsTab() {
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Viewmodel FOV", &CONFIGINT("Visuals>World>World>Viewmodel FOV"), 0, 130);
                 ImGui::Checkbox("Third Person", &CONFIGBOOL("Visuals>World>World>Third Person"));
-                ImGui::SameLine();
                 if (CONFIGBOOL("Visuals>World>World>Third Person")) {
                   static bool toggled = false;
+                  ImGui::SameLine();
                   Menu::CustomWidgets::drawKeyBinder(
                       "Key", &CONFIGINT("Visuals>World>World>Third Person Key"),
                       &toggled);
@@ -290,7 +290,7 @@ void Menu::drawVisualsTab() {
                 }
                 ImGui::Checkbox("Planted C4 Box", &CONFIGBOOL("Visuals>World>Items>Planted C4 Box"));
                 ImGui::Checkbox("Planted C4 Label", &CONFIGBOOL("Visuals>World>Items>Planted C4 Label"));
-                // ImGui::Checkbox("Bomb Timer", &CONFIGBOOL("Visuals>World>Items>Bomb Timer"));
+                ImGui::Checkbox("Bomb Timer", &CONFIGBOOL("Visuals>World>Items>Bomb Timer"));
                 ImGui::Separator();
                 if (CONFIGBOOL("Visuals>World>Items>Chicken Box")) {
                     ImGui::ColorEdit4("Chicken Box Color", (float*)&CONFIGCOL("Visuals>World>Items>Chicken Box Color"), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_PickerHueWheel);

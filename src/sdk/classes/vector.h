@@ -350,26 +350,14 @@ inline float Vector::Length(void) const
 {
 	CHECK_VALID(*this);
 
-	float root = 0.0f;
-
-	float sqsr = x*x + y*y + z*z;
-
-	root = sqrt(sqsr);
-
-	return root;
+	return sqrt(x*x + y*y + z*z);
 }
 //===============================================
 inline float Vector::Length2D(void) const
 {
 	CHECK_VALID(*this);
 
-	float root = 0.0f;
-
-	float sqst = x*x + y*y;
-
-	root = sqrt(sqst);
-
-	return root;
+	return sqrt(x*x + y*y);
 }
 //===============================================
 inline float Vector::Length2DSqr(void) const

@@ -8,4 +8,6 @@ public:
 	int GetPing(int index) {
 		return *(int*)((uintptr_t)this + GETNETVAROFFSET("DT_PlayerResource", "m_iPing") + (index * 4));
 	}
+	NETVAR("DT_PlayerResource", "m_bombsiteCenterA", bombsiteCenterA, Vector)
+	NETVAR("DT_PlayerResource", "m_bombsiteCenterB", bombsiteCenterB, Vector)
 };
