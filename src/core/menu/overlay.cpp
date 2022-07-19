@@ -27,6 +27,7 @@ void BombData::update() noexcept {
           defuseCountDown = bomb->defuseCountDown();
           defuseLength = bomb->defuseLength();
         }
+        bombsite = false;
         // if (playerResource) {
         // TODO: fix bomb site
         // const Vector &bombOrigin = bomb->origin();
@@ -38,6 +39,9 @@ void BombData::update() noexcept {
     }
   }
   blowTime = 0.0f;
+  timerLength = 1.f;
+  defuserHandle = -1;
+  bombsite = false;
 }
 
 void Menu::drawOverlay(ImDrawList* drawList) {

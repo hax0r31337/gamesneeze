@@ -471,6 +471,9 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
   if (!useableWeapon)
     return;
 
+  if (activeWeapon->nextPrimaryAttack() > Globals::serverTime())
+    return;
+    
   if (!ignoreBlind && Globals::localPlayer->maxFlashAlpha() > 75.f)
     return;
 
@@ -572,8 +575,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
         }
       }
       if (bestDamage > 0 && bestPlayer != nullptr) {
-        if (activeWeapon->nextPrimaryAttack() > Globals::serverTime())
-          return;
         if (autoSlow) {
           cmd->forwardmove = 0;
           cmd->sidemove = 0;
