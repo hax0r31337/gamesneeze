@@ -185,14 +185,12 @@ bool Features::RageBot::canShoot(Weapon *activeWeapon, QAngle *angle,
   angleVectors(*angle, &forward, &right, &up);
 
   int hitCount = 0;
-  int NeededHits =
-      static_cast<int>(255.f * (hitChance / 100.f));
 
   activeWeapon->UpdateAccuracyPenalty();
   float weap_spread = activeWeapon->GetSpread();
   float weap_inaccuracy = activeWeapon->GetInaccuracy();
 
-  for (int i = 0; i < 255; i++) {
+  for (int i = 0; i < 100; i++) {
     static float val1 = (2.0 * M_PI);
 
     double b = randFloat(0.f, val1);
@@ -225,27 +223,130 @@ bool Features::RageBot::canShoot(Weapon *activeWeapon, QAngle *angle,
     ray.Init(src, viewForward);
     Interfaces::trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, enemy, &tr);
 
-    // TraceFilter traceFilter;
-    // traceFilter.pSkip = Globals::localPlayer;
-    // Interfaces::trace->TraceRay(ray, 0x4600400B, &traceFilter, &tr);
+    // TraceFilter filter;
+    // filter.pSkip = Globals::localPlayer;
+    // //   hitbox  |  monster  | solid
+    // Interfaces::trace->TraceRay(ray, (0x40000000 | 0x40000 | 0x1), &filter, &tr);
 
     if (tr.m_pEntityHit == enemy) {
-      // Notifications::addNotification(ImColor(255, 255, 255), "HITS++");
       hitCount++;
     }
 
-    if (static_cast<int>((hitCount / 255.f) * 100.f) >= hitChance) {
+    if (hitCount >= hitChance) {
       // Notifications::addNotification(ImColor(255, 255, 255), "HITS OK");
       return true;
-    }
-
-    if ((255 - i + hitCount) < NeededHits) {
-      // Notifications::addNotification(ImColor(255, 255, 255), "FAILED HITS");
+    } else if (100 - i + hitCount < hitChance) {
       return false;
     }
   }
 
   return false;
+}
+
+void Features::RageBot::bestHeadPoint(Player *player,
+                                      int &Damage, Vector &Spot,
+                                      float headScale, WeaponInfo *weaponData,
+                                      bool friendlyFire) {
+  matrix3x4_t matrix[128];
+  if (!player->setupBones(matrix, 128, 0x100, 0.f))
+    return;
+  model_t *pModel = player->model();
+  if (!pModel)
+    return;
+
+  studiohdr_t *hdr = Interfaces::modelInfo->GetStudioModel(pModel);
+  if (!hdr)
+    return;
+  mstudiobbox_t *bbox = hdr->pHitbox((int)HitBoxes::HEAD, 0);
+  if (!bbox)
+    return;
+
+  Vector mins, maxs;
+  vectorTransform(bbox->bbmin, matrix[bbox->bone], mins);
+  vectorTransform(bbox->bbmax, matrix[bbox->bone], maxs);
+  auto local = Globals::localPlayer;
+
+  Vector center = (mins + maxs) * 0.5f;
+  static Vector points[7] = {center, center, center, center,
+                             center, center, center};
+  // 0 - center, 1 - skullcap, 3 - upperbackofhead
+  // 4 - leftear, 5 - rightear, 6 - backofhead
+  for (int i = 0; i < 7;
+       i++) // set all points initially to center mass of head.
+    points[i] = center;
+  float scale = headScale;
+  auto final_radius = bbox->radius * scale;
+
+  auto pitch_down = normalizePitch(player->eyeAngles().x) > 85.0f;
+  auto originY = local->origin().y;
+  float stuff = calcAngle(player->eyePos(), Vector{originY, originY, originY}).y;
+  auto backward = fabs(player->eyeAngles().y - stuff) > 120.0f;
+
+  points[1] = Vector(bbox->bbmax.x + 0.70710678f * final_radius,
+                     bbox->bbmax.y - 0.70710678f * final_radius, bbox->bbmax.z);
+  points[3] =
+      Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z + final_radius);
+  points[4] =
+      Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z - final_radius);
+  points[5] =
+      Vector(bbox->bbmax.x, bbox->bbmax.y - final_radius, bbox->bbmax.z);
+
+  if (pitch_down && backward)
+    points[6] =
+        Vector(bbox->bbmax.x - final_radius, bbox->bbmax.y, bbox->bbmax.z);
+
+  for (int i = 0; i < 7; i++) {
+    float bestDamage = getDamageDeal(player, points[i], weaponData, friendlyFire);
+    if (bestDamage >= player->health()) {
+      Damage = bestDamage;
+      Spot = points[i];
+      return;
+    } else if (bestDamage > Damage) {
+      Damage = bestDamage;
+      Spot = points[i];
+    }
+  }
+}
+
+void Features::RageBot::bestMultiPoint(Player *player, int &BoneIndex,
+                                        int &Damage, Vector &Spot, float bodyScale,
+                                        WeaponInfo *weaponData, bool friendlyFire) {
+  model_t *pModel = player->model();
+  if (!pModel)
+    return;
+  studiohdr_t *hdr = Interfaces::modelInfo->GetStudioModel(pModel);
+  if (!hdr)
+    return;
+  mstudiobbox_t *bbox = hdr->pHitbox((int)BoneIndex, 0);
+  if (!bbox)
+    return;
+
+  matrix3x4_t matrix[128];
+  Vector mins, maxs;
+  vectorTransform(bbox->bbmin, matrix[bbox->bone], mins);
+  vectorTransform(bbox->bbmax, matrix[bbox->bone], maxs);
+  // 0 - center 1 - left, 2 - right, 3 - back
+  Vector center = (mins + maxs) * 0.5f;
+  Vector points[4] = {center, center, center, center};
+  auto final_radius = bbox->radius * bodyScale;
+
+  points[1] =
+      Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z + final_radius);
+  points[2] =
+      Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z - final_radius);
+  points[3] = Vector(center.x, bbox->bbmax.y - final_radius, center.z);
+
+  for (int i = 0; i < 4; i++) {
+    int bestDamage = getDamageDeal(player, points[i], weaponData, friendlyFire);
+    if (bestDamage >= player->health()) {
+      Damage = bestDamage;
+      Spot = points[i];
+      return;
+    } else if (bestDamage > Damage) {
+      Damage = bestDamage;
+      Spot = points[i];
+    }
+  }
 }
 
 void Features::RageBot::createMove(CUserCmd *cmd) {
@@ -267,8 +368,9 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
   int hitboxes = CONFIGINT("Rage>RageBot>Default>Hitboxes");
   float FOV = CONFIGINT("Rage>RageBot>Default>FOV") / 10.f;
   int hitChance = CONFIGINT("Rage>RageBot>Default>Hit Chance");
-  int hitChanceBody = CONFIGINT("Rage>RageBot>Default>Hit Chance Body");
   float minDamage = CONFIGINT("Rage>RageBot>Default>Min Damage") * 1.f;
+  float headScale = CONFIGINT("Rage>RageBot>Default>Head Scale") / 100.f;
+  float bodyScale = CONFIGINT("Rage>RageBot>Default>Head Scale") / 100.f;
   bool friendlyFire = CONFIGBOOL("Rage>RageBot>Default>Friendly Fire");
   bool ignoreBlind = CONFIGBOOL("Rage>RageBot>Default>Ignore Blind");
   bool ignoreSmoke = CONFIGBOOL("Rage>RageBot>Default>Ignore Smoke");
@@ -287,8 +389,9 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>Pistol>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>Pistol>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>Pistol>Hit Chance");
-      hitChanceBody = CONFIGINT("Rage>RageBot>Pistol>Hit Chance Body");
       minDamage = CONFIGINT("Rage>RageBot>Pistol>Min Damage") * 1.f;
+      headScale = CONFIGINT("Rage>RageBot>Pistol>Head Scale") / 100.f;
+      bodyScale = CONFIGINT("Rage>RageBot>Pistol>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>Pistol>Auto Slow");
       killShot = CONFIGBOOL("Rage>RageBot>Pistol>Kill Shot");
     }
@@ -298,8 +401,9 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>Heavy Pistol>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>Heavy Pistol>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>Heavy Pistol>Hit Chance");
-      hitChanceBody = CONFIGINT("Rage>RageBot>Heavy Pistol>Hit Chance Body");
       minDamage = CONFIGINT("Rage>RageBot>Heavy Pistol>Min Damage") * 1.f;
+      headScale = CONFIGINT("Rage>RageBot>Heavy Pistol>Head Scale") / 100.f;
+      bodyScale = CONFIGINT("Rage>RageBot>Heavy Pistol>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Slow");
       killShot = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Kill Shot");
     }
@@ -309,8 +413,9 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>Rifle>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>Rifle>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>Rifle>Hit Chance");
-      hitChanceBody = CONFIGINT("Rage>RageBot>Rifle>Hit Chance Body");
       minDamage = CONFIGINT("Rage>RageBot>Rifle>Min Damage") * 1.f;
+      headScale = CONFIGINT("Rage>RageBot>Rifle>Head Scale") / 100.f;
+      bodyScale = CONFIGINT("Rage>RageBot>Rifle>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>Rifle>Auto Slow");
       killShot = CONFIGBOOL("Rage>RageBot>Rifle>Kill Shot");
     }
@@ -320,8 +425,9 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>SMG>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>SMG>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>SMG>Hit Chance");
-      hitChanceBody = CONFIGINT("Rage>RageBot>SMG>Hit Chance Body");
       minDamage = CONFIGINT("Rage>RageBot>SMG>Min Damage") * 1.f;
+      headScale = CONFIGINT("Rage>RageBot>SMG>Head Scale") / 100.f;
+      bodyScale = CONFIGINT("Rage>RageBot>SMG>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>SMG>Auto Slow");
       killShot = CONFIGBOOL("Rage>RageBot>SMG>Kill Shot");
     }
@@ -330,8 +436,9 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>Scout>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>Scout>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>Scout>Hit Chance");
-      hitChanceBody = CONFIGINT("Rage>RageBot>Scout>Hit Chance Body");
       minDamage = CONFIGINT("Rage>RageBot>Scout>Min Damage") * 1.f;
+      headScale = CONFIGINT("Rage>RageBot>Scout>Head Scale") / 100.f;
+      bodyScale = CONFIGINT("Rage>RageBot>Scout>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>Scout>Auto Slow");
       killShot = CONFIGBOOL("Rage>RageBot>Scout>Kill Shot");
     }
@@ -340,8 +447,9 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>AWP>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>AWP>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>AWP>Hit Chance");
-      hitChanceBody = CONFIGINT("Rage>RageBot>AWP>Hit Chance Body");
       minDamage = CONFIGINT("Rage>RageBot>AWP>Min Damage") * 1.f;
+      headScale = CONFIGINT("Rage>RageBot>AWP>Head Scale") / 100.f;
+      bodyScale = CONFIGINT("Rage>RageBot>AWP>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>AWP>Auto Slow");
       killShot = CONFIGBOOL("Rage>RageBot>AWP>Kill Shot");
     }
@@ -352,8 +460,9 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>Heavy>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>Heavy>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>Heavy>Hit Chance");
-      hitChanceBody = CONFIGINT("Rage>RageBot>Heavy>Hit Chance Body");
       minDamage = CONFIGINT("Rage>RageBot>Heavy>Min Damage") * 1.f;
+      headScale = CONFIGINT("Rage>RageBot>Heavy>Head Scale") / 100.f;
+      bodyScale = CONFIGINT("Rage>RageBot>Heavy>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>Heavy>Auto Slow");
       killShot = CONFIGBOOL("Rage>RageBot>Heavy>Kill Shot");
     }
@@ -388,7 +497,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
             matrix3x4_t boneMatrix[128];
             if (p->getAnythingBones(boneMatrix)) {
               Vector localPlayerEyePos = Globals::localPlayer->eyePos();
-              Vector targetBonePos;
 
               // TODO check which bone would be exposed sooner with engine
               // prediction and which would do more damage.
@@ -402,26 +510,47 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
                            : (1 << i & (int)HitBoxes::STOMACH) ? 5
                            : (1 << i & (int)HitBoxes::PELVIS)  ? 3
                                                                : 5;
-                targetBonePos = p->getBonePos(bone);
-                // if (!canScan(p, targetBonePos, weapon->GetWeaponInfo(),
-                //              killShot ? p->health() : minDamage,
-                //              friendlyFire)) {
-                //               continue;
-                // }
+
+                Vector targetBonePos = Vector{0, 0, 0};
+                int damageDeal = -1;
+                if (bone == 8) {
+                  if  (headScale == 0) {
+                    targetBonePos = p->getBonePos(bone);
+                    damageDeal = getDamageDeal(p, targetBonePos, weapon->GetWeaponInfo(), friendlyFire);
+                  } else {
+                    bestHeadPoint(p, damageDeal, targetBonePos, headScale,
+                                  weapon->GetWeaponInfo(), friendlyFire);
+                  }
+                } else {
+                  if (bodyScale == 0) {
+                    targetBonePos = p->getBonePos(bone);
+                    damageDeal =
+                        getDamageDeal(p, targetBonePos, weapon->GetWeaponInfo(),
+                                      friendlyFire);
+                  } else {
+                    int hitbox = (int) ((1 << i & (int)HitBoxes::HEAD)      ? HitBoxes::HEAD
+                             : (1 << i & (int)HitBoxes::NECK)    ? HitBoxes::NECK
+                             : (1 << i & (int)HitBoxes::CHEST)   ? HitBoxes::CHEST
+                             : (1 << i & (int)HitBoxes::STOMACH) ? HitBoxes::STOMACH
+                             : (1 << i & (int)HitBoxes::PELVIS)  ? HitBoxes::PELVIS
+                                                                 : HitBoxes::STOMACH);
+                    bestMultiPoint(p, hitbox, damageDeal, targetBonePos,
+                                   bodyScale, weapon->GetWeaponInfo(),
+                                   friendlyFire);
+                  }
+                }
+                // auto damageDeal = getDamageDeal(p, targetBonePos, weapon->GetWeaponInfo(), friendlyFire);
+                if (damageDeal <= 0 || damageDeal < (killShot ? p->health() : (p->health() < minDamage ? p->health() : minDamage))) {
+                  continue;
+                }
 
                 if (!ignoreSmoke &&
                     Offsets::lineGoesThroughSmoke(
                         Globals::localPlayer->eyePos(), targetBonePos, 1))
                   continue;
 
-                auto damageDeal = getDamageDeal(p, targetBonePos, weapon->GetWeaponInfo(), friendlyFire);
-                if (damageDeal <= 0 || damageDeal < (killShot ? p->health() : (p->health() < minDamage ? p->health() : minDamage))) {
-                  continue;
-                }
-
-                QAngle angle = calcAngle(localPlayerEyePos, targetBonePos) - aimPunch;
-                QAngle angleTarget = angle - cmd->viewangles;
-                // normalizeAngles(angle);
+                QAngle directAngle = calcAngle(localPlayerEyePos, targetBonePos);
+                QAngle angleTarget = directAngle - cmd->viewangles;
                 normalizeAngles(angleTarget);
 
                 if (angleTarget.Length() > FOV) {
@@ -429,13 +558,12 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
                 }
 
                 if (damageDeal > bestDamage) {
-                  if (!canShoot(weapon, &angle, p,
-                                bone == 8 ? hitChance : hitChanceBody)) {
+                  if (!canShoot(weapon, &directAngle, p, hitChance)) {
                     hasTarget = true;
                     continue;
                   }
                   bestDamage = damageDeal;
-                  bestPlayerAngle = angle;
+                  bestPlayerAngle = directAngle - aimPunch;
                   bestPlayer = p;
                 }
               }
@@ -460,12 +588,17 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
           cmd->buttons |= IN_ATTACK;
         }
 
-        QAngle angleTarget = bestPlayerAngle - cmd->viewangles;
-        normalizeAngles(angleTarget);
-        cmd->viewangles += angleTarget;
-      } else if (hasTarget && autoSlow) {
-        cmd->forwardmove = 0;
-        cmd->sidemove = 0;
+        cmd->viewangles = bestPlayerAngle;
+        normalizeAngles(cmd->viewangles);
+      } else if (hasTarget) {
+        if (autoSlow) {
+          cmd->forwardmove = 0;
+          cmd->sidemove = 0;
+        }
+        if (autoScope && activeWeapon->isSniperRifle() &&
+            !Globals::localPlayer->scoped()) {
+          cmd->buttons |= IN_ATTACK2;
+        }
       }
     }
   }

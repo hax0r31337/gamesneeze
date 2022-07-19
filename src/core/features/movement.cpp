@@ -110,6 +110,7 @@ void Features::Movement::prePredCreateMove(CUserCmd *cmd) {
 
 void Features::Movement::moveCheatz(CUserCmd *cmd) {
   autoStrafe(cmd);
+  antiAfkKick(cmd);
 }
 
 void Features::Movement::postPredCreateMove(CUserCmd *cmd) {
@@ -220,4 +221,12 @@ void Features::Movement::draw() {
                ImColor(255, 255, 255, 255), "gaming");
         }
     }
+}
+
+void Features::Movement::antiAfkKick(CUserCmd *cmd) {
+  if (!CONFIGBOOL("Misc>Misc>Misc>Anti AFK Kick"))
+    return;
+
+  if (cmd->command_number % 2)
+    cmd->buttons |= 1 << 27;
 }

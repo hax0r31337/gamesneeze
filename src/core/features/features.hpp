@@ -123,6 +123,8 @@ namespace Features {
     }
     namespace Triggerbot {
         void createMove(CUserCmd* cmd);
+        Entity *findPlayerThatRayHits(Vector start, Vector end,
+                                      Trace *traceToPlayer);
     }
     namespace RageBot {
         void createMove(CUserCmd* cmd);
@@ -134,6 +136,12 @@ namespace Features {
                                       float penetration, float damage, Entity *target);
         int getDamageDeal(Player *entity, const Vector &destination,
                 WeaponInfo *weaponData, bool allowFriendlyFire);
+        void bestHeadPoint(Player *player, int &Damage,
+                           Vector &Spot, float headScale,
+                           WeaponInfo *weaponData, bool friendlyFire);
+        void bestMultiPoint(Player *player, int &BoneIndex, int &Damage,
+                            Vector &Spot, float bodyScale,
+                            WeaponInfo *weaponData, bool friendlyFire);
         bool canShoot(Weapon *activeWeapon, QAngle *angle, Player *enemy,
                       int hitChance);
     }
@@ -180,5 +188,6 @@ namespace Features {
         void edgeBugPredictor(CUserCmd* cmd);
         void moveCheatz(CUserCmd* cmd);
         void draw();
+        void antiAfkKick(CUserCmd* cmd);
     }
 }

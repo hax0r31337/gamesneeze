@@ -1,15 +1,17 @@
 #include "features.hpp"
 #include <vector>
 
-Entity* findPlayerThatRayHits(Vector start, Vector end, Trace* traceToPlayer) {
-    Ray ray;
-    ray.Init(start, end);
-    TraceFilter filter;
-    filter.pSkip = Globals::localPlayer;
-                                    //   hitbox  |  monster  | solid
-    Interfaces::trace->TraceRay(ray, (0x40000000 | 0x40000 | 0x1), &filter, traceToPlayer);
+Entity *Features::Triggerbot::findPlayerThatRayHits(Vector start, Vector end,
+                                                    Trace *traceToPlayer) {
+  Ray ray;
+  ray.Init(start, end);
+  TraceFilter filter;
+  filter.pSkip = Globals::localPlayer;
+  //   hitbox  |  monster  | solid
+  Interfaces::trace->TraceRay(ray, (0x40000000 | 0x40000 | 0x1), &filter,
+                              traceToPlayer);
 
-    return traceToPlayer->m_pEntityHit;
+  return traceToPlayer->m_pEntityHit;
 }
 
 void Features::Triggerbot::createMove(CUserCmd* cmd) {

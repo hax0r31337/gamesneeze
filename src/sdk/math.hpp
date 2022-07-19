@@ -132,6 +132,27 @@ inline void angleVectors(const QAngle &angles, Vector& forward) {
 	forward.z = -sin(DEG2RAD(angles.x));
 }
 
+inline float dotProduct(const Vector &v1, const float *v2) {
+  return v1.x * v2[0] + v1.y * v2[1] + v1.z * v2[2];
+}
+
+inline void vectorTransform(const Vector &in1, const matrix3x4_t &in2,
+                            Vector &out) {
+  out.x = dotProduct(in1, in2[0]) + in2[0][3];
+  out.y = dotProduct(in1, in2[1]) + in2[1][3];
+  out.z = dotProduct(in1, in2[2]) + in2[2][3];
+}
+
+inline float normalizePitch(float pitch) {
+  while (pitch > 89.0f)
+    pitch -= 180.0f;
+
+  while (pitch < -89.0f)
+    pitch += 180.0f;
+
+  return pitch;
+}
+
 inline float getDistance(Vector pos1, Vector pos2) {
     // Do 3d pythag
     float a = abs(pos1.x-pos2.x);
