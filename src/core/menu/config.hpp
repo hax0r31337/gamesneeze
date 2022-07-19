@@ -18,6 +18,15 @@ enum class HitBoxes {
     PELVIS = 1 << 4,
 };
 
+enum class HitboxModel : int {
+  HITBOX_HEAD = 0,
+  HITBOX_NECK,
+  HITBOX_PELVIS,
+  HITBOX_SPINE,
+  HITBOX_LEGS,
+  HITBOX_ARMS,
+};
+
 #define CONFIGINT(name) Config::config.at(name).intValue
 #define CONFIGBOOL(name) Config::config.at(name).boolValue
 #define CONFIGSTR(name) Config::config.at(name).strValue

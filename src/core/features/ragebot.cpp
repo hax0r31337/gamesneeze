@@ -257,7 +257,7 @@ void Features::RageBot::bestHeadPoint(Player *player,
   studiohdr_t *hdr = Interfaces::modelInfo->GetStudioModel(pModel);
   if (!hdr)
     return;
-  mstudiobbox_t *bbox = hdr->pHitbox((int)HitBoxes::HEAD, 0);
+  mstudiobbox_t *bbox = hdr->pHitbox((int)HitboxModel::HITBOX_HEAD, 0);
   if (!bbox)
     return;
 
@@ -528,12 +528,12 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
                         getDamageDeal(p, targetBonePos, weapon->GetWeaponInfo(),
                                       friendlyFire);
                   } else {
-                    int hitbox = (int) ((1 << i & (int)HitBoxes::HEAD)      ? HitBoxes::HEAD
-                             : (1 << i & (int)HitBoxes::NECK)    ? HitBoxes::NECK
-                             : (1 << i & (int)HitBoxes::CHEST)   ? HitBoxes::CHEST
-                             : (1 << i & (int)HitBoxes::STOMACH) ? HitBoxes::STOMACH
-                             : (1 << i & (int)HitBoxes::PELVIS)  ? HitBoxes::PELVIS
-                                                                 : HitBoxes::STOMACH);
+                    int hitbox = (int) ((1 << i & (int)HitBoxes::HEAD)      ? HitboxModel::HITBOX_HEAD
+                             : (1 << i & (int)HitBoxes::NECK)    ? HitboxModel::HITBOX_NECK
+                             : (1 << i & (int)HitBoxes::CHEST)   ? HitboxModel::HITBOX_SPINE
+                             : (1 << i & (int)HitBoxes::STOMACH) ? HitboxModel::HITBOX_LEGS
+                             : (1 << i & (int)HitBoxes::PELVIS)  ? HitboxModel::HITBOX_PELVIS
+                                                                 : HitboxModel::HITBOX_SPINE);
                     bestMultiPoint(p, hitbox, damageDeal, targetBonePos,
                                    bodyScale, weapon->GetWeaponInfo(),
                                    friendlyFire);
