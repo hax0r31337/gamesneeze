@@ -130,3 +130,38 @@ bool Player::visible() {
     }
     return false;
 }
+
+void BombData::update() noexcept {
+  if (Interfaces::engine->IsInGame()) {
+    for (auto i : entityDistanceMap) {
+      if (!Globals::localPlayer ||
+          i.second == Interfaces::engine->GetLocalPlayer()) {
+        continue;
+      }
+      Entity *ent = (Entity *)Interfaces::entityList->GetClientEntity(i.second);
+      if (!ent) {
+        continue;
+      }
+      ClientClass *clientClass = ent->clientClass();
+
+      if (clientClass->m_ClassID == EClassIds::CPlantedC4) {
+        auto bomb = (PlantedC4 *)ent;
+        blowTime = bomb->time();
+        timerLength = bomb->timerLength();
+        defuserHandle = bomb->defuser();
+        if (defuserHandle != -1) {
+          defuseCountDown = bomb->defuseCountDown();
+          defuseLength = bomb->defuseLength();
+        }
+        bombsite = bomb->site();
+        origin = bomb->origin();
+        return;
+      }
+    }
+  }
+  blowTime = 0.0f;
+  timerLength = 1.f;
+  defuserHandle = -1;
+  bombsite = false;
+  origin = Vector(-1, -1, -1);
+}

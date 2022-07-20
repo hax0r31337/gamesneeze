@@ -19,6 +19,8 @@ void Hooks::Events::EventListener::FireGameEvent(IGameEvent *event) {
             player_info_t info;
             Interfaces::engine->GetPlayerInfo(victim->index(), &info);
 
+            Globals::kills++;
+
             if (CONFIGBOOL("Misc>Misc>Hitmarkers>Hitlogs")) {
                 if (CONFIGBOOL("Legit>Backtrack>Backtrack") && Features::Backtrack::lastBacktrack > 4) {
                     Features::Notifications::addNotification(ImColor(220, 220, 40), "[gs] backtracked %s %i ticks for %i health", info.name, Features::Backtrack::lastBacktrack, event->GetInt("dmg_health"));

@@ -303,3 +303,15 @@ public:
 	NETVAR("DT_FogController", "m_fog.maxdensity", maxDensity, float);
 	NETVAR("DT_FogController", "m_fog.colorPrimary", colorPrimary, int);
 };
+
+struct BombData {
+  void update() noexcept;
+
+  float blowTime;
+  float timerLength;
+  int defuserHandle;
+  float defuseCountDown;
+  float defuseLength;
+  int bombsite;
+  Vector origin;
+};

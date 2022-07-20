@@ -5,39 +5,6 @@
 #include <unistd.h>
 #include <pwd.h>
 
-void BombData::update() noexcept {
-  if (Interfaces::engine->IsInGame()) {
-    for (auto i : entityDistanceMap) {
-      if (!Globals::localPlayer ||
-          i.second == Interfaces::engine->GetLocalPlayer()) {
-        continue;
-      }
-      Entity *ent = (Entity *)Interfaces::entityList->GetClientEntity(i.second);
-      if (!ent) {
-        continue;
-      }
-      ClientClass *clientClass = ent->clientClass();
-
-      if (clientClass->m_ClassID == EClassIds::CPlantedC4) {
-        auto bomb = (PlantedC4 *)ent;
-        blowTime = bomb->time();
-        timerLength = bomb->timerLength();
-        defuserHandle = bomb->defuser();
-        if (defuserHandle != -1) {
-          defuseCountDown = bomb->defuseCountDown();
-          defuseLength = bomb->defuseLength();
-        }
-        bombsite = bomb->site();
-        return;
-      }
-    }
-  }
-  blowTime = 0.0f;
-  timerLength = 1.f;
-  defuserHandle = -1;
-  bombsite = false;
-}
-
 void Menu::drawOverlay(ImDrawList* drawList) {
     Globals::drawList = drawList;
 
@@ -74,9 +41,11 @@ void Menu::drawWaterMarkOverlay() {
   ImGui::SameLine();
   ImGui::TextColored(ImColor(108, 195, 18, 255), "sneeze");
   ImGui::SameLine();
-  ImGui::Text(
-      " | %.1f FPS | %i ms", ImGui::GetIO().Framerate,
-      Interfaces::engine->IsInGame() ? playerResource->GetPing(Interfaces::engine->GetLocalPlayer()) : 0);
+  if (Interfaces::engine->IsInGame()) {
+    ImGui::Text(" | %.1f FPS | %i ms | Kills %i", ImGui::GetIO().Framerate, playerResource->GetPing(Interfaces::engine->GetLocalPlayer()), Globals::kills);
+  } else {
+    ImGui::Text(" | %.1f FPS | Not Connected | Kills %i", ImGui::GetIO().Framerate, Globals::kills);
+  }
   ImGui::PopStyleVar();
   ImGui::End();
 }
@@ -86,7 +55,7 @@ void Menu::drawBombTimerOverlay() {
     return;
   }
 
-  const auto &plantedC4 = Menu::bombData;
+  const auto &plantedC4 = Globals::bombData;
   if (plantedC4.blowTime == 0.0f && !Menu::open)
     return;
 

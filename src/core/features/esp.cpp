@@ -266,7 +266,6 @@ void Features::ESP::draw() {
                                 char label[32] = "";
                                 snprintf(label, 32, "Planted C4\n%.3f", bombTime);
                                 drawGenericEnt(ent, CONFIGBOOL("Visuals>World>Items>Planted C4 Box"), CONFIGCOL("Visuals>World>Items>Planted C4 Box Color"), CONFIGBOOL("Visuals>World>Items>Planted C4 Label") ? label : "");
-                                AutoDefuse::onBombRender((PlantedC4*)ent);
                             }
                         }
                         

@@ -362,20 +362,16 @@ void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *activeWeapon) {
 
   QAngle ViewAngle;
   Interfaces::engine->GetViewAngles(ViewAngle);
-  static Vector oldOrigin = Globals::localPlayer->origin();
-  Vector velocity = (Globals::localPlayer->origin() - oldOrigin) *
-                    (1.f / Interfaces::globals->interval_per_tick);
-  oldOrigin = Globals::localPlayer->origin();
-  float speed = velocity.Length();
+  float speed = Globals::localPlayer->velocity().Length();
 
   if (speed > 43.f) {
     QAngle dir;
-    vectorAngles(velocity, dir);
+    vectorAngles(Globals::localPlayer->velocity(), dir);
     dir.y = ViewAngle.y - dir.x;
     Vector NewMove = Vector(0, 0, 0);
     angleVectors(dir, NewMove);
     auto max = std::max(cmd->forwardmove, cmd->sidemove);
-    auto mult = 450.f / max;
+    auto mult = std::max(450.f / max, 1.f);
     NewMove *= -mult;
 
     cmd->forwardmove = NewMove.x;
@@ -398,6 +394,8 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
          CONFIGBOOL("Rage>RageBot>Always on")) &&
         Interfaces::engine->IsInGame() && Globals::localPlayer &&
         Globals::localPlayer->health() > 0))
+    return;
+  if (Globals::localPlayer->moveType() != MOVETYPE_WALK)
     return;
 
   const auto activeWeapon = (Weapon *)Globals::localPlayer->GetWeapon();

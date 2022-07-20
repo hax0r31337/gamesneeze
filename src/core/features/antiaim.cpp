@@ -48,8 +48,6 @@ void Features::AntiAim::createMove(CUserCmd* cmd) {
                         if (!((cmd->buttons & (1 << 0)) || (cmd->buttons & (1 << 5)))) {
                             if (CONFIGINT("Rage>AntiAim>Type")) {
                                 // TODO: for some reason it refuses to desync when looking forward???!?!?
-                                
-                                cmd->viewangles.x = CONFIGINT("Rage>AntiAim>Pitch");
 
                                 int real = 0;
                                 int fake = 0;
@@ -89,7 +87,7 @@ void Features::AntiAim::createMove(CUserCmd* cmd) {
                                       auto realtime = Interfaces::globals->realtime;
                                       static float lastTime{0.0f};
 
-                                      if (realtime - lastTime > 0.5f) {
+                                      if (realtime - lastTime > CONFIGINT("Rage>AntiAim>FakeLag") / 0.125) {
                                         invert = !invert;
                                         lastTime = realtime;
                                       }
@@ -116,6 +114,8 @@ void Features::AntiAim::createMove(CUserCmd* cmd) {
                                 } else {
                                     fakelag = CONFIGINT("Rage>AntiAim>FakeLag");
                                 }
+                                cmd->viewangles.x =
+                                    CONFIGINT("Rage>AntiAim>Pitch");
 
                                 *Globals::sendPacket = cmd->tick_count % (CONFIGINT("Rage>AntiAim>Type") + fakelag + 1);
 

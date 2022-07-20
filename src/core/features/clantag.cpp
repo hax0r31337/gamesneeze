@@ -2,6 +2,7 @@
 #include "features.hpp"
 #include "beemovie.hpp"
 #include <cstring>
+#include <string>
 
 void shiftMarquee(char* text, int size) {
     char temp;
@@ -28,13 +29,27 @@ void Features::ClantagChanger::frameStageNotify(FrameStage frame) {
                 shiftMarquee((Menu::clantag), strlen(Menu::clantag));
                 updateClantag();
             }
-        }
-        else if (CONFIGBOOL("Misc>Misc>Clantag>Bee Movie Clantag")) {
-            // if(TICKCOUNTWITHPING() % 16 == 0) {
+        } else if (CONFIGBOOL("Misc>Misc>Clantag>Bee Movie Clantag")) {
+            if(TICKCOUNTWITHPING() % 16 == 0) {
                 memcpy(Menu::clantag, &beeMovieScript[(TICKCOUNTWITHPING() % 55000)/16], 127); // mod it by 55k just as a crude way of looping when it gets to the end, doubt anyone will have it on for 300 mins anyways lmao
                 Menu::clantag[127] = '\0';
                 updateClantag();
-            // }
+            }
+        } else if (CONFIGBOOL("Misc>Misc>Clantag>Brand Clantag")) {
+          static std::string brands[24] = {
+              "⚡",           "⚡g",          "⚡ga",         "⚡gam",
+              "⚡game",       "⚡games",      "⚡gamesn",     "⚡gamesne",
+              "⚡gamesnee",   "⚡gamesneez",  "⚡gamesneeze", "☠gamesneeze",
+              "⚡gamesneeze", "☠gamesneeze", "⚡gamesneeze", "⚡amesneeze",
+              "⚡mesneeze",   "⚡esneeze",    "⚡sneeze",     "⚡neeze",
+              "⚡eeze",       "⚡eze",        "⚡ze",         "⚡e",
+          };
+          if (TICKCOUNTWITHPING() % 16 == 0) {
+            std::string brandCol = brands[(TICKCOUNTWITHPING() / 16) % 24];
+            memcpy(Menu::clantag, brandCol.c_str(), 127);
+            Menu::clantag[127] = '\0';
+            updateClantag();
+          }
         }
         else {
             if(TICKCOUNTWITHPING() % 128 == 0) {

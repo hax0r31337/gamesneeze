@@ -26,7 +26,7 @@ void Menu::drawMiscTab() {
                 ImGui::Checkbox("Auto Defuse", &CONFIGBOOL("Misc>Misc>Misc>Auto Defuse"));
                 if (CONFIGBOOL("Misc>Misc>Misc>Auto Defuse")) {
                     ImGui::SameLine();
-                    ImGui::Checkbox("Latest Defuse", &CONFIGBOOL("Misc>Misc>Misc>Latest Defuse"));
+                    ImGui::Checkbox("Rotate", &CONFIGBOOL("Misc>Misc>Misc>Auto Defuse Rotate"));
                 }
                 ImGui::Checkbox("Chat Filter Bypass", &CONFIGBOOL("Misc>Misc>Misc>Chat Filter Bypass"));
                 if (CONFIGBOOL("Misc>Misc>Misc>Use Spam")) {
@@ -90,6 +90,7 @@ void Menu::drawMiscTab() {
                 ImGui::Checkbox("Clantag", &CONFIGBOOL("Misc>Misc>Clantag>Clantag"));
                 ImGui::Checkbox("Marquee", &CONFIGBOOL("Misc>Misc>Clantag>Clantag Marquee"));
                 ImGui::Checkbox("Bee Movie Clantag", &CONFIGBOOL("Misc>Misc>Clantag>Bee Movie Clantag"));
+                ImGui::Checkbox("Brand Clantag", &CONFIGBOOL("Misc>Misc>Clantag>Brand Clantag"));
                 ImGui::EndChild();
             }
 
@@ -108,7 +109,7 @@ void Menu::drawMiscTab() {
                 ImGui::EndChild();
             }
 
-            ImGui::BeginChild("Movement", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.38, ImGui::GetWindowHeight() * 0.326f), true); {
+            ImGui::BeginChild("Movement", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.38, ImGui::GetWindowHeight() * 0.176f), true); {
                 ImGui::Text("Movement");
                 ImGui::Separator();
                 ImGui::Checkbox("Bunny Hop", &CONFIGBOOL("Misc>Misc>Movement>Bunny Hop"));

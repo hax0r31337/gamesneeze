@@ -19,7 +19,7 @@ void Hooks::FrameStageNotify::hook(void* thisptr, FrameStage frame) {
 
     if (frame == FRAME_RENDER_START) {
         cachePlayers();
-        Menu::bombData.update();
+        Globals::bombData.update();
         if (Globals::localPlayer && Globals::localPlayer->health() > 0 && Interfaces::input->m_fCameraInThirdPerson) {
           Globals::localPlayer->viewAngles()->y = Globals::oldViewangles.y;
           Globals::localPlayer->viewAngles()->x = Globals::oldViewangles.x;
