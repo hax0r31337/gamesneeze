@@ -105,22 +105,22 @@ inline void vectorAngles(const Vector &forward, const Vector &up, QAngle &angles
 }
 
 inline void vectorAngles(const Vector &forward, QAngle &angles) {
-  if (forward[1] == 0.0f && forward[0] == 0.0f) {
-    angles[0] = (forward[2] > 0.0f) ? 270.0f : 90.0f; // Pitch (up/down)
-    angles[1] = 0.0f;                                 // yaw left/right
+  if (forward.y == 0.0f && forward.x == 0.0f) {
+    angles.x = (forward.z > 0.0f) ? 270.0f : 90.0f; // Pitch (up/down)
+    angles.y = 0.0f;                                 // yaw left/right
   } else {
-    angles[0] = atan2(-forward[2], forward.Length2D()) * -180 / M_PI;
-    angles[1] = atan2(forward[1], forward[0]) * 180 / M_PI;
+    angles.x = atan2(-forward[2], forward.Length2D()) * -180 / M_PI;
+    angles.y = atan2(forward[1], forward[0]) * 180 / M_PI;
 
-    if (angles[1] > 90)
-      angles[1] -= 180;
-    else if (angles[1] < 90)
-      angles[1] += 180;
-    else if (angles[1] == 90)
-      angles[1] = 0;
+    if (angles.y > 90)
+      angles.y -= 180;
+    else if (angles.y < 90)
+      angles.y += 180;
+    else if (angles.y == 90)
+      angles.y = 0;
   }
 
-  angles[2] = 0.0f;
+  angles.z = 0.0f;
 }
 
 inline void SinCos(float radians, float *sine, float *cosine) {

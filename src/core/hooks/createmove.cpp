@@ -42,6 +42,8 @@ bool Hooks::CreateMove::hook(void* thisptr, float flInputSampleTime, CUserCmd* c
 
         if (Features::AutoDefuse::shouldDefuse) {
           cmd->buttons |= (1 << 5);
+          cmd->viewangles.x = 89;
+          cmd->viewangles.y = 180;
         }
         if (!noMovementFix) { endMovementFix(cmd); }
         Features::QuickPeek::createMove(cmd);

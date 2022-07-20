@@ -1,5 +1,6 @@
 #include "../../includes.hpp"
 #include "features.hpp"
+#include <cmath>
 
 
 bool Features::RageBot::traceToExit(const Trace &enterTrace,
@@ -353,6 +354,11 @@ void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *activeWeapon) {
   // TODO: find a way that not causing untrusted
   // cmd->forwardmove = 0;
   // cmd->sidemove = 0;
+
+  if (Interfaces::globals->interval_per_tick == FP_NAN ||
+      Interfaces::globals->interval_per_tick == 0 ||
+      Interfaces::globals->interval_per_tick == FP_INFINITE) 
+      return;
 
   QAngle ViewAngle;
   Interfaces::engine->GetViewAngles(ViewAngle);
