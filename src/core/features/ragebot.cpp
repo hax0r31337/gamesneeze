@@ -350,11 +350,7 @@ void Features::RageBot::bestMultiPoint(Player *player, int &BoneIndex,
   }
 }
 
-void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *activeWeapon) {
-  // TODO: find a way that not causing untrusted
-  // cmd->forwardmove = 0;
-  // cmd->sidemove = 0;
-
+void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *weapon) {
   if (Interfaces::globals->interval_per_tick == FP_NAN ||
       Interfaces::globals->interval_per_tick == 0 ||
       Interfaces::globals->interval_per_tick == FP_INFINITE) 
@@ -365,20 +361,26 @@ void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *activeWeapon) {
   float speed = Globals::localPlayer->velocity().Length();
 
   if (speed > 43.f) {
-    QAngle dir;
-    vectorAngles(Globals::localPlayer->velocity(), dir);
-    dir.y = ViewAngle.y - dir.x;
-    Vector NewMove = Vector(0, 0, 0);
-    angleVectors(dir, NewMove);
-    auto max = std::max(cmd->forwardmove, cmd->sidemove);
-    auto mult = std::max(450.f / max, 1.f);
-    NewMove *= -mult;
+    const float maxSpeed =
+        (Globals::localPlayer->scoped()
+             ? weapon->GetWeaponInfo()->GetMaxPlayerSpeedScoped()
+             : weapon->GetWeaponInfo()->GetMaxPlayerSpeed()) /
+        3;
 
-    cmd->forwardmove = NewMove.x;
-    cmd->sidemove = NewMove.y;
+    if (cmd->forwardmove && cmd->sidemove) {
+      const float maxSpeedRoot = maxSpeed * static_cast<float>(M_SQRT1_2);
+      cmd->forwardmove = cmd->forwardmove < 0.0f ? -maxSpeedRoot : maxSpeedRoot;
+      cmd->sidemove = cmd->sidemove < 0.0f ? -maxSpeedRoot : maxSpeedRoot;
+    } else if (cmd->forwardmove) {
+      cmd->forwardmove = cmd->forwardmove < 0.0f ? -maxSpeed : maxSpeed;
+    } else if (cmd->sidemove) {
+      cmd->sidemove = cmd->sidemove < 0.0f ? -maxSpeed : maxSpeed;
+    }
+
+    cmd->buttons |= IN_WALK;
   } else {
     float sped = 0.1f;
-    float max_speed = activeWeapon->GetWeaponInfo()->GetMaxPlayerSpeed();
+    float max_speed = weapon->GetWeaponInfo()->GetMaxPlayerSpeed();
     float ratio = max_speed / 255.0f;
     sped *= ratio;
 

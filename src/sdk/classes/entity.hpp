@@ -213,6 +213,8 @@ public:
 
   float GetMaxPlayerSpeed() { return *(float *)((uintptr_t)this + 0x1B8); }
 
+  float GetMaxPlayerSpeedScoped() { return *(float *)((uintptr_t)this + 0x1BC); }
+
   int GetZoomLevels() { // Doesn't work correctly on some weapons.
     return *(int *)((uintptr_t)this +
                     0x23C); // DT_WeaponCSBaseGun.m_zoomLevel ?

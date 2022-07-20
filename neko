@@ -56,7 +56,7 @@ function load() {
 
     # disable crash dumps
     # https://github.com/seksea/gamesneeze/pull/117
-    sysctl kernel.core_pattern=core
+    sudo sysctl kernel.core_pattern=core
 
     sudo cp $libraryname /usr/lib/$tlibname
     gdbOut=$(
