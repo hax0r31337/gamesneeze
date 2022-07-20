@@ -75,6 +75,10 @@ void Menu::drawRageTab() {
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Default>Body Scale"), 1, 100);
                 ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Default>Auto Slow"));
+                ImGui::SameLine();
+                ImGui::TextDisabled("?");
+                if (ImGui::IsItemHovered())
+                  ImGui::SetTooltip("May cause untrusted, use at own risk!");
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Default>Kill Shot"));
 
                 ImGui::Separator();

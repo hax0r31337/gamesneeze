@@ -490,7 +490,6 @@ namespace Config {
         CONFIGITEM("Misc>Misc>Misc>Disable Setting Cvars", false),
         CONFIGITEM("Misc>Misc>Misc>Disable Post Processing", false),
         CONFIGITEM("Misc>Misc>Misc>No Movement Fix", false),
-        CONFIGITEM("Misc>Misc>Misc>Anti AFK Kick", false),
 
         CONFIGITEM("Misc>Skins>Skins>PaintKit", 0),
         CONFIGITEM("Misc>Skins>Skins>Wear", 0),
@@ -504,7 +503,7 @@ namespace Config {
         Config::cfgFiles.clear();
         char path[128];
         strcpy(path, getenv("HOME"));
-        strcat(path, "/.gamesneeze");
+        strcat(path, "/.config/gamesneeze");
         if (!std::filesystem::is_directory(path)) {
             std::filesystem::create_directory(path);
         }
@@ -601,7 +600,7 @@ namespace Config {
 
     inline void init() {
         strcpy(cfgDir, getenv("HOME"));
-        strcat(cfgDir, "/.gamesneeze/configs/");
+        strcat(cfgDir, "/.config/gamesneeze/configs/");
         reloadCfgList();
         if (cfgFiles.size() == 1) {
             strcpy(configFileName, cfgFiles[0].c_str());

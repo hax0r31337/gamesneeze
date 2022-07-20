@@ -349,9 +349,45 @@ void Features::RageBot::bestMultiPoint(Player *player, int &BoneIndex,
   }
 }
 
+void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *activeWeapon) {
+  // TODO: find a way that not causing untrusted
+  // cmd->forwardmove = 0;
+  // cmd->sidemove = 0;
+
+  QAngle ViewAngle;
+  Interfaces::engine->GetViewAngles(ViewAngle);
+  static Vector oldOrigin = Globals::localPlayer->origin();
+  Vector velocity = (Globals::localPlayer->origin() - oldOrigin) *
+                    (1.f / Interfaces::globals->interval_per_tick);
+  oldOrigin = Globals::localPlayer->origin();
+  float speed = velocity.Length();
+
+  if (speed > 43.f) {
+    QAngle dir;
+    vectorAngles(velocity, dir);
+    dir.y = ViewAngle.y - dir.x;
+    Vector NewMove = Vector(0, 0, 0);
+    angleVectors(dir, NewMove);
+    auto max = std::max(cmd->forwardmove, cmd->sidemove);
+    auto mult = 450.f / max;
+    NewMove *= -mult;
+
+    cmd->forwardmove = NewMove.x;
+    cmd->sidemove = NewMove.y;
+  } else {
+    float sped = 0.1f;
+    float max_speed = activeWeapon->GetWeaponInfo()->GetMaxPlayerSpeed();
+    float ratio = max_speed / 255.0f;
+    sped *= ratio;
+
+    cmd->forwardmove *= sped;
+    cmd->sidemove *= sped;
+  }
+
+  cmd->buttons |= IN_WALK;
+}
+
 void Features::RageBot::createMove(CUserCmd *cmd) {
-  // if (!CONFIGBOOL("Rage>Enabled"))
-  //   return;
   if (!((Menu::CustomWidgets::isKeyDown(CONFIGINT("Rage>RageBot>Key")) ||
          CONFIGBOOL("Rage>RageBot>Always on")) &&
         Interfaces::engine->IsInGame() && Globals::localPlayer &&
@@ -576,8 +612,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
       }
       if (bestDamage > 0 && bestPlayer != nullptr) {
         if (autoSlow) {
-          cmd->forwardmove = 0;
-          cmd->sidemove = 0;
+          applyAutoSlow(cmd, weapon);
         }
         if (autoScope &&
             activeWeapon->isSniperRifle() && !Globals::localPlayer->scoped()) {
@@ -593,8 +628,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
         normalizeAngles(cmd->viewangles);
       } else if (hasTarget) {
         if (autoSlow) {
-          cmd->forwardmove = 0;
-          cmd->sidemove = 0;
+          applyAutoSlow(cmd, weapon);
         }
         if (autoScope && activeWeapon->isSniperRifle() &&
             !Globals::localPlayer->scoped()) {

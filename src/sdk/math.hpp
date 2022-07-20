@@ -15,31 +15,45 @@ inline void startMovementFix(CUserCmd* cmd) {
 inline void endMovementFix(CUserCmd* cmd) {
     // this was just taken from designer bc im lazy
     // https://github.com/designer1337/csgo-cheat-base/blob/09fa2ba8de52eef482bbc82f682976e369191077/dependencies/math/math.cpp#L4
-    if (cmd->forwardmove == 0 && cmd->sidemove == 0) { return; }
-    float deltaViewAngles;
-	float f1;
-	float f2;
 
-	if (originalAngle.y < 0.f)
-		f1 = 360.0f + originalAngle.y;
-	else
-		f1 = originalAngle.y;
+  //   float deltaViewAngles;
+	// float f1;
+	// float f2;
 
-	if (cmd->viewangles.y < 0.0f)
-		f2 = 360.0f + cmd->viewangles.y;
-	else
-		f2 = cmd->viewangles.y;
+	// if (originalAngle.y < 0.f)
+	// 	f1 = 360.0f + originalAngle.y;
+	// else
+	// 	f1 = originalAngle.y;
 
-	if (f2 < f1)
-		deltaViewAngles = abs(f2 - f1);
-	else
-		deltaViewAngles = 360.0f - abs(f1 - f2);
+	// if (cmd->viewangles.y < 0.0f)
+	// 	f2 = 360.0f + cmd->viewangles.y;
+	// else
+	// 	f2 = cmd->viewangles.y;
 
-	deltaViewAngles = 360.0f - deltaViewAngles;
+	// if (f2 < f1)
+	// 	deltaViewAngles = abs(f2 - f1);
+	// else
+	// 	deltaViewAngles = 360.0f - abs(f1 - f2);
 
-	cmd->forwardmove = cos(DEG2RAD(deltaViewAngles)) * originalForwardMove + cos(DEG2RAD(deltaViewAngles + 90.f)) * originalSideMove;
-	cmd->sidemove = sin(DEG2RAD(deltaViewAngles)) * originalForwardMove + sin(DEG2RAD(deltaViewAngles + 90.f)) * originalSideMove;
-    // TODO: support upmove
+	// deltaViewAngles = 360.0f - deltaViewAngles;
+
+	// cmd->forwardmove = cos(DEG2RAD(deltaViewAngles)) * originalForwardMove + cos(DEG2RAD(deltaViewAngles + 90.f)) * originalSideMove;
+	// cmd->sidemove = sin(DEG2RAD(deltaViewAngles)) * originalForwardMove + sin(DEG2RAD(deltaViewAngles + 90.f)) * originalSideMove;
+
+  // from osiris
+  float oldYaw = originalAngle.y + (originalAngle.y < 0.0f ? 360.0f : 0.0f);
+  float newYaw =
+      cmd->viewangles.y + (cmd->viewangles.y < 0.0f ? 360.0f : 0.0f);
+  float yawDelta = newYaw < oldYaw ? fabsf(newYaw - oldYaw)
+                                   : 360.0f - fabsf(newYaw - oldYaw);
+  yawDelta = 360.0f - yawDelta;
+  
+  const float forwardmove = cmd->forwardmove;
+  const float sidemove = cmd->sidemove;
+  cmd->forwardmove = std::cos(DEG2RAD(yawDelta)) * forwardmove +
+                     std::cos(DEG2RAD(yawDelta + 90.0f)) * sidemove;
+  cmd->sidemove = std::sin(DEG2RAD(yawDelta)) * forwardmove +
+                  std::sin(DEG2RAD(yawDelta + 90.0f)) * sidemove;
 }
 
 inline void normalizeAngles(QAngle& angle) {
@@ -88,6 +102,25 @@ inline void vectorAngles(const Vector &forward, const Vector &up, QAngle &angles
     angles.y = atan2f(-left.x, left.y) * 180 / M_PI_F;
     angles.z = 0;
   }
+}
+
+inline void vectorAngles(const Vector &forward, QAngle &angles) {
+  if (forward[1] == 0.0f && forward[0] == 0.0f) {
+    angles[0] = (forward[2] > 0.0f) ? 270.0f : 90.0f; // Pitch (up/down)
+    angles[1] = 0.0f;                                 // yaw left/right
+  } else {
+    angles[0] = atan2(-forward[2], forward.Length2D()) * -180 / M_PI;
+    angles[1] = atan2(forward[1], forward[0]) * 180 / M_PI;
+
+    if (angles[1] > 90)
+      angles[1] -= 180;
+    else if (angles[1] < 90)
+      angles[1] += 180;
+    else if (angles[1] == 90)
+      angles[1] = 0;
+  }
+
+  angles[2] = 0.0f;
 }
 
 inline void SinCos(float radians, float *sine, float *cosine) {

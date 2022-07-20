@@ -31,6 +31,7 @@ namespace Menu {
     void drawRageTab();
     void drawVisualsTab();
     void drawMiscTab();
+    void drawLuaTab();
     void drawDevWindow();
     void drawOverlay(ImDrawList* drawList);
     void onPollEvent(SDL_Event* event, const int result);

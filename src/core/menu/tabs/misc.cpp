@@ -38,7 +38,6 @@ void Menu::drawMiscTab() {
                 ImGui::Checkbox("Disable Setting Cvars", &CONFIGBOOL("Misc>Misc>Misc>Disable Setting Cvars"));
                 ImGui::Checkbox("Disable Post Processing", &CONFIGBOOL("Misc>Misc>Misc>Disable Post Processing"));
                 ImGui::Checkbox("No Movement Fix", &CONFIGBOOL("Misc>Misc>Misc>No Movement Fix"));
-                ImGui::Checkbox("Anti AFK Kick", &CONFIGBOOL("Misc>Misc>Misc>Anti AFK Kick"));
                 ImGui::EndChild();
             }
 
@@ -83,7 +82,7 @@ void Menu::drawMiscTab() {
                 ImGui::EndChild();
             }
 
-            ImGui::BeginChild("Clantag", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.38, ImGui::GetWindowHeight() * 0.21f), true); {
+            ImGui::BeginChild("Clantag", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.38, ImGui::GetWindowHeight() * 0.22f), true); {
                 ImGui::Text("Clantag");
                 ImGui::Separator();
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
@@ -114,10 +113,6 @@ void Menu::drawMiscTab() {
                 ImGui::Separator();
                 ImGui::Checkbox("Bunny Hop", &CONFIGBOOL("Misc>Misc>Movement>Bunny Hop"));
                 ImGui::Checkbox("Auto Strafe", &CONFIGBOOL("Misc>Misc>Movement>Auto Strafe"));
-                ImGui::SameLine();
-                ImGui::TextDisabled("?");
-                if (ImGui::IsItemHovered())
-                  ImGui::SetTooltip("May cause untrusted, use at own risk!");
                 if (CONFIGBOOL("Misc>Misc>Movement>Edge Jump")) {
                     static bool toggled = false;
                     Menu::CustomWidgets::drawKeyBinder("Key", &CONFIGINT("Misc>Misc>Movement>Edge Jump Key"), &toggled);

@@ -117,7 +117,7 @@ void Features::AntiAim::createMove(CUserCmd* cmd) {
                                     fakelag = CONFIGINT("Rage>AntiAim>FakeLag");
                                 }
 
-                                *Globals::sendPacket = cmd->tick_count % ((CONFIGBOOL("Rage>Enabled") && CONFIGINT("Rage>AntiAim>Type")) + fakelag + 1);
+                                *Globals::sendPacket = cmd->tick_count % (CONFIGINT("Rage>AntiAim>Type") + fakelag + 1);
 
                                 if (updatingLby()) {
                                     cmd->viewangles.y = real + (fake * 2);

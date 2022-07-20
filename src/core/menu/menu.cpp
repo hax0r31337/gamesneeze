@@ -156,14 +156,15 @@ void Menu::onSwapWindow(SDL_Window* window) {
         ImGui_ImplSDL2_InitForOpenGL(window, nullptr);
         style();
 
-        ImFont *normalFont = addFontFromVFONT("csgo/panorama/fonts/notosans-regular.vfont", 15.0f, getFontGlyphRanges(), false);
+        ImFont *normalFont = addFontFromVFONT("csgo/panorama/fonts/notosans-bold.vfont", 15.0f, getFontGlyphRanges(), false);
         if (!normalFont) {
           ImFontConfig cfg;
           cfg.SizePixels = 14.0f;
           ImGui::GetIO().Fonts->AddFontDefault(&cfg);
         }
-        addFontFromVFONT("csgo/panorama/fonts/notosanskr-regular.vfont", 15.0f, ImGui::GetIO().Fonts->GetGlyphRangesKorean(), true);
-        addFontFromVFONT("csgo/panorama/fonts/notosanssc-regular.vfont", 17.0f, ImGui::GetIO().Fonts->GetGlyphRangesChineseFull(), true);
+        addFontFromVFONT("csgo/panorama/fonts/notosanskr-bold.vfont", 15.0f, ImGui::GetIO().Fonts->GetGlyphRangesKorean(), true);
+        addFontFromVFONT("csgo/panorama/fonts/notosanssc-bold.vfont", 17.0f, ImGui::GetIO().Fonts->GetGlyphRangesChineseFull(), true);
+        addFontFromVFONT("csgo/panorama/fonts/notosansjp-bold.vfont", 15.0f, ImGui::GetIO().Fonts->GetGlyphRangesJapanese(), true);
 
         initialised = true;
     }
@@ -204,22 +205,10 @@ void Menu::onSwapWindow(SDL_Window* window) {
 void Menu::drawMenu() {
     ImGui::SetNextWindowSize(ImVec2{900, 627});
     ImGui::Begin("gamesneeze-linux", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 4));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 5));
     ImGui::Text("game"); ImGui::SameLine(); ImGui::PopStyleVar();
-    if (ImGui::IsItemClicked()) {
-        system("xdg-open https://discord.gg/SCHsWHFJMb &"); //if it works it works lmao
-    }
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Click for discord!");
-    }
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(490, 5));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(410, 5));
     ImGui::TextColored(ImColor(108, 195, 18, 255), "sneeze");
-    if (ImGui::IsItemClicked()) {
-        system("xdg-open https://discord.gg/SCHsWHFJMb &"); //if it works it works lmao
-    }
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Click for discord!");
-    }
     ImGui::SameLine();
     ImGui::PopStyleVar();
 
@@ -233,23 +222,29 @@ void Menu::drawMenu() {
 
     ImGui::GetStyle().Colors[ImGuiCol_Button] = (Menu::tabSelected == 1) ? ImVec4(0.05f, 0.41f, 0.06f, 0.62f) : ImVec4(0.03f, 0.23f, 0.04f, 0.62f);
     if (ImGui::Button("Rage", bWidth)) {
-        Menu::tabSelected = 1;
+      Menu::tabSelected = 1;
     } ImGui::SameLine();
 
     ImGui::GetStyle().Colors[ImGuiCol_Button] = (Menu::tabSelected == 2) ? ImVec4(0.05f, 0.41f, 0.06f, 0.62f) : ImVec4(0.03f, 0.23f, 0.04f, 0.62f);
     if (ImGui::Button("Visuals", bWidth)) {
-        Menu::tabSelected = 2;
+      Menu::tabSelected = 2;
     } ImGui::SameLine();
 
     ImGui::GetStyle().Colors[ImGuiCol_Button] = (Menu::tabSelected == 3) ? ImVec4(0.05f, 0.41f, 0.06f, 0.62f) : ImVec4(0.03f, 0.23f, 0.04f, 0.62f);
     if (ImGui::Button("Misc", bWidth)) {
-        Menu::tabSelected = 3;
+      Menu::tabSelected = 3;
+    } ImGui::SameLine();
+
+    ImGui::GetStyle().Colors[ImGuiCol_Button] = (Menu::tabSelected == 4) ? ImVec4(0.05f, 0.41f, 0.06f, 0.62f) : ImVec4(0.03f, 0.23f, 0.04f, 0.62f);
+    if (ImGui::Button("Lua", bWidth)) {
+      Menu::tabSelected = 4;
     }
+
     ImGui::GetStyle().Colors[ImGuiCol_Button] = ImVec4(0.05f, 0.41f, 0.06f, 0.62f);
     ImGui::PopStyleVar();
 
     ImGui::Separator();
-    ImGui::Separator();
+    // ImGui::Separator();
 
     switch(tabSelected) {
         case 0: {
@@ -263,6 +258,9 @@ void Menu::drawMenu() {
         }
         case 3: {
             Menu::drawMiscTab();break;
+        }
+        case 4: {
+            Menu::drawLuaTab();break;
         }
     }
 

@@ -96,9 +96,7 @@ void Menu::drawBombTimerOverlay() {
   if (plantedC4.blowTime == 0.0f && !Menu::open)
     return;
 
-  if (!Menu::open) {
-    ImGui::SetNextWindowBgAlpha(0.3f);
-  }
+  ImGui::SetNextWindowBgAlpha(0.3f);
 
   static float windowWidth = 200.0f;
   ImGui::SetNextWindowPos({(ImGui::GetIO().DisplaySize.x - 200.0f) / 2.0f, 60.0f}, ImGuiCond_Once);

@@ -128,6 +128,7 @@ namespace Features {
     }
     namespace RageBot {
         void createMove(CUserCmd* cmd);
+        void applyAutoSlow(CUserCmd *cmd, Weapon *activeWeapon);
         bool traceToExit(const Trace &enterTrace, const Vector &start,
                          const Vector &direction, Vector &end, Trace &exitTrace, Entity *target);
         float handleBulletPenetration(SurfaceData *enterSurfaceData,
@@ -186,8 +187,6 @@ namespace Features {
         void prePredCreateMove(CUserCmd* cmd);
         void postPredCreateMove(CUserCmd* cmd);
         void edgeBugPredictor(CUserCmd* cmd);
-        void moveCheatz(CUserCmd* cmd);
         void draw();
-        void antiAfkKick(CUserCmd* cmd);
     }
 }
