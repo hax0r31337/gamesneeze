@@ -60,6 +60,11 @@ void autoStrafe(CUserCmd *cmd) {
   }
 }
 
+void moonWalk(CUserCmd *cmd) {
+  if (CONFIGBOOL("Misc>Misc>Movement>Moon Walk") && Globals::localPlayer && Globals::localPlayer->moveType() != MOVETYPE_LADDER)
+      cmd->buttons ^= IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT;
+}
+
 void edgeJump(CUserCmd *cmd) {
     if (CONFIGBOOL("Misc>Misc>Movement>Edge Jump") &&
         Menu::CustomWidgets::isKeyDown(CONFIGINT("Misc>Misc>Movement>Edge Jump Key")) &&
@@ -104,6 +109,7 @@ void Features::Movement::prePredCreateMove(CUserCmd *cmd) {
     velBackup = Globals::localPlayer->velocity();
     bhop(cmd);
     autoStrafe(cmd);
+    moonWalk(cmd);
 
     if (shouldEdgebug && shouldDuckNext)
         cmd->buttons |= IN_DUCK;

@@ -129,33 +129,22 @@ void Menu::drawBombTimerOverlay() {
   if (plantedC4.defuserHandle != -1) {
     const bool canDefuse = plantedC4.blowTime >= plantedC4.defuseCountDown;
 
-    if (plantedC4.defuserHandle == Globals::localPlayer->index()) {
-      if (canDefuse) {
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
-        ImGui::Text("You can defuse!");
-      } else {
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
-        ImGui::Text("You can not defuse!");
-      }
-      ImGui::PopStyleColor();
-    } else {
-      std::ostringstream ss;
-      ss << "Defusing  " << std::fixed
-         << std::showpoint << std::setprecision(3)
-         << (std::max)(plantedC4.defuseCountDown - Interfaces::globals->curtime, 0.0f)
-         << " s";
+    std::ostringstream ss;
+    ss << "Defusing  " << std::fixed << std::showpoint << std::setprecision(3)
+       << (std::max)(plantedC4.defuseCountDown - Interfaces::globals->curtime,
+                     0.0f)
+       << " s";
 
-      ImGui::Text("%s", ss.str().c_str());
+    ImGui::Text("%s", ss.str().c_str());
 
-      ImGui::PushStyleColor(ImGuiCol_PlotHistogram,
-                            canDefuse ? IM_COL32(255, 255, 0, 255)
-                                      : IM_COL32(255, 0, 0, 255));
-      ImGui::ProgressBar(
-          (plantedC4.defuseCountDown - Interfaces::globals->curtime) /
-              plantedC4.defuseLength,
-          ImVec2(windowWidth - 20, 5.0f));
-      ImGui::PopStyleColor();
-    }
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram,
+                          canDefuse ? IM_COL32(255, 255, 0, 255)
+                                    : IM_COL32(255, 0, 0, 255));
+    ImGui::ProgressBar(
+        (plantedC4.defuseCountDown - Interfaces::globals->curtime) /
+            plantedC4.defuseLength,
+        ImVec2(windowWidth - 20, 5.0f));
+    ImGui::PopStyleColor();
   }
 
   ImGui::PopStyleColor(2);
