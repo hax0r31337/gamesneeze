@@ -107,7 +107,7 @@ void Menu::drawBombTimerOverlay() {
 
   ImGui::SetNextWindowSizeConstraints({0, -1}, {FLT_MAX, -1});
   ImGui::Begin("Bomb Timer", nullptr,
-               ImGuiWindowFlags_NoTitleBar |
+               ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
                    (Menu::open ? 0
                                   : ImGuiWindowFlags_NoInputs |
                                         ImGuiWindowFlags_NoDecoration));

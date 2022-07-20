@@ -26,16 +26,16 @@ bool Hooks::CreateMove::hook(void* thisptr, float flInputSampleTime, CUserCmd* c
         Features::Movement::prePredCreateMove(cmd);
 
         Features::Prediction::start(cmd);
-        if (CONFIGBOOL("Rage>Enabled")) {
+        // if (CONFIGBOOL("Rage>Enabled")) {
           Features::RageBot::createMove(cmd);
           Features::AntiAim::createMove(cmd);
-        } else {
+        // } else {
           Features::LegitBot::createMove(cmd);
           Features::Triggerbot::createMove(cmd);
           Features::Backtrack::store(cmd);
           Features::Backtrack::createMove(cmd);
           Features::Forwardtrack::createMove(cmd);
-        }
+        // }
         Features::Prediction::end();
 
         Features::Movement::postPredCreateMove(cmd);
@@ -65,5 +65,6 @@ bool Hooks::CreateMove::hook(void* thisptr, float flInputSampleTime, CUserCmd* c
         Globals::oldViewangles = cmd->viewangles;
     }
 
-    return !(CONFIGBOOL("Rage>Enabled")); // return false when we want to do silent angles for rb
+    // return !(CONFIGBOOL("Rage>Enabled"));
+    return false;
 }

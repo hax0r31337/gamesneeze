@@ -42,11 +42,11 @@ void Menu::hitboxSelectBox(const char *configVarName) {
 }
 
 void Menu::drawRageTab() {
-    ImGui::Checkbox("Enabled", &CONFIGBOOL("Rage>Enabled"));
-    ImGui::SameLine();
-    ImGui::Separator();
+    // ImGui::Checkbox("Enabled", &CONFIGBOOL("Rage>Enabled"));
+    // ImGui::SameLine();
+    // ImGui::Separator();
 
-    ImGui::BeginChild("Rage", ImVec2((ImGui::GetWindowContentRegionWidth()/2) - 4, 520), true); {
+    ImGui::BeginChild("Rage", ImVec2((ImGui::GetWindowContentRegionWidth()/2) - 4, 575), true); {
         ImGui::Text("RageBot");
         ImGui::Separator();
         if (ImGui::BeginTabBar("Weapons Tabbar")) {
@@ -231,7 +231,7 @@ void Menu::drawRageTab() {
         ImGui::EndChild();
     }
     ImGui::SameLine();
-    ImGui::BeginChild("Others", ImVec2((ImGui::GetWindowContentRegionWidth()/2) - 4, 520), true); {
+    ImGui::BeginChild("Others", ImVec2((ImGui::GetWindowContentRegionWidth()/2) - 4, 575), true); {
         ImGui::Text("Anti-Aim");
         ImGui::Separator();
         

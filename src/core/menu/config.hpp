@@ -154,7 +154,8 @@ namespace Config {
 
         CONFIGITEM("Rage>Resolver", false),
 
-        CONFIGITEM("Rage>Enabled", false), CONFIGITEM("Rage>RageBot>Key", 0),
+        // CONFIGITEM("Rage>Enabled", false),
+        CONFIGITEM("Rage>RageBot>Key", 0),
         CONFIGITEM("Rage>RageBot>Always on", false),
         // CONFIGITEM("Rage>RageBot>Default>FOV", 0),
 

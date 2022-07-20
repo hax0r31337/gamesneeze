@@ -102,7 +102,7 @@ void chamPlayer(void* thisptr, void* ctx, const DrawModelState_t &state, const M
                     cham(thisptr, ctx, state, pInfo, pCustomBoneToWorld, CONFIGCOL("Visuals>Players>Enemies>Chams>Visible Overlay Color"), CONFIGINT("Visuals>Players>Enemies>Chams>Visible Overlay Material"), false, CONFIGBOOL("Visuals>Players>Enemies>Chams>Visible Overlay Wireframe"));
                 }
 
-                if (CONFIGBOOL("Legit>Backtrack>Backtrack") && !CONFIGBOOL("Rage>Enabled")) {
+                if (CONFIGBOOL("Legit>Backtrack>Backtrack")) {
                     if (Features::Backtrack::backtrackTicks.size() > 2) {
                         if (CONFIGINT("Visuals>Players>Enemies>Chams>Backtrack Material")) {
                             if (CONFIGBOOL("Visuals>Players>Enemies>Chams>Trail")) {
