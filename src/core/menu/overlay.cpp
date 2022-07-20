@@ -27,13 +27,7 @@ void BombData::update() noexcept {
           defuseCountDown = bomb->defuseCountDown();
           defuseLength = bomb->defuseLength();
         }
-        bombsite = false;
-        // if (playerResource) {
-        // TODO: fix bomb site
-        // const Vector &bombOrigin = bomb->origin();
-        // bombsite = bombOrigin.DistTo((playerResource)->bombsiteCenterA()) >
-        //            bombOrigin.DistTo((playerResource)->bombsiteCenterB());
-        // }
+        bombsite = bomb->site();
         return;
       }
     }
@@ -113,7 +107,7 @@ void Menu::drawBombTimerOverlay() {
                                         ImGuiWindowFlags_NoDecoration));
 
   std::ostringstream ss;
-  ss << "Bomb "/* << (!plantedC4.bombsite ? 'A' : 'B')*/ << " : " << std::fixed
+  ss << "Bomb on site " << (plantedC4.bombsite == 0 ? 'A' : 'B') << " : " << std::fixed
      << std::showpoint << std::setprecision(3)
      << (std::max)(plantedC4.blowTime - Interfaces::globals->curtime, 0.0f)
      << " s";
