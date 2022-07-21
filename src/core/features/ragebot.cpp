@@ -356,9 +356,7 @@ void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *weapon) {
       Interfaces::globals->interval_per_tick == 0 ||
       Interfaces::globals->interval_per_tick == FP_INFINITE) 
       return;
-  if (!(Globals::localPlayer->flags() & FL_ONGROUND)) {
-    return;
-  }
+
   float speed = Globals::localPlayer->velocity().Length();
   const float maxSpeed =
       (Globals::localPlayer->scoped()
@@ -369,16 +367,16 @@ void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *weapon) {
     QAngle viewAngle;
     Interfaces::engine->GetViewAngles(viewAngle);
     QAngle dir;
-    vectorAngles(Globals::localPlayer->velocity(), dir);
+    vectorAngles(Globals::localPlayer->velocity() * (1.f / Interfaces::globals->interval_per_tick), dir);
     dir.y = viewAngle.y - dir.x;
-    Vector NewMove;
-    angleVectors(dir, NewMove);
+    Vector newMove;
+    angleVectors(dir, newMove);
     auto max = std::max(cmd->forwardmove, cmd->sidemove);
-    auto mult = std::min(450.f / max, speed * 0.3f);
-    NewMove *= -mult;
+    auto mult = 450.f / max;
+    newMove *= -mult;
 
-    cmd->forwardmove = NewMove.x;
-    cmd->sidemove = NewMove.y;
+    cmd->forwardmove = newMove.x;
+    cmd->sidemove = newMove.y;
   } else {
     float sped = 0.1f;
     float ratio = maxSpeed / 255.0f;
