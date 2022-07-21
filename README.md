@@ -109,4 +109,4 @@ All args are executed in the order they are written in, for example, "-u -b -l" 
 ## Screenshots
 
 ![Console Output](res/console.png)
-![Choms Output](res/chams.png)
+![Choms Output](res/chams.jpg)

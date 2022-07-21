@@ -376,8 +376,6 @@ void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *weapon) {
     } else if (cmd->sidemove) {
       cmd->sidemove = cmd->sidemove < 0.0f ? -maxSpeed : maxSpeed;
     }
-
-    cmd->buttons |= IN_WALK;
   } else {
     float sped = 0.1f;
     float max_speed = weapon->GetWeaponInfo()->GetMaxPlayerSpeed();
