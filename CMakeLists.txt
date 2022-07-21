@@ -43,5 +43,13 @@ endif(NOT CMAKE_BUILD_TYPE)
 file(GLOB_RECURSE SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/*.cpp")
 list(APPEND SOURCE_FILES "${CMAKE_SOURCE_DIR}/src/core/menu/imgui/GL/gl3w.c")
 
+include_directories(${INCLUDE_DIRS})
+include_directories("${CMAKE_SOURCE_DIR}/luajit/")
+
 add_library(gamesneeze SHARED ${SOURCE_FILES})
-target_link_libraries(gamesneeze dl pthread SDL2 GL)
+
+target_link_libraries(gamesneeze dl pthread SDL2 GL
+    # a hack way to link the library https://stackoverflow.com/questions/14347107/how-to-put-compiler-command-line-args-in-specific-places-using-cmake/14347487
+    "-Wl,--whole-archive"
+    "${CMAKE_SOURCE_DIR}/luajit/libluajit-5.1.a" 
+    "-Wl,--no-whole-archive")
