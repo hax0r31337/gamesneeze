@@ -357,36 +357,17 @@ void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *weapon) {
       Interfaces::globals->interval_per_tick == FP_INFINITE) 
       return;
 
-  float speed = Globals::localPlayer->velocity().Length();
   const float maxSpeed =
       (Globals::localPlayer->scoped()
            ? weapon->GetWeaponInfo()->GetMaxPlayerSpeedScoped()
            : weapon->GetWeaponInfo()->GetMaxPlayerSpeed());
 
-  if (speed > 43.f) {
-    QAngle viewAngle;
-    Interfaces::engine->GetViewAngles(viewAngle);
-    QAngle dir;
-    vectorAngles(Globals::localPlayer->velocity() * (1.f / Interfaces::globals->interval_per_tick), dir);
-    dir.y = viewAngle.y - dir.x;
-    Vector newMove;
-    angleVectors(dir, newMove);
-    auto max = std::max(cmd->forwardmove, cmd->sidemove);
-    auto mult = 450.f / max;
-    newMove *= -mult;
-
-    cmd->forwardmove = newMove.x;
-    cmd->sidemove = newMove.y;
-  } else {
-    float sped = 0.1f;
-    float ratio = maxSpeed / 255.0f;
-    sped *= ratio;
-
-    cmd->forwardmove *= sped;
-    cmd->sidemove *= sped;
+  if (Globals::localPlayer->velocity().Length() > maxSpeed / 3) {
+    cmd->forwardmove = -cmd->forwardmove;
+    cmd->sidemove = -cmd->sidemove;
+    cmd->upmove = 0;
+    cmd->buttons |= IN_WALK;
   }
-
-  cmd->buttons |= IN_WALK;
 }
 
 void Features::RageBot::createMove(CUserCmd *cmd) {

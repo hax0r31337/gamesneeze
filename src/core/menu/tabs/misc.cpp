@@ -2,6 +2,44 @@
 #include <filesystem>
 #include "../config.hpp"
 
+void reportBotSelectBox(const char *configVarName) {
+  ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+
+  int curSelected = CONFIGINT(configVarName);
+
+  std::stringstream selectedHitboxes;
+  selectedHitboxes << (curSelected & (int)HitBoxes::HEAD ? "textabuse, " : "")
+                   << (curSelected & (int)HitBoxes::NECK ? "grief, " : "")
+                   << (curSelected & (int)HitBoxes::CHEST ? "wallhack, " : "")
+                   << (curSelected & (int)HitBoxes::STOMACH ? "aimbot, " : "")
+                   << (curSelected & (int)HitBoxes::PELVIS ? "speedhack, " : "");
+
+  if (ImGui::BeginCombo("##ReportBot", selectedHitboxes.str().c_str())) {
+
+    if (ImGui::Selectable("TextAbuse", curSelected & (int)HitBoxes::HEAD,
+                          ImGuiSelectableFlags_DontClosePopups))
+      CONFIGINT(configVarName) ^= (int)HitBoxes::HEAD;
+
+    if (ImGui::Selectable("Grief", curSelected & (int)HitBoxes::NECK,
+                          ImGuiSelectableFlags_DontClosePopups))
+      CONFIGINT(configVarName) ^= (int)HitBoxes::NECK;
+
+    if (ImGui::Selectable("WallHack", curSelected & (int)HitBoxes::CHEST,
+                          ImGuiSelectableFlags_DontClosePopups))
+      CONFIGINT(configVarName) ^= (int)HitBoxes::CHEST;
+
+    if (ImGui::Selectable("AimBot", curSelected & (int)HitBoxes::STOMACH,
+                          ImGuiSelectableFlags_DontClosePopups))
+      CONFIGINT(configVarName) ^= (int)HitBoxes::STOMACH;
+
+    if (ImGui::Selectable("SpeedHack", curSelected & (int)HitBoxes::PELVIS,
+                          ImGuiSelectableFlags_DontClosePopups))
+      CONFIGINT(configVarName) ^= (int)HitBoxes::PELVIS;
+
+    ImGui::EndCombo();
+  }
+}
+
 void Menu::drawMiscTab() {
     if (ImGui::BeginTabBar("##miscTabs")) {
         if (ImGui::BeginTabItem("Misc")) {
@@ -38,6 +76,14 @@ void Menu::drawMiscTab() {
                 ImGui::Checkbox("Disable Setting Cvars", &CONFIGBOOL("Misc>Misc>Misc>Disable Setting Cvars"));
                 ImGui::Checkbox("Disable Post Processing", &CONFIGBOOL("Misc>Misc>Misc>Disable Post Processing"));
                 ImGui::Checkbox("No Movement Fix", &CONFIGBOOL("Misc>Misc>Misc>No Movement Fix"));
+                ImGui::Checkbox("Report Bot", &CONFIGBOOL("Misc>Misc>ReportBot"));
+                if (CONFIGBOOL("Misc>Misc>ReportBot")) {
+                    ImGui::SameLine();
+                    ImGui::Checkbox("Team Mates", &CONFIGBOOL("Misc>Misc>ReportBot>TeamMate"));
+                    ImGui::SameLine();
+                    ImGui::Checkbox("InfiniReport", &CONFIGBOOL("Misc>Misc>ReportBot>InfiniReport"));
+                    reportBotSelectBox("Misc>Misc>ReportBot>Report Flags");
+                }
                 ImGui::EndChild();
             }
 

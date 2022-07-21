@@ -125,6 +125,9 @@ namespace Features {
         Entity *findPlayerThatRayHits(Vector start, Vector end,
                                       Trace *traceToPlayer);
     }
+    namespace ReportBot {
+        void createMove(CUserCmd* cmd);
+    }
     namespace RageBot {
         void createMove(CUserCmd* cmd);
         void applyAutoSlow(CUserCmd *cmd, Weapon *activeWeapon);

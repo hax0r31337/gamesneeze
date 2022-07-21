@@ -44,6 +44,7 @@ bool Hooks::CreateMove::hook(void* thisptr, float flInputSampleTime, CUserCmd* c
         if (!noMovementFix) { endMovementFix(cmd); }
         Features::QuickPeek::createMove(cmd);
         Features::SlowWalk::createMove(cmd);
+        Features::ReportBot::createMove(cmd);
 
         auto view_backup = cmd->viewangles;
         Features::Movement::edgeBugPredictor(cmd);

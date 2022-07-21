@@ -129,6 +129,9 @@ namespace Offsets {
 
     typedef void (*RestoreEntityToPredictedFrame)(void*, int, int);
     inline RestoreEntityToPredictedFrame restoreEntityToPredictedFrame;
+
+    typedef bool (*SubmitReport) (void *, const char *, const char *);
+    inline SubmitReport submitReport;
 }
 
 #define GETNETVAROFFSET(table, prop) Netvar::offsets.at({table, prop})
