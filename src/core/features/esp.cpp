@@ -118,76 +118,114 @@ void drawForwardTrack(Player* p) {
 }
 
 void drawPlayer(Player* p) {
-    if (!p->dormant()) {
-        if (p->health() > 0) {
-            int x, y, x2, y2;
-            if (getBox(p, x, y, x2, y2)) {
-                player_info_t info;
-                Interfaces::engine->GetPlayerInfo(p->index(), &info);
+    if (p->health() > 0) {
+      int x, y, x2, y2;
+      if (getBox(p, x, y, x2, y2)) {
+        player_info_t info;
+        Interfaces::engine->GetPlayerInfo(p->index(), &info);
 
-                if (p->isEnemy()) {
-                    
-                    if (CONFIGBOOL("Visuals>Players>Enemies>Vis Check") ? (Globals::localPlayer->health() > 0 ? p->visible() : true) : true) {
-                        if (CONFIGBOOL("Visuals>Players>Enemies>Only When Dead") ? (Globals::localPlayer->health() == 0) : true) {
-                            std::stringstream rightText;
-                            if (CONFIGBOOL("Visuals>Players>Enemies>Health"))
-                                rightText << p->health() << "hp\n";
-                            if (CONFIGBOOL("Visuals>Players>Enemies>Money"))
-                                rightText << "$" << p->money() << "\n";
+        if (p->isEnemy()) {
 
-                            if (CONFIGBOOL("Visuals>Players>Enemies>Armor"))
-                                rightText << (p->helmet() ? "H" : "") << (p->armor() ? "K" : "") << "\n";
-                            if (CONFIGBOOL("Visuals>Players>Enemies>Flashed") && p->flashDuration() > 3) //This value is quite strange
-                                rightText << "Flashed\n"; // TODO: Fully refactor
+          if (CONFIGBOOL("Visuals>Players>Enemies>Vis Check")
+                  ? (Globals::localPlayer->health() > 0 ? p->visible() : true)
+                  : true) {
+            if (CONFIGBOOL("Visuals>Players>Enemies>Only When Dead")
+                    ? (Globals::localPlayer->health() == 0)
+                    : true) {
+              std::stringstream rightText;
+              if (CONFIGBOOL("Visuals>Players>Enemies>Health"))
+                rightText << p->health() << "hp\n";
+              if (CONFIGBOOL("Visuals>Players>Enemies>Money"))
+                rightText << "$" << p->money() << "\n";
 
-                            if (CONFIGBOOL("Visuals>Players>Enemies>Weapon")) {
-                                Weapon *weapon = (Weapon *) Interfaces::entityList->GetClientEntity((uintptr_t)p->activeWeapon() & 0xFFF); // GetClientEntityFromHandle is being gay
-                                if (weapon) {
-                                    rightText << getNameFromItemIndex((ItemIndex)(weapon->itemIndex() & 0xFFF)) << "\n";
-                                }
-                            }
-                            
-                            drawBox(x, y, x2, y2, CONFIGBOOL("Visuals>Players>Enemies>Box"), 
-                                        p->visible() ? CONFIGCOL("Visuals>Players>Enemies>Vis Box Color") :  CONFIGCOL("Visuals>Players>Enemies>Box Color"), CONFIGBOOL("Visuals>Players>Enemies>Name") ? info.name : (char*)"", 
-                                        (char*)rightText.str().c_str(), CONFIGBOOL("Visuals>Players>Enemies>Health Bar") ? p->health() : -1, CONFIGBOOL("Visuals>Players>Enemies>Dynamic Color"), 
-                                        CONFIGCOL("Visuals>Players>Enemies>Health Bar Color"));
-                            
-                            if (CONFIGBOOL("Visuals>Players>Enemies>Skeleton"))
-                                drawSkeleton(p, CONFIGCOL("Visuals>Players>Enemies>Skeleton Color"));
-
-                            if (CONFIGBOOL("Visuals>Players>Enemies>Forwardtrack Dots"))
-                                drawForwardTrack(p);
-                        }
-                    }
+              if (CONFIGBOOL("Visuals>Players>Enemies>Armor"))
+                rightText << (p->helmet() ? "H" : "") << (p->armor() ? "K" : "")
+                          << "\n";
+              if (CONFIGBOOL("Visuals>Players>Enemies>Flashed") &&
+                  p->flashDuration() > 3) // This value is quite strange
+                rightText << "Flashed\n"; // TODO: Fully refactor
+              if (p->dormant()) {
+                if (CONFIGBOOL("Visuals>Players>Enemies>Dormant")) {
+                  rightText << "Dormant\n";
+                } else {
+                    return;
                 }
-                else if (!p->isEnemy() && 
-                        ((Globals::localPlayer->health() == 0 && CONFIGBOOL("Visuals>Players>Teammates>Only When Dead")) || !CONFIGBOOL("Visuals>Players>Teammates>Only When Dead"))) {
-                    std::stringstream rightText;
-                    if (CONFIGBOOL("Visuals>Players>Teammates>Health"))
-                        rightText << p->health() << "hp\n";
-                    if (CONFIGBOOL("Visuals>Players>Teammates>Money"))
-                        rightText << "$" << p->money() << "\n";
+              }
 
-                    if (CONFIGBOOL("Visuals>Players>Teammates>Armor"))
-                        rightText << (p->helmet() ? "H" : "") << (p->armor() ? "K" : "") << "\n";
-
-                    if (CONFIGBOOL("Visuals>Players>Teammates>Weapon")) {
-                        Weapon *weapon = (Weapon *) Interfaces::entityList->GetClientEntity((uintptr_t)p->activeWeapon() & 0xFFF); // GetClientEntityFromHandle is being gay
-                        if (weapon) {
-                            rightText << getNameFromItemIndex((ItemIndex)(weapon->itemIndex() & 0xFFF)) << "\n";
-                        }
-                    }
-                    
-                    drawBox(x, y, x2, y2, CONFIGBOOL("Visuals>Players>Teammates>Box"), 
-                                CONFIGCOL("Visuals>Players>Teammates>Box Color"), CONFIGBOOL("Visuals>Players>Teammates>Name") ? info.name : (char*)"", 
-                                (char*)rightText.str().c_str(), CONFIGBOOL("Visuals>Players>Teammates>Health Bar") ? p->health() : -1, CONFIGBOOL("Visuals>Players>Teammates>Dynamic Color"), 
-                                CONFIGCOL("Visuals>Players>Teammates>Health Bar Color"));
-
-                    if (CONFIGBOOL("Visuals>Players>Teammates>Skeleton"))
-                        drawSkeleton(p, CONFIGCOL("Visuals>Players>Teammates>Skeleton Color"));
+              if (CONFIGBOOL("Visuals>Players>Enemies>Weapon")) {
+                Weapon *weapon =
+                    (Weapon *)Interfaces::entityList->GetClientEntity(
+                        (uintptr_t)p->activeWeapon() &
+                        0xFFF); // GetClientEntityFromHandle is being gay
+                if (weapon) {
+                  rightText << getNameFromItemIndex(
+                                   (ItemIndex)(weapon->itemIndex() & 0xFFF))
+                            << "\n";
                 }
+              }
+
+              drawBox(x, y, x2, y2, CONFIGBOOL("Visuals>Players>Enemies>Box"),
+                      p->dormant() ? CONFIGCOL("Visuals>Players>Enemies>Dorm Box Color") : (p->visible()
+                          ? CONFIGCOL("Visuals>Players>Enemies>Vis Box Color")
+                          : CONFIGCOL("Visuals>Players>Enemies>Box Color")),
+                      CONFIGBOOL("Visuals>Players>Enemies>Name") ? info.name
+                                                                 : (char *)"",
+                      (char *)rightText.str().c_str(),
+                      CONFIGBOOL("Visuals>Players>Enemies>Health Bar")
+                          ? p->health()
+                          : -1,
+                      CONFIGBOOL("Visuals>Players>Enemies>Dynamic Color"),
+                      CONFIGCOL("Visuals>Players>Enemies>Health Bar Color"));
+
+              if (CONFIGBOOL("Visuals>Players>Enemies>Skeleton"))
+                drawSkeleton(
+                    p, CONFIGCOL("Visuals>Players>Enemies>Skeleton Color"));
+
+              if (CONFIGBOOL("Visuals>Players>Enemies>Forwardtrack Dots"))
+                drawForwardTrack(p);
             }
+          }
+        } else if (!p->isEnemy() && !p->dormant() &&
+                   ((Globals::localPlayer->health() == 0 &&
+                     CONFIGBOOL("Visuals>Players>Teammates>Only When Dead")) ||
+                    !CONFIGBOOL("Visuals>Players>Teammates>Only When Dead"))) {
+          std::stringstream rightText;
+          if (CONFIGBOOL("Visuals>Players>Teammates>Health"))
+            rightText << p->health() << "hp\n";
+          if (CONFIGBOOL("Visuals>Players>Teammates>Money"))
+            rightText << "$" << p->money() << "\n";
+
+          if (CONFIGBOOL("Visuals>Players>Teammates>Armor"))
+            rightText << (p->helmet() ? "H" : "") << (p->armor() ? "K" : "")
+                      << "\n";
+
+          if (CONFIGBOOL("Visuals>Players>Teammates>Weapon")) {
+            Weapon *weapon = (Weapon *)Interfaces::entityList->GetClientEntity(
+                (uintptr_t)p->activeWeapon() &
+                0xFFF); // GetClientEntityFromHandle is being gay
+            if (weapon) {
+              rightText << getNameFromItemIndex(
+                               (ItemIndex)(weapon->itemIndex() & 0xFFF))
+                        << "\n";
+            }
+          }
+
+          drawBox(x, y, x2, y2, CONFIGBOOL("Visuals>Players>Teammates>Box"),
+                  CONFIGCOL("Visuals>Players>Teammates>Box Color"),
+                  CONFIGBOOL("Visuals>Players>Teammates>Name") ? info.name
+                                                               : (char *)"",
+                  (char *)rightText.str().c_str(),
+                  CONFIGBOOL("Visuals>Players>Teammates>Health Bar")
+                      ? p->health()
+                      : -1,
+                  CONFIGBOOL("Visuals>Players>Teammates>Dynamic Color"),
+                  CONFIGCOL("Visuals>Players>Teammates>Health Bar Color"));
+
+          if (CONFIGBOOL("Visuals>Players>Teammates>Skeleton"))
+            drawSkeleton(p,
+                         CONFIGCOL("Visuals>Players>Teammates>Skeleton Color"));
         }
+      }
     }
 }
 

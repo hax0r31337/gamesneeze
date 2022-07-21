@@ -109,6 +109,8 @@ void Menu::drawVisualsTab() {
                     ImGui::SameLine();
                     ImGui::ColorEdit4("Box Color", (float*)&CONFIGCOL("Visuals>Players>Enemies>Vis Box Color"), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_PickerHueWheel);
                     ImGui::SameLine();
+                    ImGui::ColorEdit4("Box Color", (float*)&CONFIGCOL("Visuals>Players>Enemies>Dorm Box Color"), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_PickerHueWheel);
+                    ImGui::SameLine();
                 }
                 ImGui::Checkbox("Box", &CONFIGBOOL("Visuals>Players>Enemies>Box"));
 
@@ -133,6 +135,7 @@ void Menu::drawVisualsTab() {
                 ImGui::Checkbox("Armor", &CONFIGBOOL("Visuals>Players>Enemies>Armor"));
                 ImGui::Checkbox("Flashed", &CONFIGBOOL("Visuals>Players>Enemies>Flashed"));
                 ImGui::Checkbox("Weapon", &CONFIGBOOL("Visuals>Players>Enemies>Weapon"));
+                ImGui::Checkbox("Dormant", &CONFIGBOOL("Visuals>Players>Enemies>Dormant"));
                 ImGui::Checkbox("Radar", &CONFIGBOOL("Visuals>Players>Enemies>Radar"));
                 ImGui::Checkbox("Forwardtrack Dots", &CONFIGBOOL("Visuals>Players>Enemies>Forwardtrack Dots"));
                 ImGui::Checkbox("Vis Check", &CONFIGBOOL("Visuals>Players>Enemies>Vis Check"));

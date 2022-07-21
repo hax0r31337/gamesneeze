@@ -355,31 +355,31 @@ void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *weapon) {
       Interfaces::globals->interval_per_tick == 0 ||
       Interfaces::globals->interval_per_tick == FP_INFINITE) 
       return;
-
-  QAngle ViewAngle;
-  Interfaces::engine->GetViewAngles(ViewAngle);
+  if (!(Globals::localPlayer->flags() & FL_ONGROUND)) {
+    return;
+  }
   float speed = Globals::localPlayer->velocity().Length();
+  const float maxSpeed =
+      (Globals::localPlayer->scoped()
+           ? weapon->GetWeaponInfo()->GetMaxPlayerSpeedScoped()
+           : weapon->GetWeaponInfo()->GetMaxPlayerSpeed());
 
   if (speed > 43.f) {
-    const float maxSpeed =
-        (Globals::localPlayer->scoped()
-             ? weapon->GetWeaponInfo()->GetMaxPlayerSpeedScoped()
-             : weapon->GetWeaponInfo()->GetMaxPlayerSpeed()) /
-        3;
+    QAngle viewAngle;
+    Interfaces::engine->GetViewAngles(viewAngle);
+    QAngle dir;
+    vectorAngles(Globals::localPlayer->velocity(), dir);
+    dir.y = viewAngle.y - dir.x;
+    Vector NewMove;
+    angleVectors(dir, NewMove);
+    const float maxSpeedRoot = maxSpeed * static_cast<float>(M_SQRT1_2);
+    NewMove *= -maxSpeedRoot;
 
-    if (cmd->forwardmove && cmd->sidemove) {
-      const float maxSpeedRoot = maxSpeed * static_cast<float>(M_SQRT1_2);
-      cmd->forwardmove = cmd->forwardmove < 0.0f ? -maxSpeedRoot : maxSpeedRoot;
-      cmd->sidemove = cmd->sidemove < 0.0f ? -maxSpeedRoot : maxSpeedRoot;
-    } else if (cmd->forwardmove) {
-      cmd->forwardmove = cmd->forwardmove < 0.0f ? -maxSpeed : maxSpeed;
-    } else if (cmd->sidemove) {
-      cmd->sidemove = cmd->sidemove < 0.0f ? -maxSpeed : maxSpeed;
-    }
+    cmd->forwardmove = NewMove.x;
+    cmd->sidemove = NewMove.y;
   } else {
     float sped = 0.1f;
-    float max_speed = weapon->GetWeaponInfo()->GetMaxPlayerSpeed();
-    float ratio = max_speed / 255.0f;
+    float ratio = maxSpeed / 255.0f;
     sped *= ratio;
 
     cmd->forwardmove *= sped;
