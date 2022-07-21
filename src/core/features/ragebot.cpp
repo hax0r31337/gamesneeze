@@ -1,5 +1,6 @@
 #include "../../includes.hpp"
 #include "features.hpp"
+#include <algorithm>
 #include <cmath>
 
 
@@ -372,8 +373,9 @@ void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *weapon) {
     dir.y = viewAngle.y - dir.x;
     Vector NewMove;
     angleVectors(dir, NewMove);
-    const float maxSpeedRoot = maxSpeed * static_cast<float>(M_SQRT1_2);
-    NewMove *= -maxSpeedRoot;
+    auto max = std::max(cmd->forwardmove, cmd->sidemove);
+    auto mult = std::min(450.f / max, speed * 0.3f);
+    NewMove *= -mult;
 
     cmd->forwardmove = NewMove.x;
     cmd->sidemove = NewMove.y;
