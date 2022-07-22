@@ -69,3 +69,7 @@ int __attribute__((constructor)) Main() {
 	mainThread.detach();
     return 0;
 }
+
+void Globals::selfUnload() {
+    Unload();
+}

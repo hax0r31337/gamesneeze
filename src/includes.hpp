@@ -35,4 +35,5 @@ namespace Globals {
     inline int kills = 0;
 
     float serverTime(CUserCmd *cmd = nullptr);
+    void selfUnload();
 }
