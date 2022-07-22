@@ -4,7 +4,6 @@
 # https://github.com/LWSS/Fuzion
 
 
-tlibname="libgamemodeauto.so.0" # Pretend to be gamemode, change this to another lib that may be in /maps (if already using real gamemode, I'd suggest using libMangoHud.so)
 gdb="$(dirname "$0")/gdb" # For using a gdb build such as the cathook one (The one included)
 libraryname="libgamesneeze.so" # The name of the library to patch
 
@@ -39,30 +38,49 @@ function load() {
         exit 1
     fi
 
-    echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope > /dev/null # get the sudo permission
-
     start=$(date +%s)
 
-    echo_orange "Injecting cheat $libraryname into pid $csgo_pid..."
+    echo_orange "Patching cheat instead to bypass anti-cheat"
 
+    # Get a Random name from the build_names file.
+    filename=$(shuf -n 1 build_names)
 
-    # pBypass for crash dumps being sent
+    # In case this file exists, get another one. ( checked it works )
+    while [ -f "/usr/lib/${filename}" ] || grep -q ${filename} /proc/$(pidof csgo_linux64)/maps; do
+        filename=$(shuf -n 1 build_names)
+    done
+
+    patchelf --set-soname "$filename" "$libraryname" || echo_orange "Warning: your patchelf version does not support \"--set-soname\"\nConsider building from source: https://github.com/NixOS/patchelf"
+
+    echo_orange "Injecting cheat $filename into pid $csgo_pid..."
+
+    # Bypass for crash dumps being sent
     # You may also want to consider using -nobreakpad in your launch options.
     sudo rm -rf /tmp/dumps           # Remove if it exists
     sudo mkdir --mode=000 /tmp/dumps # Make it as root with no permissions
 
+    echo 2 | sudo tee /proc/sys/kernel/yama/ptrace_scope > /dev/null  # Only allows root to inject code. This is temporary until reboot.
+    sudo cp $libraryname /usr/lib/$filename
+
     sudo killall -19 steam
     sudo killall -19 steamwebhelper
 
-    sudo cp $libraryname /usr/lib/$tlibname
+    lib_dir_name="lib"
+    if [ $(getconf LONG_BIT) = 64 ]; then
+        lib_dir_name+="64"
+    fi
+
     gdbOut=$(
-      $gdb -n -q -batch \
-      -ex "set auto-load safe-path /usr/lib/" \
+      sudo $gdb -n -q -batch \
+      -ex "set logging on" \
+      -ex "set logging file /dev/null" \
+      -ex "set logging redirect on" \
+      -ex "set auto-load safe-path /usr/share/gdb/auto-load/usr/$lib_dir_name/:/usr/$lib_dir_name/" \
       -ex "attach $csgo_pid" \
       -ex "set \$dlopen = (void*(*)(char*, int)) dlopen" \
-      -ex "call \$dlopen(\"/usr/lib/$tlibname\", 1)" \
+      -ex "call \$dlopen(\"/usr/lib/$filename\", 1)" \
       -ex "detach" \
-      -ex "quit" 2> /dev/null
+      -ex "quit"
     )
     lastLine="${gdbOut##*$'\n'}"
     if [[ "$lastLine" != "\$1 = (void *) 0x0" ]]; then
@@ -71,11 +89,11 @@ function load() {
         echo_red "Injection failed, make sure you have compiled."
     fi
 
-    sudo rm /usr/lib/$tlibname > /dev/null
-
     sleep 1
     sudo killall -18 steamwebhelper
     sudo killall -18 steam
+
+    sudo rm "/usr/lib/${filename}" > /dev/null
 
     secs_to_human "$(($(date +%s) - ${start}))"
 }
@@ -90,7 +108,6 @@ function build {
     
     make -j"$(grep -c "^processor" /proc/cpuinfo)" "$@" 
     strip -s -v "$libraryname"
-    patchelf --set-soname "$tlibname" "$libraryname"
 
     echo "Build Completed."
 }

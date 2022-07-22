@@ -38,7 +38,9 @@ void Hooks::Events::EventListener::FireGameEvent(IGameEvent *event) {
                 Interfaces::engine->ExecuteClientCmd("play buttons/arena_switch_press_02"); // TODO: play sound via a better method
             }
             
-            Features::AutoL::event(event);
+            if (CONFIGBOOL("Misc>Misc>AutoL")) {
+                Features::AutoL::event(event);
+            }
 
             if (CONFIGBOOL("Misc>Misc>Hitmarkers>Damage Markers")) {
                 Features::Hitmarkers::DamageMarker damageMarker;
