@@ -76,6 +76,7 @@ void Menu::drawMiscTab() {
                 ImGui::Checkbox("Disable Setting Cvars", &CONFIGBOOL("Misc>Misc>Misc>Disable Setting Cvars"));
                 ImGui::Checkbox("Disable Post Processing", &CONFIGBOOL("Misc>Misc>Misc>Disable Post Processing"));
                 ImGui::Checkbox("No Movement Fix", &CONFIGBOOL("Misc>Misc>Misc>No Movement Fix"));
+                ImGui::Checkbox("AutoL", &CONFIGBOOL("Misc>Misc>AutoL"));
                 ImGui::Checkbox("Report Bot", &CONFIGBOOL("Misc>Misc>ReportBot"));
                 if (CONFIGBOOL("Misc>Misc>ReportBot")) {
                     ImGui::SameLine();

@@ -496,6 +496,7 @@ namespace Config {
         CONFIGITEM("Misc>Misc>Misc>Disable Setting Cvars", false),
         CONFIGITEM("Misc>Misc>Misc>Disable Post Processing", false),
         CONFIGITEM("Misc>Misc>Misc>No Movement Fix", false),
+        CONFIGITEM("Misc>Misc>AutoL", false),
         CONFIGITEM("Misc>Misc>ReportBot", false),
         CONFIGITEM("Misc>Misc>ReportBot>TeamMate", false),
         CONFIGITEM("Misc>Misc>ReportBot>Report Flags", 0),

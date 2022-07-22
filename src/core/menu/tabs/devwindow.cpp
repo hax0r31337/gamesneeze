@@ -21,7 +21,7 @@ void Menu::drawDevWindow() {
     ImGui::Separator();
 
     if (ImGui::Button("Send test notification")) {
-        Features::Notifications::addNotification(ImColor(30, 255, 30), "[gs] Test notification! %f", Interfaces::globals->realtime);
+        Features::Notifications::addNotification(ImColor(30, 255, 30), "Test notification! %f", Interfaces::globals->realtime);
     }
 
     ImGui::Text("Is in dangerzone: %s", strstr(Offsets::getLocalClient(-1)->m_szLevelNameShort, "dz_") ? "true" : "false");

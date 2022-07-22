@@ -177,6 +177,10 @@ namespace Features {
     namespace Resolver {
         void frameStageNotify(FrameStage frame);
     }
+
+    namespace AutoL {
+        void event(IGameEvent *event);
+    }
     namespace NoVisualRecoil {
         void frameStageNotify(FrameStage frame);
     }
