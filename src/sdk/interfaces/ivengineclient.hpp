@@ -139,4 +139,16 @@ public:
         typedef bool (*Fn)(void*);
         return getVirtualFunc<Fn>(this, 225)(this);
     }
+
+    bool Voice_RecordStart(const char *pUncompressedFile,
+                           const char *pDecompressedFile,
+                           const char *pMicInputFile) {
+      typedef bool (*Fn)(void *, const char *, const char *, const char *);
+      return getVirtualFunc<Fn>(this, 226)(this, pUncompressedFile, pDecompressedFile, pMicInputFile);
+    }
+	
+    bool Voice_RecordStop() {
+      typedef bool (*Fn)(void *);
+      return getVirtualFunc<Fn>(this, 227)(this);
+    }
 };

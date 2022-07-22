@@ -84,6 +84,25 @@ void Menu::drawMiscTab() {
                     ImGui::Checkbox("InfiniReport", &CONFIGBOOL("Misc>Misc>ReportBot>InfiniReport"));
                     reportBotSelectBox("Misc>Misc>ReportBot>Report Flags");
                 }
+                static char musicFile[256];
+                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() * 0.315);
+                ImGui::InputText("##music-box", musicFile, IM_ARRAYSIZE(musicFile));
+                ImGui::SameLine();
+                if (ImGui::Button("PlayMusic", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.315, 0))) {
+                    Features::Notifications::addNotification(ImColor(255, 255, 255), "Music Player Started");
+                    // Interfaces::engine->ExecuteClientCmd("voice_loopback 1");
+                    Interfaces::engine->Voice_RecordStart(musicFile, nullptr, nullptr);
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Stop", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.315, 0))) {
+                    Features::Notifications::addNotification(ImColor(255, 255, 255), "Stop Playing Music");
+                    Interfaces::engine->ExecuteClientCmd("-voicerecord");
+                    Interfaces::engine->Voice_RecordStop();
+                }
+                ImGui::SameLine();
+                ImGui::TextDisabled("?");
+                if (ImGui::IsItemHovered())
+                  ImGui::SetTooltip("Music must be WAV file!");
                 ImGui::EndChild();
             }
 

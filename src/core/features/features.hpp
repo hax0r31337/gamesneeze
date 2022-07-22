@@ -174,6 +174,9 @@ namespace Features {
     namespace RagdollGravity {
         void frameStageNotify(FrameStage frame);
     }
+    namespace Resolver {
+        void frameStageNotify(FrameStage frame);
+    }
     namespace NoVisualRecoil {
         void frameStageNotify(FrameStage frame);
     }
