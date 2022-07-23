@@ -124,7 +124,7 @@ void drawPlayer(Player* p) {
         player_info_t info;
         Interfaces::engine->GetPlayerInfo(p->index(), &info);
 
-        if (p->isEnemy() && !p->dormant()) {
+        if (p->isEnemy()) {
           if (CONFIGBOOL("Visuals>Players>Enemies>Vis Check")
                   ? (Globals::localPlayer->health() > 0 ? p->visible() : true)
                   : true) {
