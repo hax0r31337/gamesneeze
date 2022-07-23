@@ -953,12 +953,7 @@ static std::string additions[4565] = {"垃圾狗族废材爹爹我不想埋汰�
 "你这个弱智儿童不要用你的童心挑衅你爹的温柔","无视你这样的废物了啊装腔作势不服输的够杂俎","现在爹爹华华丽丽的把你这个废物抛尸街头了啊","孩子不要羡慕嫉妒你爹爹的境界你不要怄气好吗",
 "你挺起腰杆好好努力不要灰心再过两年挑战爹爹","爹爹我现在留你一个人在这语无伦次自我反省吧","孩子你要痛定思痛痛改前非不要继续不自量力的","走之前记住了孩子我是你永远不可战胜的神话哦"};
 
-void Features::AutoL::event(IGameEvent *event) {
-  Player *victim = (Player *)Interfaces::entityList->GetClientEntity(
-      Interfaces::engine->GetPlayerForUserID(event->GetInt("userid")));
-  player_info_t info;
-  Interfaces::engine->GetPlayerInfo(victim->index(), &info);
-
+void Features::AutoL::killEvent(player_info_t info) {
   std::ostringstream str;
   str << "say \"[gamesneeze] L " << info.name << " " << additions[TICKCOUNTWITHPING() % 4565] << "\"";
 

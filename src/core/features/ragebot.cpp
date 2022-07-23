@@ -177,7 +177,7 @@ void Features::RageBot::traceLine(Vector vecAbsStart, Vector vecAbsEnd,
   Interfaces::trace->TraceRay(ray, mask, &filter, ptr);
 }
 
-bool Features::RageBot::simulateFireBullet(Weapon *pWeapon, bool teamCheck,
+bool Features::RageBot::simulateFireBullet(Weapon *pWeapon, bool allowFriendlyFire,
                                Features::RageBot::FireBulletData &data) {
   WeaponInfo *weaponInfo = pWeapon->GetWeaponInfo();
 
@@ -212,9 +212,11 @@ bool Features::RageBot::simulateFireBullet(Weapon *pWeapon, bool teamCheck,
       data.current_damage *=
           powf(weaponInfo->GetRangeModifier(), data.trace_length * 0.002f);
 
-      Player *player = (Player *)data.enter_trace.m_pEntityHit;
-      if (teamCheck && !player->isEnemy())
+      if (!allowFriendlyFire && data.enter_trace.m_pEntityHit &&
+        data.enter_trace.m_pEntityHit->isPlayer() && !data.enter_trace.m_pEntityHit->isEnemy()) 
         return false;
+
+      Player *player = (Player *)data.enter_trace.m_pEntityHit;
 
       scaleDamage(data.enter_trace.hitgroup, player,
                   weaponInfo->GetWeaponArmorRatio(), data.current_damage);
@@ -578,9 +580,9 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
 
     int bestDamage = -1;
     QAngle bestPlayerAngle = {0, 0, 0};
-    Player *bestPlayer = nullptr;
     QAngle aimPunch = Globals::localPlayer->aimPunch() * 2;
     bool hasTarget = false;
+    bool hasSelectedTarget = false;
 
     // Enumerate over players and get angle to the closest player to crosshair
     for (int i = 1; i < Interfaces::globals->maxClients; i++) {
@@ -636,8 +638,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
                                  friendlyFire);
                 }
               }
-              // auto damageDeal = getDamageDeal(p, targetBonePos,
-              // weapon->GetWeaponInfo(), friendlyFire);
               if (damageDeal <= 0 ||
                   damageDeal < (killShot
                                     ? p->health()
@@ -660,20 +660,20 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
               }
 
               if (damageDeal > bestDamage) {
+                hasTarget = true;
                 if (!canShoot(weapon, &directAngle, p, hitChance)) {
-                  hasTarget = true;
                   continue;
                 }
                 bestDamage = damageDeal;
                 bestPlayerAngle = directAngle - aimPunch;
-                bestPlayer = p;
+                hasSelectedTarget = true;
               }
             }
           }
         }
       }
     }
-    if (bestDamage > 0 && bestPlayer != nullptr) {
+    if (hasTarget) {
       if (autoSlow) {
         applyAutoSlow(cmd, weapon);
       }
@@ -682,19 +682,13 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
         cmd->buttons |= IN_ATTACK2;
         return;
       }
-      if (autoShot) {
-        cmd->buttons |= IN_ATTACK;
-      }
+      if (hasSelectedTarget) {
+        if (autoShot) {
+          cmd->buttons |= IN_ATTACK;
+        }
 
-      cmd->viewangles = bestPlayerAngle;
-      normalizeAngles(cmd->viewangles);
-    } else if (hasTarget) {
-      if (autoSlow) {
-        applyAutoSlow(cmd, weapon);
-      }
-      if (autoScope && weapon->isSniperRifle() &&
-          !Globals::localPlayer->scoped()) {
-        cmd->buttons |= IN_ATTACK2;
+        cmd->viewangles = bestPlayerAngle;
+        normalizeAngles(cmd->viewangles);
       }
     }
   }

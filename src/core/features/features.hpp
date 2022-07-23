@@ -155,7 +155,7 @@ namespace Features {
                                     Features::RageBot::FireBulletData &data);
         void traceLine(Vector vecAbsStart, Vector vecAbsEnd, unsigned int mask,
                Player *ignore, Trace *ptr);
-        bool simulateFireBullet(Weapon *pWeapon, bool teamCheck,
+        bool simulateFireBullet(Weapon *pWeapon, bool allowFriendlyFire,
                                FireBulletData &data);
         int getDamageDeal(Player *entity, const Vector &destination,
                 Weapon *weapon, bool allowFriendlyFire);
@@ -199,7 +199,7 @@ namespace Features {
     }
 
     namespace AutoL {
-        void event(IGameEvent *event);
+        void killEvent(player_info_t info);
     }
     namespace NoVisualRecoil {
         void frameStageNotify(FrameStage frame);
