@@ -134,22 +134,37 @@ namespace Features {
         bool isPlayerReported(std::uint64_t xuid);
     }
     namespace RageBot {
+        struct FireBulletData {
+            Vector src;
+            Trace enter_trace;
+            Vector direction;
+            TraceFilter filter;
+            float trace_length;
+            float trace_length_remaining;
+            float current_damage;
+            int penetrate_count;
+        };
         void createMove(CUserCmd* cmd);
-        void applyAutoSlow(CUserCmd *cmd, Weapon *activeWeapon);
-        bool traceToExit(const Trace &enterTrace, const Vector &start,
-                         const Vector &direction, Vector &end, Trace &exitTrace, Entity *target);
-        float handleBulletPenetration(SurfaceData *enterSurfaceData,
-                                      const Trace &enterTrace,
-                                      const Vector &direction, Vector &result,
-                                      float penetration, float damage, Entity *target);
+        void applyAutoSlow(CUserCmd *cmd, Weapon *weapon) ;
+        
+        void scaleDamage(HitGroups hitgroup, Player *enemy,
+                 float weapon_armor_ratio, float &current_damage);
+        bool traceToExit(Vector &end, Trace *enter_trace, Vector start, Vector dir,
+                 Trace *exit_trace);
+        bool handleBulletPenetration(WeaponInfo *weaponInfo,
+                                    Features::RageBot::FireBulletData &data);
+        void traceLine(Vector vecAbsStart, Vector vecAbsEnd, unsigned int mask,
+               Player *ignore, Trace *ptr);
+        bool simulateFireBullet(Weapon *pWeapon, bool teamCheck,
+                               FireBulletData &data);
         int getDamageDeal(Player *entity, const Vector &destination,
-                WeaponInfo *weaponData, bool allowFriendlyFire);
+                Weapon *weapon, bool allowFriendlyFire);
         void bestHeadPoint(Player *player, int &Damage,
                            Vector &Spot, float headScale,
-                           WeaponInfo *weaponData, bool friendlyFire);
+                           Weapon *weapon, bool friendlyFire);
         void bestMultiPoint(Player *player, int &BoneIndex, int &Damage,
                             Vector &Spot, float bodyScale,
-                            WeaponInfo *weaponData, bool friendlyFire);
+                            Weapon *weapon, bool friendlyFire);
         bool canShoot(Weapon *activeWeapon, QAngle *angle, Player *enemy,
                       int hitChance);
     }

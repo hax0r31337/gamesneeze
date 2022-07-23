@@ -3,67 +3,84 @@
 #include <algorithm>
 #include <cmath>
 
+void Features::RageBot::scaleDamage(HitGroups hitgroup, Player *enemy,
+                 float weapon_armor_ratio, float &current_damage) {
+  current_damage *= HitGroupsHelper::getDamageMultiplier(hitgroup);
+  int ArmorValue = enemy->armor();
+  if (ArmorValue > 0) {
+    float Damage = current_damage;
+    float v47 = 1.f, ArmorBonusRatio = 0.5f,
+          ArmorRatio = weapon_armor_ratio * 0.5f;
+    auto NewDamage = Damage * ArmorRatio;
 
-bool Features::RageBot::traceToExit(const Trace &enterTrace,
-                                    const Vector &start,
-                                    const Vector &direction, Vector &end,
-                                    Trace &exitTrace, Entity *target) {
+    if (((Damage - (Damage * ArmorRatio)) * (v47 * ArmorBonusRatio)) >
+        ArmorValue) {
+      NewDamage = Damage - (ArmorValue / ArmorBonusRatio);
+    }
+
+    current_damage = Damage;
+    if (hitgroup == HitGroups::HITGROUP_HEAD) {
+      if (enemy->helmet())
+        current_damage *= weapon_armor_ratio * 0.5f;
+    } else
+      current_damage *= weapon_armor_ratio * 0.5f;
+  }
+}
+
+bool Features::RageBot::traceToExit(Vector &end, Trace *enter_trace, Vector start, Vector dir,
+                 Trace *exit_trace) {
   float distance = 0.0f;
 
   while (distance <= 90.0f) {
     distance += 4.0f;
-    end = start + direction * distance;
+    end = start + dir * distance;
 
-    int point_contents = Interfaces::trace->GetPointContents(
-        end, MASK_SHOT_HULL | CONTENTS_HITBOX);
+    auto point_contents =
+        Interfaces::trace->GetPointContents(end, MASK_SHOT_HULL | CONTENTS_HITBOX);
 
-    if (point_contents & MASK_SHOT_HULL &&
-        !(point_contents & CONTENTS_HITBOX)) {
+    if (point_contents & MASK_SHOT_HULL && !(point_contents & CONTENTS_HITBOX))
       continue;
-    }
 
-    auto new_end = end - (direction * 4.0f);
+    auto new_end = end - (dir * 4.0f);
 
-    auto ray = Ray{};
+    Ray ray;
     ray.Init(end, new_end);
+    Interfaces::trace->TraceRay(ray, MASK_SHOT, 0, exit_trace);
 
-    Interfaces::trace->TraceRay(ray, MASK_SHOT, 0, &exitTrace);
-
-    if (exitTrace.startsolid && exitTrace.surface.flags & SURF_HITBOX) {
+    if (exit_trace->startsolid && exit_trace->surface.flags & SURF_HITBOX) {
       ray.Init(end, start);
-      TraceFilter tf;
-      tf.pSkip = exitTrace.m_pEntityHit;
-      Interfaces::trace->TraceRay(ray, 0x600400B, &tf, &exitTrace);
 
-      if ((exitTrace.fraction < 1.0f || exitTrace.allsolid) &&
-          !exitTrace.startsolid) {
-        end = exitTrace.endpos;
+      TraceFilter filter;
+      filter.pSkip = exit_trace->m_pEntityHit;
+
+      Interfaces::trace->TraceRay(ray, 0x600400B, &filter, exit_trace);
+
+      if ((exit_trace->fraction < 1.0f || exit_trace->allsolid) &&
+          !exit_trace->startsolid) {
+        end = exit_trace->endpos;
         return true;
       }
 
       continue;
     }
 
-    if (!(exitTrace.fraction < 1.0 || exitTrace.allsolid ||
-          exitTrace.startsolid) ||
-        exitTrace.startsolid) {
-      if (exitTrace.m_pEntityHit) {
-        if (enterTrace.m_pEntityHit && enterTrace.m_pEntityHit == target) {
-          return true;
-        }
+    if (!(exit_trace->fraction < 1.0 || exit_trace->allsolid ||
+          exit_trace->startsolid) ||
+        exit_trace->startsolid) {
+      if (exit_trace->m_pEntityHit && enter_trace->m_pEntityHit) {
+        return true;
       }
 
       continue;
     }
 
-    if (exitTrace.surface.flags >> 7 & 1 &&
-        !(enterTrace.surface.flags >> 7 & 1)) {
+    if (exit_trace->surface.flags >> 7 & 1 &&
+        !(enter_trace->surface.flags >> 7 & 1))
       continue;
-    }
 
-    if (exitTrace.plane.normal.dotProduct(direction) <= 1.0f) {
-      auto fraction = exitTrace.fraction * 4.0f;
-      end = end - (direction * fraction);
+    if (exit_trace->plane.normal.Dot(dir) <= 1.0f) {
+      auto fraction = exit_trace->fraction * 4.0f;
+      end = end - (dir * fraction);
 
       return true;
     }
@@ -72,109 +89,166 @@ bool Features::RageBot::traceToExit(const Trace &enterTrace,
   return false;
 }
 
-float Features::RageBot::handleBulletPenetration(
-    SurfaceData *enterSurfaceData, const Trace &enterTrace,
-    const Vector &direction, Vector &result, float penetration, float damage, Entity *target) {
-  Vector end;
-  Trace exitTrace;
-
-  if (!traceToExit(enterTrace, enterTrace.endpos, direction, end, exitTrace, target))
-    return -1.0f;
-
-  SurfaceData *exitSurfaceData =
+bool Features::RageBot::handleBulletPenetration(
+    WeaponInfo *weaponInfo, Features::RageBot::FireBulletData &data) {
+  SurfaceData *enter_surface_data =
       Interfaces::physicsSurfaceProps->GetSurfaceData(
-          exitTrace.surface.surfaceProps);
+          data.enter_trace.surface.surfaceProps);
+  int enter_material = enter_surface_data->game.material;
+  float enter_surf_penetration_mod =
+      enter_surface_data->game.flPenetrationModifier;
 
-  float damageModifier = 0.16f;
-  float penetrationModifier = (enterSurfaceData->game.flPenetrationModifier +
-                               exitSurfaceData->game.flPenetrationModifier) /
-                              2.0f;
+  data.trace_length += data.enter_trace.fraction * data.trace_length_remaining;
+  data.current_damage *=
+      powf(weaponInfo->GetRangeModifier(), data.trace_length * 0.002f);
 
-  if (enterSurfaceData->game.material == 71 ||
-      enterSurfaceData->game.material == 89) {
-    damageModifier = 0.05f;
-    penetrationModifier = 3.0f;
-  } else if (enterTrace.contents >> 3 & 1 ||
-             enterTrace.surface.flags >> 7 & 1) {
-    penetrationModifier = 1.0f;
+  if (data.trace_length > 3000.f || enter_surf_penetration_mod < 0.1f)
+    data.penetrate_count = 0;
+
+  if (data.penetrate_count <= 0)
+    return false;
+
+  Vector dummy;
+  Trace trace_exit;
+
+  if (!traceToExit(dummy, &data.enter_trace, data.enter_trace.endpos,
+                   data.direction, &trace_exit))
+    return false;
+
+  SurfaceData *exit_surface_data = Interfaces::physicsSurfaceProps->GetSurfaceData(trace_exit.surface.surfaceProps);
+  int exit_material = exit_surface_data->game.material;
+
+  float exit_surf_penetration_mod =
+      exit_surface_data->game.flPenetrationModifier;
+
+  float final_damage_modifier = 0.16f;
+  float combined_penetration_modifier = 0.0f;
+
+  if ((data.enter_trace.contents & CONTENTS_GRATE) != 0 ||
+      enter_material == 89 || enter_material == 71) {
+    combined_penetration_modifier = 3.0f;
+    final_damage_modifier = 0.05f;
+  } else
+    combined_penetration_modifier =
+        (enter_surf_penetration_mod + exit_surf_penetration_mod) * 0.5f;
+
+  if (enter_material == exit_material) {
+    if (exit_material == 87 || exit_material == 85)
+      combined_penetration_modifier = 3.0f;
+    else if (exit_material == 76)
+      combined_penetration_modifier = 2.0f;
   }
 
-  if (enterSurfaceData->game.material == exitSurfaceData->game.material) {
-    if (exitSurfaceData->game.material == 85 ||
-        exitSurfaceData->game.material == 87)
-      penetrationModifier = 3.0f;
-    else if (exitSurfaceData->game.material == 76)
-      penetrationModifier = 2.0f;
-  }
+  float v34 = fmaxf(0.f, 1.0f / combined_penetration_modifier);
+  float v35 =
+      (data.current_damage * final_damage_modifier) +
+      v34 * 3.0f * fmaxf(0.0f, (3.0f / weaponInfo->GetPenetration()) * 1.25f);
+  float thickness = (trace_exit.endpos - data.enter_trace.endpos).Length();
 
-  damage -= 11.25f / penetration / penetrationModifier +
-            damage * damageModifier +
-            (exitTrace.endpos - enterTrace.endpos).squareLength() / 24.0f /
-                penetrationModifier;
+  thickness *= thickness;
+  thickness *= v34;
+  thickness /= 24.0f;
 
-  result = exitTrace.endpos;
-  return damage;
+  float lost_damage = fmaxf(0.0f, v35 + thickness);
+
+  if (lost_damage > data.current_damage)
+    return false;
+
+  if (lost_damage >= 0.0f)
+    data.current_damage -= lost_damage;
+
+  if (data.current_damage < 1.0f)
+    return false;
+
+  data.src = trace_exit.endpos;
+  data.penetrate_count--;
+
+  return true;
 }
 
-int Features::RageBot::getDamageDeal(Player *entity, const Vector &destination,
-                                     WeaponInfo *weaponData, bool allowFriendlyFire) {
-  if (!Globals::localPlayer)
+void Features::RageBot::traceLine(Vector vecAbsStart, Vector vecAbsEnd,
+                                  unsigned int mask, Player *ignore,
+                                  Trace *ptr) {
+  Ray ray;
+  ray.Init(vecAbsStart, vecAbsEnd);
+  TraceFilter filter;
+  filter.pSkip = ignore;
+
+  Interfaces::trace->TraceRay(ray, mask, &filter, ptr);
+}
+
+bool Features::RageBot::simulateFireBullet(Weapon *pWeapon, bool teamCheck,
+                               Features::RageBot::FireBulletData &data) {
+  WeaponInfo *weaponInfo = pWeapon->GetWeaponInfo();
+
+  data.penetrate_count = 4;
+  data.trace_length = 0.0f;
+  data.current_damage = (float)weaponInfo->GetDamage();
+
+  while (data.penetrate_count > 0 && data.current_damage >= 1.0f) {
+    data.trace_length_remaining = weaponInfo->GetRange() - data.trace_length;
+
+    Vector end = data.src + data.direction * data.trace_length_remaining;
+
+    // data.enter_trace
+    traceLine(data.src, end, MASK_SHOT, Globals::localPlayer,
+              &data.enter_trace);
+
+    Ray ray;
+    ray.Init(data.src, end + data.direction * 40.f);
+
+    Interfaces::trace->TraceRay(ray, MASK_SHOT, &data.filter, &data.enter_trace);
+
+    traceLine(data.src, end + data.direction * 40.f, MASK_SHOT, Globals::localPlayer,
+              &data.enter_trace);
+
+    if (data.enter_trace.fraction == 1.0f)
+      break;
+
+    if (data.enter_trace.hitgroup <= HitGroups::HITGROUP_RIGHTLEG &&
+        data.enter_trace.hitgroup > HitGroups::HITGROUP_GENERIC) {
+      data.trace_length +=
+          data.enter_trace.fraction * data.trace_length_remaining;
+      data.current_damage *=
+          powf(weaponInfo->GetRangeModifier(), data.trace_length * 0.002f);
+
+      Player *player = (Player *)data.enter_trace.m_pEntityHit;
+      if (teamCheck && !player->isEnemy())
+        return false;
+
+      scaleDamage(data.enter_trace.hitgroup, player,
+                  weaponInfo->GetWeaponArmorRatio(), data.current_damage);
+
+      return true;
+    }
+
+    if (!handleBulletPenetration(weaponInfo, data))
+      break;
+  }
+
+  return false;
+}
+
+int Features::RageBot::getDamageDeal(Player *player, const Vector &point,
+                                     Weapon *weapon, bool allowFriendlyFire) {
+  Vector dst = point;
+  if (!Globals::localPlayer || Globals::localPlayer->health() <= 0)
     return -1;
 
-  float damage{static_cast<float>(weaponData->GetDamage())};
+  Features::RageBot::FireBulletData data;
+  data.src = Globals::localPlayer->eyePos();
+  data.filter.pSkip = Globals::localPlayer;
 
-  Vector start{Globals::localPlayer->eyePos()};
-  Vector direction{destination - start};
-  direction /= direction.length();
+  QAngle angles = calcAngle(data.src, dst);
+  angleVectors(angles, data.direction);
 
-  int hitsLeft = 4;
+  Vector tmp = data.direction;
+  data.direction = tmp.Normalize();
 
-  while (damage >= 1.0f && hitsLeft > 0) {
-    Trace trace;
-    Ray ray;
-    ray.Init(start, destination);
-    TraceFilter traceFilter;
-    traceFilter.pSkip = Globals::localPlayer;
-    Interfaces::trace->TraceRay(ray, 0x4600400B, &traceFilter, &trace);
+  if (simulateFireBullet(weapon, allowFriendlyFire, data))
+    return (int)data.current_damage;
 
-    if (!allowFriendlyFire && trace.m_pEntityHit &&
-        trace.m_pEntityHit->isPlayer() && !trace.m_pEntityHit->isEnemy()) {
-      return -1;
-    }
-
-    if (trace.fraction == 1.0f) {
-      return -1;
-    }
-
-    if (trace.m_pEntityHit == entity &&
-        trace.hitgroup > HitGroups::HITGROUP_GENERIC &&
-        trace.hitgroup <= HitGroups::HITGROUP_RIGHTLEG) {
-      damage = HitGroupsHelper::getDamageMultiplier(trace.hitgroup) * damage *
-               std::pow(weaponData->GetRangeModifier(),
-                        trace.fraction * weaponData->GetRange() / 500.0f);
-
-      if (float armorRatio{weaponData->GetWeaponArmorRatio() / 2.0f};
-          HitGroupsHelper::isArmored(trace.hitgroup,
-                                     trace.m_pEntityHit->helmet()))
-        damage -= (trace.m_pEntityHit->armor() < damage * armorRatio / 2.0f
-                       ? trace.m_pEntityHit->armor() * 4.0f
-                       : damage) *
-                  (1.0f - armorRatio);
-
-      return damage;
-    }
-    const auto surfaceData = Interfaces::physicsSurfaceProps->GetSurfaceData(
-        trace.surface.surfaceProps);
-
-    if (surfaceData->game.flPenetrationModifier < 0.1f) {
-      break;
-    }
-
-    damage = handleBulletPenetration(surfaceData, trace, direction, start,
-                                     weaponData->GetPenetration(), damage, entity);
-    hitsLeft--;
-  }
-  return 0;
+  return -1.0f;
 }
 
 bool Features::RageBot::canShoot(Weapon *weapon, QAngle *angle, 
@@ -247,7 +321,7 @@ bool Features::RageBot::canShoot(Weapon *weapon, QAngle *angle,
 
 void Features::RageBot::bestHeadPoint(Player *player,
                                       int &Damage, Vector &Spot,
-                                      float headScale, WeaponInfo *weaponData,
+                                      float headScale, Weapon *weapon,
                                       bool friendlyFire) {
   matrix3x4_t matrix[128];
   if (!player->setupBones(matrix, 128, 0x100, 0.f))
@@ -298,7 +372,7 @@ void Features::RageBot::bestHeadPoint(Player *player,
         Vector(bbox->bbmax.x - final_radius, bbox->bbmax.y, bbox->bbmax.z);
 
   for (int i = 0; i < 7; i++) {
-    float bestDamage = getDamageDeal(player, points[i], weaponData, friendlyFire);
+    float bestDamage = getDamageDeal(player, points[i], weapon, friendlyFire);
     if (bestDamage >= player->health()) {
       Damage = bestDamage;
       Spot = points[i];
@@ -312,7 +386,7 @@ void Features::RageBot::bestHeadPoint(Player *player,
 
 void Features::RageBot::bestMultiPoint(Player *player, int &BoneIndex,
                                         int &Damage, Vector &Spot, float bodyScale,
-                                        WeaponInfo *weaponData, bool friendlyFire) {
+                                        Weapon *weapon, bool friendlyFire) {
   model_t *pModel = player->model();
   if (!pModel)
     return;
@@ -339,7 +413,7 @@ void Features::RageBot::bestMultiPoint(Player *player, int &BoneIndex,
   points[3] = Vector(center.x, bbox->bbmax.y - final_radius, center.z);
 
   for (int i = 0; i < 4; i++) {
-    int bestDamage = getDamageDeal(player, points[i], weaponData, friendlyFire);
+    int bestDamage = getDamageDeal(player, points[i], weapon, friendlyFire);
     if (bestDamage >= player->health()) {
       Damage = bestDamage;
       Spot = points[i];
@@ -536,17 +610,15 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
               if (bone == 8) {
                 if (headScale == 0) {
                   targetBonePos = p->getBonePos(bone);
-                  damageDeal = getDamageDeal(
-                      p, targetBonePos, weapon->GetWeaponInfo(), friendlyFire);
+                  damageDeal = getDamageDeal(p, targetBonePos, weapon, friendlyFire);
                 } else {
                   bestHeadPoint(p, damageDeal, targetBonePos, headScale,
-                                weapon->GetWeaponInfo(), friendlyFire);
+                                weapon, friendlyFire);
                 }
               } else {
                 if (bodyScale == 0) {
                   targetBonePos = p->getBonePos(bone);
-                  damageDeal = getDamageDeal(
-                      p, targetBonePos, weapon->GetWeaponInfo(), friendlyFire);
+                  damageDeal = getDamageDeal(p, targetBonePos, weapon, friendlyFire);
                 } else {
                   int hitbox = (int)((1 << i & (int)HitBoxes::HEAD)
                                          ? HitboxModel::HITBOX_HEAD
@@ -560,7 +632,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
                                          ? HitboxModel::HITBOX_PELVIS
                                          : HitboxModel::HITBOX_SPINE);
                   bestMultiPoint(p, hitbox, damageDeal, targetBonePos,
-                                 bodyScale, weapon->GetWeaponInfo(),
+                                 bodyScale, weapon,
                                  friendlyFire);
                 }
               }
