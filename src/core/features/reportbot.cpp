@@ -42,31 +42,32 @@ bool Features::ReportBot::isPlayerReported(std::uint64_t xuid) {
 }
 
 void Features::ReportBot::createMove(CUserCmd *cmd) {
-  if (!Globals::localPlayer || !Interfaces::engine->IsInGame()) {
-    return;
-  }
-  if (!CONFIGBOOL("Misc>Misc>ReportBot")) {
-    reportedPlayers.clear();
-    return;
-  }
-  static auto lastReportTime = 0.0f;
+  // if (!Interfaces::engine->IsInGame() || !Globals::localPlayer || !Interfaces::globals) {
+  //   return;
+  // }
+  // if (!CONFIGBOOL("Misc>Misc>ReportBot")) {
+  //   reportedPlayers.push_back(0);
+  //   reportedPlayers.clear();
+  //   return;
+  // }
+  // static auto lastReportTime = 0.0f;
 
-  if (lastReportTime + 1 > Interfaces::globals->realtime)
-    return;
+  // if (lastReportTime + 1 > Interfaces::globals->realtime)
+  //   return;
 
-  for (const auto &xuid : getXuidsOfCandidatesToBeReported()) {
-    if (isPlayerReported(xuid))
-      continue;
+  // for (const auto &xuid : getXuidsOfCandidatesToBeReported()) {
+  //   if (isPlayerReported(xuid))
+  //     continue;
 
-    if (const auto report = generateReportString(); !report.empty()) {
-      Offsets::submitReport(nullptr, std::to_string(xuid).c_str(), report.c_str());
-      lastReportTime = Interfaces::globals->realtime;
-      reportedPlayers.push_back(xuid);
-      return;
-    }
-  }
+  //   if (const auto report = generateReportString(); !report.empty()) {
+  //     Offsets::submitReport(nullptr, std::to_string(xuid).c_str(), report.c_str());
+  //     lastReportTime = Interfaces::globals->realtime;
+  //     reportedPlayers.push_back(xuid);
+  //     return;
+  //   }
+  // }
 
-  if (CONFIGBOOL("Misc>Misc>ReportBot>InfiniReport")) {
-    reportedPlayers.clear();
-  }
+  // if (CONFIGBOOL("Misc>Misc>ReportBot>InfiniReport")) {
+  //   reportedPlayers.clear();
+  // }
 }
