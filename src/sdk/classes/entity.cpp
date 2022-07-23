@@ -162,6 +162,6 @@ void BombData::update() noexcept {
   blowTime = 0.0f;
   timerLength = 1.f;
   defuserHandle = -1;
-  bombsite = false;
+  bombsite = 0;
   origin = Vector(-1, -1, -1);
 }

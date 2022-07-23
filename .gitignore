@@ -16,6 +16,7 @@ CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 Makefile
+inject.lock
 *.id0
 *.id1
 *.nam

@@ -124,8 +124,7 @@ void drawPlayer(Player* p) {
         player_info_t info;
         Interfaces::engine->GetPlayerInfo(p->index(), &info);
 
-        if (p->isEnemy()) {
-
+        if (p->isEnemy() && !p->dormant()) {
           if (CONFIGBOOL("Visuals>Players>Enemies>Vis Check")
                   ? (Globals::localPlayer->health() > 0 ? p->visible() : true)
                   : true) {
@@ -133,6 +132,13 @@ void drawPlayer(Player* p) {
                     ? (Globals::localPlayer->health() == 0)
                     : true) {
               std::stringstream rightText;
+              if (p->dormant()) {
+                if (CONFIGBOOL("Visuals>Players>Enemies>Dormant")) {
+                  rightText << "Dormant\n";
+                } else {
+                  return;
+                }
+              }
               if (CONFIGBOOL("Visuals>Players>Enemies>Health"))
                 rightText << p->health() << "hp\n";
               if (CONFIGBOOL("Visuals>Players>Enemies>Money"))
@@ -144,13 +150,6 @@ void drawPlayer(Player* p) {
               if (CONFIGBOOL("Visuals>Players>Enemies>Flashed") &&
                   p->flashDuration() > 3) // This value is quite strange
                 rightText << "Flashed\n"; // TODO: Fully refactor
-              if (p->dormant()) {
-                if (CONFIGBOOL("Visuals>Players>Enemies>Dormant")) {
-                  rightText << "Dormant\n";
-                } else {
-                    return;
-                }
-              }
 
               if (CONFIGBOOL("Visuals>Players>Enemies>Weapon")) {
                 Weapon *weapon =

@@ -126,7 +126,12 @@ namespace Features {
                                       Trace *traceToPlayer);
     }
     namespace ReportBot {
+        inline std::vector<std::uint64_t> reportedPlayers;
+        inline int reportbotRound;
         void createMove(CUserCmd* cmd);
+        std::vector<std::uint64_t> getXuidsOfCandidatesToBeReported();
+        std::string generateReportString();
+        bool isPlayerReported(std::uint64_t xuid);
     }
     namespace RageBot {
         void createMove(CUserCmd* cmd);

@@ -37,10 +37,6 @@ void Hooks::Events::EventListener::FireGameEvent(IGameEvent *event) {
             if (CONFIGBOOL("Misc>Misc>Hitmarkers>Hitsound")) {
                 Interfaces::engine->ExecuteClientCmd("play buttons/arena_switch_press_02"); // TODO: play sound via a better method
             }
-            
-            if (CONFIGBOOL("Misc>Misc>AutoL")) {
-                Features::AutoL::event(event);
-            }
 
             if (CONFIGBOOL("Misc>Misc>Hitmarkers>Damage Markers")) {
                 Features::Hitmarkers::DamageMarker damageMarker;
@@ -64,6 +60,10 @@ void Hooks::Events::EventListener::FireGameEvent(IGameEvent *event) {
         if (attacker && victim && attacker == Globals::localPlayer) {
             player_info_t info;
             Interfaces::engine->GetPlayerInfo(victim->index(), &info);
+
+            if (CONFIGBOOL("Misc>Misc>AutoL")) {
+              Features::AutoL::event(event);
+            }
 
             if (CONFIGBOOL("Misc>Misc>Hitmarkers>Hitlogs")) {
                 Features::Notifications::addNotification(ImColor(220, 40, 40), "killed %s", info.name);

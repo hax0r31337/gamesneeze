@@ -1,10 +1,7 @@
 #include "../../includes.hpp"
 #include "features.hpp"
 
-static std::vector<std::uint64_t> reportedPlayers;
-static int reportbotRound;
-
-static std::vector<std::uint64_t> getXuidsOfCandidatesToBeReported() {
+std::vector<std::uint64_t> Features::ReportBot::getXuidsOfCandidatesToBeReported() {
   std::vector<std::uint64_t> xuids;
 
   for (int i = 1; i <= Interfaces::engine->GetMaxClients(); ++i) {
@@ -25,7 +22,7 @@ static std::vector<std::uint64_t> getXuidsOfCandidatesToBeReported() {
   return xuids;
 }
 
-static std::string generateReportString() {
+std::string Features::ReportBot::generateReportString() {
 
   int flags = CONFIGINT("Misc>Misc>ReportBot>Report Flags");
 
@@ -39,12 +36,15 @@ static std::string generateReportString() {
   return str.str();
 }
 
-static bool isPlayerReported(std::uint64_t xuid) {
+bool Features::ReportBot::isPlayerReported(std::uint64_t xuid) {
   return std::ranges::find(std::as_const(reportedPlayers), xuid) !=
          reportedPlayers.cend();
 }
 
 void Features::ReportBot::createMove(CUserCmd *cmd) {
+  if (!Globals::localPlayer || !Interfaces::engine->IsInGame()) {
+    return;
+  }
   if (!CONFIGBOOL("Misc>Misc>ReportBot")) {
     reportedPlayers.clear();
     return;

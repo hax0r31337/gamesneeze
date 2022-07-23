@@ -309,11 +309,11 @@ public:
 struct BombData {
   void update() noexcept;
 
-  float blowTime;
-  float timerLength;
-  int defuserHandle;
-  float defuseCountDown;
-  float defuseLength;
-  int bombsite;
-  Vector origin;
+  float blowTime = 0.f;
+  float timerLength = 1.f;
+  int defuserHandle = -1;
+  float defuseCountDown = 0.f;
+  float defuseLength = 1.f;
+  int bombsite = 0;
+  Vector origin = Vector{0, 0, 0};
 };

@@ -102,7 +102,7 @@ bool checkEdgebug() {
 }
 
 void Features::Movement::prePredCreateMove(CUserCmd *cmd) {
-    if (!Globals::localPlayer)
+    if (!Globals::localPlayer || !Interfaces::engine->IsInGame())
         return;
 
     flagsBackup = Globals::localPlayer->flags();
