@@ -48,7 +48,7 @@ void Features::AntiAim::createMove(CUserCmd* cmd) {
               weapon->itemIndex() == ItemIndex::WEAPON_SMOKEGRENADE ||
               weapon->itemIndex() == ItemIndex::WEAPON_MOLOTOV ||
               weapon->itemIndex() == ItemIndex::WEAPON_INCGRENADE)) {
-          if (!((cmd->buttons & (1 << 0)) || (cmd->buttons & (1 << 5)))) {
+          if (!((cmd->buttons & IN_ATTACK) || (cmd->buttons & IN_USE))) {
             if (CONFIGINT("Rage>AntiAim>Type")) {
               // TODO: for some reason it refuses to desync when looking
               // forward???!?!?

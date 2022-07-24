@@ -44,9 +44,10 @@ void autoStrafe(CUserCmd *cmd) {
   if (Globals::localPlayer->moveType() == MOVETYPE_NOCLIP || Globals::localPlayer->moveType() == MOVETYPE_LADDER)
     return;
 
+  static const auto cl_sidespeed = Interfaces::convar->FindVar("cl_sidespeed");
   if (!(Globals::localPlayer->flags() & FL_ONGROUND)) {
     if (cmd->mousedx > 1 || cmd->mousedx < -1) {
-      cmd->sidemove = cmd->mousedx < 0.f ? -400.f : 400.f;
+      cmd->sidemove = cmd->mousedx < 0.f ? -cl_sidespeed->GetFloat() : cl_sidespeed->GetFloat();
     } else {
       auto l2d = Globals::localPlayer->velocity().Length2D();
       if (l2d == 0 || l2d == INFINITY || l2d == NAN) {
@@ -54,15 +55,31 @@ void autoStrafe(CUserCmd *cmd) {
         return;
       }
       cmd->forwardmove = std::clamp(5850.f / l2d,
-                                    -400.0f, 400.0f);
-      cmd->sidemove = (cmd->command_number % 2) == 0 ? -400.f : 400.f;
+                                    -cl_sidespeed->GetFloat(), cl_sidespeed->GetFloat());
+      cmd->sidemove = (cmd->command_number % 2) == 0 ? -cl_sidespeed->GetFloat() : cl_sidespeed->GetFloat();
     }
   }
 }
 
 void moonWalk(CUserCmd *cmd) {
-  if (CONFIGBOOL("Misc>Misc>Movement>Moon Walk") && Globals::localPlayer && Globals::localPlayer->moveType() != MOVETYPE_LADDER)
-      cmd->buttons ^= IN_FORWARD | IN_BACK | IN_MOVELEFT | IN_MOVERIGHT;
+  if (!CONFIGBOOL("Misc>Misc>Movement>Moon Walk") || !Globals::localPlayer ||
+      Globals::localPlayer->moveType() == MOVETYPE_FLY ||
+      Globals::localPlayer->moveType() == MOVETYPE_NOCLIP ||
+      !(Globals::localPlayer->flags() & FL_ONGROUND) ||
+      !(cmd->buttons & IN_SPEED))
+    return;
+
+  static float maxSpeed = 133.f;
+
+  Vector moveDir = Vector{0, 0, 0};
+  moveDir.x = cmd->sidemove;
+  moveDir.y = cmd->forwardmove;
+  moveDir = clampMagnitude(moveDir, maxSpeed);
+  cmd->sidemove = moveDir.x;
+  cmd->forwardmove = moveDir.y;
+  if (!(Globals::localPlayer->velocity().Length2D() > maxSpeed + 1))
+    cmd->buttons &= ~IN_SPEED;
+  return;
 }
 
 void edgeJump(CUserCmd *cmd) {

@@ -198,9 +198,10 @@ namespace Features {
         void frameStageNotify(FrameStage frame);
     }
 
-    namespace AutoL {
-        void killEvent(player_info_t info);
+    namespace RainbowHud {
+        void frameStageNotify(FrameStage frame);
     }
+
     namespace NoVisualRecoil {
         void frameStageNotify(FrameStage frame);
     }

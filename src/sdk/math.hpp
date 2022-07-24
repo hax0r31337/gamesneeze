@@ -186,6 +186,14 @@ inline float normalizePitch(float pitch) {
   return pitch;
 }
 
+inline float normalizeYaw(float yaw) {
+  while (yaw < -180.f)
+    yaw += 360.f;
+  while (yaw > 180.f)
+    yaw -= 360.f;
+  return yaw;
+}
+
 inline float getDistance(Vector pos1, Vector pos2) {
     // Do 3d pythag
     float a = abs(pos1.x-pos2.x);
@@ -201,6 +209,22 @@ inline float getDistanceNoSqrt(Vector pos1, Vector pos2) {
     float b = abs(pos1.y-pos2.y);
     float c = abs(pos1.z-pos2.z);
     return pow(a, 2.f) + pow(b, 2.f) + pow(c, 2.f);
+}
+
+inline float magnitude(Vector a) { return sqrt((a.x * a.x) + (a.y * a.y)); }
+
+inline Vector normalizeMagnitude(Vector value) {
+  float num = magnitude(value);
+  if (num != 0.f)
+    return value / num;
+  return Vector(0.f, 0.f, 0.f);
+}
+
+inline Vector clampMagnitude(Vector vector, float maxLength) {
+  if (magnitude(vector) > maxLength)
+    return Vector(normalizeMagnitude(vector).x * maxLength,
+                  normalizeMagnitude(vector).y * maxLength, 0);
+  return vector;
 }
 
 bool worldToScreen(const Vector& origin, Vector& screen);

@@ -262,6 +262,8 @@ void Menu::drawVisualsTab() {
                 ImGui::SliderInt("##Fog Farz", &CONFIGINT("Visuals>World>World>Fog Farz"), 0, 30000);
                 ImGui::ColorEdit4("Fog Color", (float*)&CONFIGCOL("Visuals>World>World>Fog Color"), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_PickerHueWheel);
 
+                ImGui::Checkbox("Rainbow HUD", &CONFIGBOOL("Visuals>World>World>Rainbow HUD"));
+                
                 ImGui::EndChild();
             }
             ImGui::SameLine();
