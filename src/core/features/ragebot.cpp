@@ -375,11 +375,7 @@ void Features::RageBot::bestHeadPoint(Player *player,
 
   for (int i = 0; i < 7; i++) {
     float bestDamage = getDamageDeal(player, points[i], weapon, friendlyFire);
-    if (bestDamage >= player->health()) {
-      Damage = bestDamage;
-      Spot = points[i];
-      return;
-    } else if (bestDamage > Damage) {
+    if (bestDamage > Damage) {
       Damage = bestDamage;
       Spot = points[i];
     }
@@ -416,11 +412,7 @@ void Features::RageBot::bestMultiPoint(Player *player, int &BoneIndex,
 
   for (int i = 0; i < 4; i++) {
     int bestDamage = getDamageDeal(player, points[i], weapon, friendlyFire);
-    if (bestDamage >= player->health()) {
-      Damage = bestDamage;
-      Spot = points[i];
-      return;
-    } else if (bestDamage > Damage) {
+    if (bestDamage > Damage) {
       Damage = bestDamage;
       Spot = points[i];
     }

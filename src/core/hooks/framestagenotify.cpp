@@ -17,6 +17,7 @@ void Hooks::FrameStageNotify::hook(void* thisptr, FrameStage frame) {
     Features::RagdollGravity::frameStageNotify(frame);
     Features::NoVisualRecoil::frameStageNotify(frame);
     Features::RainbowHud::frameStageNotify(frame);
+    Features::NoBlur::frameStageNotify(frame);
 
     if (frame == FRAME_RENDER_START) {
         cachePlayers();

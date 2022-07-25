@@ -263,6 +263,7 @@ void Menu::drawVisualsTab() {
                 ImGui::ColorEdit4("Fog Color", (float*)&CONFIGCOL("Visuals>World>World>Fog Color"), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_PickerHueWheel);
 
                 ImGui::Checkbox("Rainbow HUD", &CONFIGBOOL("Visuals>World>World>Rainbow HUD"));
+                ImGui::Checkbox("No Blur", &CONFIGBOOL("Visuals>World>World>No Blur"));
                 
                 ImGui::EndChild();
             }
