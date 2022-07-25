@@ -455,6 +455,7 @@ namespace Config {
         CONFIGITEM("Visuals>World>World>Ragdoll Gravity", false),
         CONFIGITEM("Visuals>World>World>Rainbow HUD", false),
         CONFIGITEM("Visuals>World>World>No Blur", false),
+        CONFIGITEM("Visuals>World>World>No Scope Overlay", false),
         // }
         // }
         // Misc {

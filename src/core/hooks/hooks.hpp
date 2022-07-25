@@ -52,6 +52,12 @@ namespace Hooks {
         float hook(void* thisptr);
     }
 
+    namespace SetDrawColor {
+        using func = float(*)(void* thisptr, int r, int g, int b, int a);
+        inline func original;
+        void hook(void *thisptr, int r, int g, int b, int a);
+    }
+
     /* EVENT MANAGER */
     namespace Events {
         class EventListener : public IGameEventListener2 {
@@ -62,7 +68,7 @@ namespace Hooks {
             void FireGameEvent(IGameEvent* event) override;
             int GetEventDebugID() override;
         };
-    }
+    } // namespace Events
 
     /* SDL HOOKS */
     namespace SDL {

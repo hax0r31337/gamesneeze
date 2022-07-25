@@ -19,6 +19,12 @@ bool Hooks::init() {
     Log::log(LOG, " Hooking CreateMove...");
     CreateMove::original = (CreateMove::func)VMT::hook(Interfaces::clientMode, (void*)CreateMove::hook, 25);
 
+    Log::log(LOG, " Hooking OverrideView...");
+    OverrideView::original = (OverrideView::func)VMT::hook(Interfaces::clientMode, (void*)OverrideView::hook, 19);
+
+    Log::log(LOG, " Hooking GetViewmodelFOV... ");
+    GetViewmodelFOV::original = (GetViewmodelFOV::func)VMT::hook(Interfaces::clientMode, (void*)GetViewmodelFOV::hook, 36);
+
     Log::log(LOG, " Hooking Paint...");
     Paint::original = (Paint::func)VMT::hook(Interfaces::engineVgui, (void*)Paint::hook, 15);
 
@@ -37,11 +43,8 @@ bool Hooks::init() {
     Log::log(LOG, " Hooking ClientCmd...");
     ClientCmd::original = (ClientCmd::func)VMT::hook(Interfaces::engine, (void*)ClientCmd::hook, 7);
 
-    Log::log(LOG, " Hooking OverrideView...");
-    OverrideView::original = (OverrideView::func)VMT::hook(Interfaces::clientMode, (void*)OverrideView::hook, 19);
-
-    Log::log(LOG, " Hooking GetViewmodelFOV... ");
-    GetViewmodelFOV::original = (GetViewmodelFOV::func)VMT::hook(Interfaces::clientMode, (void*)GetViewmodelFOV::hook, 36);
+    Log::log(LOG, " Hooking SetDrawColor...");
+    SetDrawColor::original = (SetDrawColor::func)VMT::hook(Interfaces::surface, (void*)SetDrawColor::hook, 14);
 
     eventListener = new Events::EventListener;
 
@@ -62,6 +65,12 @@ bool Hooks::unload() {
     Log::log(LOG, " Unhooking CreateMove...");
     VMT::hook(Interfaces::clientMode, (void*)CreateMove::original, 25);
 
+    Log::log(LOG, " Unhooking OverrideView...");
+    VMT::hook(Interfaces::clientMode, (void *)OverrideView::original, 19);
+
+    Log::log(LOG, " Unhooking GetViewmodelFOV...");
+    VMT::hook(Interfaces::clientMode, (void *)GetViewmodelFOV::original, 36);
+
     Log::log(LOG, " Unhooking Paint...");
     VMT::hook(Interfaces::engineVgui, (void*)Paint::original, 15);
 
@@ -80,11 +89,8 @@ bool Hooks::unload() {
     Log::log(LOG, " Unhooking ClientCmd...");
     VMT::hook(Interfaces::engine, (void*)ClientCmd::original, 7);
 
-    Log::log(LOG, " Unhooking OverrideView...");
-    VMT::hook(Interfaces::clientMode, (void*)OverrideView::original, 19);
-
-    Log::log(LOG, " Unhooking GetViewmodelFOV...");
-    VMT::hook(Interfaces::clientMode, (void*)GetViewmodelFOV::original, 36);
+    Log::log(LOG, " Unhooking SetDrawColor...");
+    VMT::hook(Interfaces::surface, (void*)SetDrawColor::original, 14);
 
     delete eventListener;
 

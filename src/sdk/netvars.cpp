@@ -112,6 +112,10 @@ bool Netvar::init() {
 
     Offsets::submitReport = (Offsets::SubmitReport)PatternScan::findFirstInModule("/client_client.so",
         "55 48 89 F7 48 89 E5 41 57 41 56 41 55 41 54 53 48 89 D3 48 83 EC 58");
+    Log::log(LOG, " submitReport | %lx", Offsets::submitReport);
+
+    Offsets::scopeDust = PatternScan::findFirstInModule("/client_client.so", "8B 85 ? ? ? ? 43 8D 14 2E");
+    Offsets::scopeArc = PatternScan::findFirstInModule("/client_client.so", "49 8B 3C 24 8B B3 ? ? ? ? 48 8B 07 FF 90 ? ? ? ? 49 8B 3C 24 4C 89 EA");
 
     return true;
 }

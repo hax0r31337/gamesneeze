@@ -132,6 +132,9 @@ namespace Offsets {
 
     typedef bool (*SubmitReport) (void *, const char *, const char *);
     inline SubmitReport submitReport;
+
+    inline std::uintptr_t scopeDust;
+    inline std::uintptr_t scopeArc;
 }
 
 #define GETNETVAROFFSET(table, prop) Netvar::offsets.at({table, prop})

@@ -264,6 +264,7 @@ void Menu::drawVisualsTab() {
 
                 ImGui::Checkbox("Rainbow HUD", &CONFIGBOOL("Visuals>World>World>Rainbow HUD"));
                 ImGui::Checkbox("No Blur", &CONFIGBOOL("Visuals>World>World>No Blur"));
+                ImGui::Checkbox("No Scope Overlay", &CONFIGBOOL("Visuals>World>World>No Scope Overlay"));
                 
                 ImGui::EndChild();
             }

@@ -5,6 +5,7 @@
 #include <string>
 
 #include "ibaseclientdll.hpp"
+#include "isurface.hpp"
 #include "ivengineclient.hpp"
 #include "ipanel.hpp"
 #include "icliententitylist.hpp"
@@ -46,6 +47,7 @@ namespace Interfaces {
     inline IPrediction* prediction;
     inline IGameEventManager2* eventManager;
     inline ICvar* convar;
+    inline ISurface *surface;
 
     inline IClientMode* clientMode;
     inline CGlobalVars* globals;
