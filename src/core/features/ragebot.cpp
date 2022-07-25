@@ -443,6 +443,13 @@ void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *weapon) {
     cmd->sidemove = -cmd->sidemove;
     cmd->upmove = 0;
     cmd->buttons |= IN_WALK;
+  } else {
+    float sped = 0.1f;
+    float ratio = maxSpeed / 255.0f;
+    sped *= ratio;
+
+    cmd->forwardmove *= sped;
+    cmd->sidemove *= sped;
   }
 }
 

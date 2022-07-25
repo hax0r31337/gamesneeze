@@ -31,7 +31,7 @@ secs_to_human() {
     echo "Time Elapsed : ${min} minutes and ${secs} seconds."
 }
 
-function load() {
+function load {
     csgo_pid=$(pidof csgo_linux64)
     if [ -z "$csgo_pid" ]; then
         echo_red "CS:GO needs to be open before you can inject, exiting..."
@@ -104,7 +104,6 @@ function load() {
     # done
     # sleep 10
 
-    echo_green "cleaning up...."
     sudo rm "/usr/lib/${filename}" > /dev/null
     rm inject.lock
 }
@@ -123,6 +122,25 @@ function build {
     echo "Build Completed."
 }
 
+function build_debug {
+    cmake -D CMAKE_BUILD_TYPE=Debug .
+
+    if ! hash patchelf 2>/dev/null; then
+        echo_red -e "You need to install the \"patchelf\" command!\nUse your package manager to install it, or get source here:\nhttps://github.com/NixOS/patchelf"
+        exit 1
+    fi
+    
+    make -j"$(grep -c "^processor" /proc/cpuinfo)" "$@" 
+    # strip -s -v "$libraryname"
+
+    echo "Build Completed."
+}
+
+function load_debug {
+    load
+    $gdb -p "$(pidof csgo_linux64)"
+}
+
 while [[ $# -gt 0 ]]; do
 keys="$1"
 case $keys in
@@ -130,8 +148,16 @@ case $keys in
         load
         shift
         ;;
+    -ld|--load_debug)
+        load_debug
+        shift
+        ;;
     -b|--build)
         build
+        shift
+        ;;
+    -bd|--build_debug)
+        build_debug
         shift
         ;;
     *)
