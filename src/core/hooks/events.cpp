@@ -1,6 +1,5 @@
 #include "../../includes.hpp"
 #include "hooks.hpp"
-#include "../features/autol.hpp"
 
 Hooks::Events::EventListener::EventListener() {
     Interfaces::eventManager->AddListener(this, "player_hurt", false);
@@ -83,14 +82,6 @@ void Hooks::Events::EventListener::FireGameEvent(IGameEvent *event) {
       player_info_t info;
       if (!Interfaces::engine->GetPlayerInfo(victim->index(), &info)) {
         return;
-      }
-
-      if (CONFIGBOOL("Misc>Misc>AutoL")) {
-        std::ostringstream strStream;
-        strStream << "say \"[gamesneeze] L " << info.name << " "
-                  << AutoL::pickWord(TICKCOUNTWITHPING()) << "\"";
-
-        Interfaces::engine->ExecuteClientCmd(strStream.str().c_str());
       }
 
       if (CONFIGBOOL("Misc>Misc>Hitmarkers>Hitlogs")) {
