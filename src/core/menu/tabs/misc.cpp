@@ -52,6 +52,8 @@ void Menu::drawMiscTab() {
                 ImGui::Checkbox("Developer window", &devWindow);
                 ImGui::Checkbox("Disable Watermark", &CONFIGBOOL("Misc>Misc>Misc>Disable Watermark"));
                 ImGui::Checkbox("Force square radar", &CONFIGBOOL("Misc>Misc>Misc>Force square radar"));
+                ImGui::Checkbox("Reveal Money", &CONFIGBOOL("Misc>Misc>Misc>Reveal Money"));
+                ImGui::Checkbox("Reveal Vote", &CONFIGBOOL("Misc>Misc>Misc>Reveal Vote"));
                 ImGui::Checkbox("Rank Revealer", &CONFIGBOOL("Misc>Misc>Misc>Rank Revealer"));
 
                 ImGui::Checkbox("Spectators", &CONFIGBOOL("Misc>Misc>Misc>Spectators"));

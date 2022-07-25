@@ -1,6 +1,8 @@
 #pragma once
 #include "../../includes.hpp"
 
+#define RETURN_ADDRESS() std::uintptr_t(__builtin_return_address(0))
+
 namespace Hooks {
     bool init();
     bool unload();
@@ -56,6 +58,12 @@ namespace Hooks {
         using func = float(*)(void* thisptr, int r, int g, int b, int a);
         inline func original;
         void hook(void *thisptr, int r, int g, int b, int a);
+    }
+
+    namespace IsPlayingDemo {
+        using func = bool(*)(void* thisptr);
+        inline func original;
+        bool hook(void* thisptr);
     }
 
     /* EVENT MANAGER */

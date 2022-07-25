@@ -43,6 +43,9 @@ bool Hooks::init() {
     Log::log(LOG, " Hooking ClientCmd...");
     ClientCmd::original = (ClientCmd::func)VMT::hook(Interfaces::engine, (void*)ClientCmd::hook, 7);
 
+    Log::log(LOG, " Hooking IsPlayingDemo...");
+    IsPlayingDemo::original = (IsPlayingDemo::func)VMT::hook(Interfaces::engine, (void*)IsPlayingDemo::hook, 82);
+
     Log::log(LOG, " Hooking SetDrawColor...");
     SetDrawColor::original = (SetDrawColor::func)VMT::hook(Interfaces::surface, (void*)SetDrawColor::hook, 14);
 
@@ -88,6 +91,9 @@ bool Hooks::unload() {
 
     Log::log(LOG, " Unhooking ClientCmd...");
     VMT::hook(Interfaces::engine, (void*)ClientCmd::original, 7);
+
+    Log::log(LOG, " Unhooking IsPlayingDemo...");
+    VMT::hook(Interfaces::engine, (void *)IsPlayingDemo::original, 82);
 
     Log::log(LOG, " Unhooking SetDrawColor...");
     VMT::hook(Interfaces::surface, (void*)SetDrawColor::original, 14);

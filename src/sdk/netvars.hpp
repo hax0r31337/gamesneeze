@@ -135,6 +135,7 @@ namespace Offsets {
 
     inline std::uintptr_t scopeDust;
     inline std::uintptr_t scopeArc;
+    inline std::uintptr_t demoOrHLTV;
 }
 
 #define GETNETVAROFFSET(table, prop) Netvar::offsets.at({table, prop})

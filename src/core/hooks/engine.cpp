@@ -21,13 +21,17 @@ void Hooks::ClientCmd::hook(void* thisptr, char* szCmdString) {
 }
 
 bool Hooks::IsHLTV::hook(void *thisptr) {
-  if (CONFIGBOOL("Misc>Misc>Misc>Force square radar")) {
-    const auto returnAddress = (uintptr_t)__builtin_return_address(0);
-
-    if (returnAddress == Offsets::radarIsHltvCheck) {
-      return true;
-    }
+  if (CONFIGBOOL("Misc>Misc>Misc>Force square radar") &&
+      RETURN_ADDRESS() == Offsets::radarIsHltvCheck) {
+    return true;
   }
 
+  return original(thisptr);
+}
+
+bool Hooks::IsPlayingDemo::hook(void *thisptr) {
+  if (CONFIGBOOL("Misc>Misc>Misc>Reveal Money") && RETURN_ADDRESS() == Offsets::demoOrHLTV) {
+    return true;
+  }
   return original(thisptr);
 }

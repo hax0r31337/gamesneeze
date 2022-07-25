@@ -28,6 +28,9 @@ namespace Features {
         void frameStageNotify(FrameStage frame);
         void draw();
     }
+    namespace VoteRevealer {
+        void event(IGameEvent* event);
+    }
     namespace SkinChanger {
         void frameStageNotify(FrameStage frame);
     }

@@ -116,6 +116,7 @@ bool Netvar::init() {
 
     Offsets::scopeDust = PatternScan::findFirstInModule("/client_client.so", "8B 85 ? ? ? ? 43 8D 14 2E");
     Offsets::scopeArc = PatternScan::findFirstInModule("/client_client.so", "49 8B 3C 24 8B B3 ? ? ? ? 48 8B 07 FF 90 ? ? ? ? 49 8B 3C 24 4C 89 EA");
+    Offsets::demoOrHLTV = PatternScan::findFirstInModule("/client_client.so", "0F B6 10 89 D0") - 16;
 
     return true;
 }

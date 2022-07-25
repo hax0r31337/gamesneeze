@@ -5,6 +5,7 @@ Hooks::Events::EventListener::EventListener() {
     Interfaces::eventManager->AddListener(this, "player_hurt", false);
     Interfaces::eventManager->AddListener(this, "player_death", false);
     Interfaces::eventManager->AddListener(this, "bullet_impact", false);
+    Interfaces::eventManager->AddListener(this, "vote_cast", false);
 }
 
 Hooks::Events::EventListener::~EventListener() {
@@ -89,6 +90,8 @@ void Hooks::Events::EventListener::FireGameEvent(IGameEvent *event) {
                                                  "killed %s", info.name);
       }
     }
+  } else if (strstr(name, "vote_cast")) {
+    Features::VoteRevealer::event(event);
   }
   Features::BulletTracers::event(event);
 }

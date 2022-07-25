@@ -483,6 +483,8 @@ namespace Config {
 
         CONFIGITEM("Misc>Misc>Misc>Disable Watermark", false),
         CONFIGITEM("Misc>Misc>Misc>Force square radar", false),
+        CONFIGITEM("Misc>Misc>Misc>Reveal Money", false),
+        CONFIGITEM("Misc>Misc>Misc>Reveal Vote", false),
         CONFIGITEM("Misc>Misc>Misc>Rank Revealer", false),
         CONFIGITEM("Misc>Misc>Clantag>Clantag", false),
         CONFIGITEM("Misc>Misc>Clantag>Clantag Marquee", false),
