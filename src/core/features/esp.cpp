@@ -283,7 +283,7 @@ void Features::ESP::draw() {
                                     label << (CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Decoy\n" : "");
                                     col = ImColor(157, 157, 157, 255);
                                 } else if (strstr(modelName, "smokegrenade")) {
-                                    label << (CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Smoke" : "");
+                                    label << (CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Smoke\n" : "");
                                     col = ImColor(157, 157, 157, 255);
                                 }
 

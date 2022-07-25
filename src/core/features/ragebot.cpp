@@ -345,28 +345,48 @@ std::vector<Vector> Features::RageBot::getPoints(Player *player, int iHitbox,
   vectorTransform(bbox->bbmin, matrix[bbox->bone], mins);
   vectorTransform(bbox->bbmax, matrix[bbox->bone], maxs);
   Vector center = (mins + maxs) * 0.5f;
-  points.push_back(center);
-  auto final_radius = bbox->radius * bodyScale;
 
-  if (iHitbox == (int)HitboxModel::HITBOX_HEAD) {
-    auto pitch_down = normalizePitch(player->eyeAngles().x) > 85.0f;
-    auto originY = Globals::localPlayer->origin().y;
-    float stuff =
-        calcAngle(player->eyePos(), Vector{originY, originY, originY}).y;
-    auto backward = fabs(player->eyeAngles().y - stuff) > 120.0f;
+  if (bbox->radius <= 0.f) {
+    matrix3x4_t rot;
+    angleMatrix(bbox->rotation, rot);
 
-    points.push_back(Vector(bbox->bbmax.x + 0.70710678f * final_radius,
-               bbox->bbmax.y - 0.70710678f * final_radius, bbox->bbmax.z));
-    points.push_back(Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z + final_radius));
-    points.push_back(Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z - final_radius));
-    points.push_back(Vector(bbox->bbmax.x, bbox->bbmax.y - final_radius, bbox->bbmax.z));
+    auto origin = rot.GetOrigin();
 
-    if (pitch_down && backward)
-      points.push_back(Vector(bbox->bbmax.x - final_radius, bbox->bbmax.y, bbox->bbmax.z));
+    Vector center = (bbox->bbmin + bbox->bbmax) / 2.f;
+
+    points.emplace_back(Vector(center.Dot(rot[0]), center.Dot(rot[1]), center.Dot(rot[2])) + origin);
   } else {
-    points.push_back(Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z + final_radius));
-    points.push_back(Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z - final_radius));
-    points.push_back(Vector(center.x, bbox->bbmax.y - final_radius, center.z));
+    points.emplace_back(center);
+    auto final_radius = bbox->radius * bodyScale;
+
+    if (iHitbox == (int)HitboxModel::HITBOX_HEAD) {
+      auto pitch_down = normalizePitch(player->eyeAngles().x) > 85.0f;
+      auto originY = Globals::localPlayer->origin().y;
+      float stuff =
+          calcAngle(player->eyePos(), Vector{originY, originY, originY}).y;
+      auto backward = fabs(player->eyeAngles().y - stuff) > 120.0f;
+
+      points.emplace_back(Vector(bbox->bbmax.x + 0.70710678f * final_radius,
+                              bbox->bbmax.y - 0.70710678f * final_radius,
+                              bbox->bbmax.z));
+      points.emplace_back(
+          Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z + final_radius));
+      points.emplace_back(
+          Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z - final_radius));
+      points.emplace_back(
+          Vector(bbox->bbmax.x, bbox->bbmax.y - final_radius, bbox->bbmax.z));
+
+      if (pitch_down && backward)
+        points.emplace_back(
+            Vector(bbox->bbmax.x - final_radius, bbox->bbmax.y, bbox->bbmax.z));
+    } else {
+      points.emplace_back(
+          Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z + final_radius));
+      points.emplace_back(
+          Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z - final_radius));
+      points.emplace_back(
+          Vector(center.x, bbox->bbmax.y - final_radius, center.z));
+    }
   }
 
   return points;
