@@ -73,7 +73,7 @@ void Menu::drawRageTab() {
                 ImGui::SliderInt("##Head Scale", &CONFIGINT("Rage>RageBot>Default>Head Scale"), 0, 100);
                 ImGui::Text("Body Scale");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Default>Body Scale"), 1, 100);
+                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Default>Body Scale"), 0, 100);
                 ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Default>Auto Slow"));
                 ImGui::SameLine();
                 ImGui::TextDisabled("?");
@@ -107,7 +107,7 @@ void Menu::drawRageTab() {
                 ImGui::SliderInt("##Head Scale", &CONFIGINT("Rage>RageBot>Pistol>Head Scale"), 0, 100);
                 ImGui::Text("Body Scale");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Pistol>Body Scale"), 1, 100);
+                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Pistol>Body Scale"), 0, 100);
                 ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Pistol>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Pistol>Kill Shot"));
                 ImGui::EndTabItem();
@@ -126,7 +126,7 @@ void Menu::drawRageTab() {
                 ImGui::SliderInt("##Head Scale", &CONFIGINT("Rage>RageBot>Heavy Pistol>Head Scale"), 0, 100);
                 ImGui::Text("Body Scale");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Heavy Pistol>Body Scale"), 1, 100);
+                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Heavy Pistol>Body Scale"), 0, 100);
                 ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Heavy Pistol>Kill Shot"));
                 ImGui::EndTabItem();
@@ -145,7 +145,7 @@ void Menu::drawRageTab() {
                 ImGui::SliderInt("##Head Scale", &CONFIGINT("Rage>RageBot>Rifle>Head Scale"), 0, 100);
                 ImGui::Text("Body Scale");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Rifle>Body Scale"), 1, 100);
+                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Rifle>Body Scale"), 0, 100);
                 ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Rifle>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Rifle>Kill Shot"));
                 ImGui::EndTabItem();
@@ -164,7 +164,7 @@ void Menu::drawRageTab() {
                 ImGui::SliderInt("##Head Scale", &CONFIGINT("Rage>RageBot>SMG>Head Scale"), 0, 100);
                 ImGui::Text("Body Scale");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>SMG>Body Scale"), 1, 100);
+                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>SMG>Body Scale"), 0, 100);
                 ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>SMG>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>SMG>Kill Shot"));
                 ImGui::EndTabItem();
@@ -183,7 +183,7 @@ void Menu::drawRageTab() {
                 ImGui::SliderInt("##Head Scale", &CONFIGINT("Rage>RageBot>Scout>Head Scale"), 0, 100);
                 ImGui::Text("Body Scale");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Scout>Body Scale"), 1, 100);
+                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Scout>Body Scale"), 0, 100);
                 ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Scout>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Scout>Kill Shot"));
                 ImGui::EndTabItem();
@@ -202,7 +202,7 @@ void Menu::drawRageTab() {
                 ImGui::SliderInt("##Head Scale", &CONFIGINT("Rage>RageBot>AWP>Head Scale"), 0, 100);
                 ImGui::Text("Body Scale");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>AWP>Body Scale"), 1, 100);
+                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>AWP>Body Scale"), 0, 100);
                 ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>AWP>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>AWP>Kill Shot"));
                 ImGui::EndTabItem();
@@ -221,7 +221,7 @@ void Menu::drawRageTab() {
                 ImGui::SliderInt("##Head Scale", &CONFIGINT("Rage>RageBot>Heavy>Head Scale"), 0, 100);
                 ImGui::Text("Body Scale");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Heavy>Body Scale"), 1, 100);
+                ImGui::SliderInt("##Body Scale", &CONFIGINT("Rage>RageBot>Heavy>Body Scale"), 0, 100);
                 ImGui::Checkbox("Auto Slow", &CONFIGBOOL("Rage>RageBot>Heavy>Auto Slow"));
                 ImGui::Checkbox("Kill Shot", &CONFIGBOOL("Rage>RageBot>Heavy>Kill Shot"));
                 ImGui::EndTabItem();

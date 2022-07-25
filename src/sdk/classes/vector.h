@@ -46,27 +46,6 @@ enum
 
 inline float degreesToRadians(float degrees) { return degrees * (M_PI / 180); }
 
-struct matrix3x4_t
-{
-	matrix3x4_t() {}
-	matrix3x4_t(
-		float m00, float m01, float m02, float m03,
-		float m10, float m11, float m12, float m13,
-		float m20, float m21, float m22, float m23)
-	{
-		m_flMatVal[0][0] = m00;	m_flMatVal[0][1] = m01; m_flMatVal[0][2] = m02; m_flMatVal[0][3] = m03;
-		m_flMatVal[1][0] = m10;	m_flMatVal[1][1] = m11; m_flMatVal[1][2] = m12; m_flMatVal[1][3] = m13;
-		m_flMatVal[2][0] = m20;	m_flMatVal[2][1] = m21; m_flMatVal[2][2] = m22; m_flMatVal[2][3] = m23;
-	}
-
-	float *operator[](int i)				{ Assert((i >= 0) && (i < 3)); return m_flMatVal[i]; }
-	const float *operator[](int i) const	{ Assert((i >= 0) && (i < 3)); return m_flMatVal[i]; }
-	float *Base()							{ return &m_flMatVal[0][0]; }
-	const float *Base() const				{ return &m_flMatVal[0][0]; }
-
-	float m_flMatVal[3][4];
-};
-
 class VMatrix
 {
 public:
@@ -190,6 +169,7 @@ public:
 	inline float	DistTo(const Vector &vOther) const;
 	inline float	DistToSqr(const Vector &vOther) const;
 	float	Dot(const Vector& vOther) const;
+	float	Dot(const float* fOther) const;
 	float	Length2D(void) const;
 	float	Length2DSqr(void) const;
 	Vector& operator=(const Vector &vOther);
@@ -502,6 +482,13 @@ inline float Vector::Dot(const Vector& vOther) const
 	const Vector& a = *this;
 
 	return(a.x*vOther.x + a.y*vOther.y + a.z*vOther.z);
+}
+
+inline float Vector::Dot(const float* fOther) const
+{
+  const Vector &a = *this;
+
+  return (a.x * fOther[0] + a.y * fOther[1] + a.z * fOther[2]);
 }
 
 //-----------------------------------------------------------------------------
@@ -1690,4 +1677,27 @@ public:
         sy{sinf(degreesToRadians(v.y))}, cy{cosf(degreesToRadians(v.y))},
         sr{sinf(degreesToRadians(v.z))}, cr{cosf(degreesToRadians(v.z))},
         forward{get(0)}, right{get(1)}, up{get(2)} {}
+};
+struct matrix3x4_t
+{
+	matrix3x4_t() {}
+	matrix3x4_t(
+		float m00, float m01, float m02, float m03,
+		float m10, float m11, float m12, float m13,
+		float m20, float m21, float m22, float m23)
+	{
+		m_flMatVal[0][0] = m00;	m_flMatVal[0][1] = m01; m_flMatVal[0][2] = m02; m_flMatVal[0][3] = m03;
+		m_flMatVal[1][0] = m10;	m_flMatVal[1][1] = m11; m_flMatVal[1][2] = m12; m_flMatVal[1][3] = m13;
+		m_flMatVal[2][0] = m20;	m_flMatVal[2][1] = m21; m_flMatVal[2][2] = m22; m_flMatVal[2][3] = m23;
+	}
+
+	float *operator[](int i)				{ Assert((i >= 0) && (i < 3)); return m_flMatVal[i]; }
+	const float *operator[](int i) const	{ Assert((i >= 0) && (i < 3)); return m_flMatVal[i]; }
+	float *Base()							{ return &m_flMatVal[0][0]; }
+	const float *Base() const				{ return &m_flMatVal[0][0]; }
+	Vector GetOrigin() {
+		return Vector(m_flMatVal[0][3], m_flMatVal[1][3], m_flMatVal[2][3]);
+	}
+
+	float m_flMatVal[3][4];
 };

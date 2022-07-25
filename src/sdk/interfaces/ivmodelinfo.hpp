@@ -53,7 +53,7 @@ struct mstudiobbox_t {
 	Vector bbmin;
 	Vector bbmax;
 	int hitboxnameindex;
-	int pad[3];
+	Vector rotation;
 	float radius;
 	int pad2[4];
 

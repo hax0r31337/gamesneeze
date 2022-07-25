@@ -264,34 +264,32 @@ void Features::ESP::draw() {
                                 player_info_t info;
                                 Interfaces::engine->GetPlayerInfo((*(int*)((uintptr_t)ent+GETNETVAROFFSET("DT_BaseCombatWeapon", "m_hOwnerEntity"))) & 0xFFF, &info);
 
-                                char label[128] = "";
+                                std::ostringstream label;
                                 ImColor col(255, 255, 255, 255);
 
                                 if (strstr(modelName, "fraggrenade")) {
-                                    snprintf(label, 128, "%s\n%s", CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "HE Grenade" : "", CONFIGBOOL("Visuals>World>Items>Grenade Owners") ? info.name : "");
+                                    label << (CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "HE Grenade\n" : "");
                                     col = ImColor(0, 86, 0, 255);
-                                }
-                                else if (strstr(modelName, "flashbang")) {
-                                    snprintf(label, 128, "%s\n%s", CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Flashbang" : "", CONFIGBOOL("Visuals>World>Items>Grenade Owners") ? info.name : "");
+                                } else if (strstr(modelName, "flashbang")) {
+                                    label << (CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Flashbang\n" : "");
                                     col = ImColor(255, 255, 0, 255);
-                                }
-                                else if (strstr(modelName, "molotov")) {
-                                    snprintf(label, 128, "%s\n%s", CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Molotov" : "", CONFIGBOOL("Visuals>World>Items>Grenade Owners") ? info.name : "");
+                                } else if (strstr(modelName, "molotov")) {
+                                    label << (CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Molotov\n" : "");
                                     col = ImColor(255, 0, 0, 255);
-                                }
-                                else if (strstr(modelName, "incendiarygrenade")) {
-                                    snprintf(label, 128, "%s\n%s", CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Incendiary" : "", CONFIGBOOL("Visuals>World>Items>Grenade Owners") ? info.name : "");
+                                } else if (strstr(modelName, "incendiarygrenade")) {
+                                    label << (CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Incendiary\n" : "");
                                     col = ImColor(255, 0, 0, 255);
-                                }
-                                else if (strstr(modelName, "decoy")) {
-                                    snprintf(label, 128, "%s\n%s", CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Decoy" : "", CONFIGBOOL("Visuals>World>Items>Grenade Owners") ? info.name : "");
+                                } else if (strstr(modelName, "decoy")) {
+                                    label << (CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Decoy\n" : "");
+                                    col = ImColor(157, 157, 157, 255);
+                                } else if (strstr(modelName, "smokegrenade")) {
+                                    label << (CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Smoke" : "");
                                     col = ImColor(157, 157, 157, 255);
                                 }
-                                else if (strstr(modelName, "smokegrenade")) {
-                                    snprintf(label, 128, "%s\n%s", CONFIGBOOL("Visuals>World>Items>Grenade Label") ? "Smoke" : "", CONFIGBOOL("Visuals>World>Items>Grenade Owners") ? info.name : "");
-                                    col = ImColor(157, 157, 157, 255);
-                                }
-                                drawGenericEnt(ent, CONFIGBOOL("Visuals>World>Items>Grenade Box"), CONFIGBOOL("Visuals>World>Items>Grenade Box Dynamic Color") ? col : CONFIGCOL("Visuals>World>Items>Grenade Box Color"), label);
+
+                                label << (CONFIGBOOL("Visuals>World>Items>Grenade Owners") ? info.name : "");
+
+                                drawGenericEnt(ent, CONFIGBOOL("Visuals>World>Items>Grenade Box"), CONFIGBOOL("Visuals>World>Items>Grenade Box Dynamic Color") ? col : CONFIGCOL("Visuals>World>Items>Grenade Box Color"), label.str().c_str());
                             }
                         }
 

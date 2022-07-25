@@ -22,9 +22,12 @@ enum class HitboxModel : int {
   HITBOX_HEAD = 0,
   HITBOX_NECK,
   HITBOX_PELVIS,
-  HITBOX_SPINE,
-  HITBOX_LEGS,
-  HITBOX_ARMS,
+  HITBOX_STOMACH,
+  HITBOX_LOWER_CHEST,
+  HITBOX_CHEST,
+  HITBOX_UPPER_CHEST,
+  HIXBOX_RIGHT_THIGH,
+  HITBOX_LEFT_THIGH,
 };
 
 #define CONFIGINT(name) Config::config.at(name).intValue
@@ -483,7 +486,6 @@ namespace Config {
         CONFIGITEM("Misc>Misc>Misc>Rank Revealer", false),
         CONFIGITEM("Misc>Misc>Clantag>Clantag", false),
         CONFIGITEM("Misc>Misc>Clantag>Clantag Marquee", false),
-        CONFIGITEM("Misc>Misc>Clantag>Bee Movie Clantag", false),
         CONFIGITEM("Misc>Misc>Clantag>Brand Clantag", false),
         CONFIGITEM("Misc>Misc>Name>Name Stealer", false),
         CONFIGITEM("Misc>Misc>Misc>Spectators", false),

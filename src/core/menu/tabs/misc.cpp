@@ -136,7 +136,6 @@ void Menu::drawMiscTab() {
                 ImGui::InputText("##clantag-tbox", clantag, IM_ARRAYSIZE(clantag));
                 ImGui::Checkbox("Clantag", &CONFIGBOOL("Misc>Misc>Clantag>Clantag"));
                 ImGui::Checkbox("Marquee", &CONFIGBOOL("Misc>Misc>Clantag>Clantag Marquee"));
-                ImGui::Checkbox("Bee Movie Clantag", &CONFIGBOOL("Misc>Misc>Clantag>Bee Movie Clantag"));
                 ImGui::Checkbox("Brand Clantag", &CONFIGBOOL("Misc>Misc>Clantag>Brand Clantag"));
                 ImGui::EndChild();
             }

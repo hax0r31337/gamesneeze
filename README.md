@@ -42,7 +42,7 @@ Monero:
  - Recoil crosshair
  - Rank revealer
  - Radio fake ban/fake chat
- - Clantag (and pBeeMovie clantag)
+ - Clantag
  - Backtracking
  - Backtrack Chams
  - Flappy Bird clone

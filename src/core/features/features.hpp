@@ -158,12 +158,11 @@ namespace Features {
         bool simulateFireBullet(Weapon *pWeapon, bool allowFriendlyFire,
                                FireBulletData &data);
         int getDamageDeal(Player *entity, const Vector &destination,
-                Weapon *weapon, bool allowFriendlyFire);
-        void bestHeadPoint(Player *player, int &Damage,
-                           Vector &Spot, float headScale,
-                           Weapon *weapon, bool friendlyFire);
+                          Weapon *weapon, bool allowFriendlyFire);
+        std::vector<Vector> getPoints(Player *player, int iHitbox,
+                                      float headScale, float bodyScale);
         void bestMultiPoint(Player *player, int &BoneIndex, int &Damage,
-                            Vector &Spot, float bodyScale,
+                            Vector &Spot, float headScale, float bodyScale,
                             Weapon *weapon, bool friendlyFire);
         bool canShoot(Weapon *activeWeapon, QAngle *angle, Player *enemy,
                       int hitChance);

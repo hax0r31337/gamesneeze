@@ -18,7 +18,7 @@ void Features::RageBot::scaleDamage(HitGroups hitgroup, Player *enemy,
       NewDamage = Damage - (ArmorValue / ArmorBonusRatio);
     }
 
-    current_damage = Damage;
+    current_damage = NewDamage;
     if (hitgroup == HitGroups::HITGROUP_HEAD) {
       if (enemy->helmet())
         current_damage *= weapon_armor_ratio * 0.5f;
@@ -321,100 +321,65 @@ bool Features::RageBot::canShoot(Weapon *weapon, QAngle *angle,
   return false;
 }
 
-void Features::RageBot::bestHeadPoint(Player *player,
-                                      int &Damage, Vector &Spot,
-                                      float headScale, Weapon *weapon,
-                                      bool friendlyFire) {
-  matrix3x4_t matrix[128];
-  if (!player->setupBones(matrix, 128, 0x100, 0.f))
-    return;
+std::vector<Vector> Features::RageBot::getPoints(Player *player, int iHitbox,
+                                                 float headScale,
+                                                 float bodyScale) {
+  std::vector<Vector> points;
+
   model_t *pModel = player->model();
   if (!pModel)
-    return;
+    return points;
 
   studiohdr_t *hdr = Interfaces::modelInfo->GetStudioModel(pModel);
   if (!hdr)
-    return;
-  mstudiobbox_t *bbox = hdr->pHitbox((int)HitboxModel::HITBOX_HEAD, 0);
+    return points;
+  mstudiobbox_t *bbox = hdr->pHitbox(iHitbox, 0);
   if (!bbox)
-    return;
+    return points;
+
+  matrix3x4_t matrix[128];
+  if (!player->getHitboxBones(matrix))
+    return points;
 
   Vector mins, maxs;
   vectorTransform(bbox->bbmin, matrix[bbox->bone], mins);
   vectorTransform(bbox->bbmax, matrix[bbox->bone], maxs);
-  auto local = Globals::localPlayer;
-
   Vector center = (mins + maxs) * 0.5f;
-  static Vector points[7] = {center, center, center, center,
-                             center, center, center};
-  // 0 - center, 1 - skullcap, 3 - upperbackofhead
-  // 4 - leftear, 5 - rightear, 6 - backofhead
-  for (int i = 0; i < 7;
-       i++) // set all points initially to center mass of head.
-    points[i] = center;
-  float scale = headScale;
-  auto final_radius = bbox->radius * scale;
+  points.push_back(center);
+  auto final_radius = bbox->radius * bodyScale;
 
-  auto pitch_down = normalizePitch(player->eyeAngles().x) > 85.0f;
-  auto originY = local->origin().y;
-  float stuff = calcAngle(player->eyePos(), Vector{originY, originY, originY}).y;
-  auto backward = fabs(player->eyeAngles().y - stuff) > 120.0f;
+  if (iHitbox == (int)HitboxModel::HITBOX_HEAD) {
+    auto pitch_down = normalizePitch(player->eyeAngles().x) > 85.0f;
+    auto originY = Globals::localPlayer->origin().y;
+    float stuff =
+        calcAngle(player->eyePos(), Vector{originY, originY, originY}).y;
+    auto backward = fabs(player->eyeAngles().y - stuff) > 120.0f;
 
-  points[1] = Vector(bbox->bbmax.x + 0.70710678f * final_radius,
-                     bbox->bbmax.y - 0.70710678f * final_radius, bbox->bbmax.z);
-  points[3] =
-      Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z + final_radius);
-  points[4] =
-      Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z - final_radius);
-  points[5] =
-      Vector(bbox->bbmax.x, bbox->bbmax.y - final_radius, bbox->bbmax.z);
+    points.push_back(Vector(bbox->bbmax.x + 0.70710678f * final_radius,
+               bbox->bbmax.y - 0.70710678f * final_radius, bbox->bbmax.z));
+    points.push_back(Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z + final_radius));
+    points.push_back(Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z - final_radius));
+    points.push_back(Vector(bbox->bbmax.x, bbox->bbmax.y - final_radius, bbox->bbmax.z));
 
-  if (pitch_down && backward)
-    points[6] =
-        Vector(bbox->bbmax.x - final_radius, bbox->bbmax.y, bbox->bbmax.z);
-
-  for (int i = 0; i < 7; i++) {
-    float bestDamage = getDamageDeal(player, points[i], weapon, friendlyFire);
-    if (bestDamage > Damage) {
-      Damage = bestDamage;
-      Spot = points[i];
-    }
+    if (pitch_down && backward)
+      points.push_back(Vector(bbox->bbmax.x - final_radius, bbox->bbmax.y, bbox->bbmax.z));
+  } else {
+    points.push_back(Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z + final_radius));
+    points.push_back(Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z - final_radius));
+    points.push_back(Vector(center.x, bbox->bbmax.y - final_radius, center.z));
   }
+
+  return points;
 }
 
 void Features::RageBot::bestMultiPoint(Player *player, int &BoneIndex,
-                                        int &Damage, Vector &Spot, float bodyScale,
+                                        int &Damage, Vector &Spot, float headScale, float bodyScale,
                                         Weapon *weapon, bool friendlyFire) {
-  model_t *pModel = player->model();
-  if (!pModel)
-    return;
-  studiohdr_t *hdr = Interfaces::modelInfo->GetStudioModel(pModel);
-  if (!hdr)
-    return;
-  mstudiobbox_t *bbox = hdr->pHitbox((int)BoneIndex, 0);
-  if (!bbox)
-    return;
-
-  matrix3x4_t matrix[128];
-  Vector mins, maxs;
-  vectorTransform(bbox->bbmin, matrix[bbox->bone], mins);
-  vectorTransform(bbox->bbmax, matrix[bbox->bone], maxs);
-  // 0 - center 1 - left, 2 - right, 3 - back
-  Vector center = (mins + maxs) * 0.5f;
-  Vector points[4] = {center, center, center, center};
-  auto final_radius = bbox->radius * bodyScale;
-
-  points[1] =
-      Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z + final_radius);
-  points[2] =
-      Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z - final_radius);
-  points[3] = Vector(center.x, bbox->bbmax.y - final_radius, center.z);
-
-  for (int i = 0; i < 4; i++) {
-    int bestDamage = getDamageDeal(player, points[i], weapon, friendlyFire);
+  for (const auto& point : getPoints(player, BoneIndex, headScale, bodyScale)) {
+    int bestDamage = getDamageDeal(player, point, weapon, friendlyFire);
     if (bestDamage > Damage) {
       Damage = bestDamage;
-      Spot = points[i];
+      Spot = point;
     }
   }
 }
@@ -608,35 +573,26 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
 
               Vector targetBonePos = Vector{0, 0, 0};
               int damageDeal = -1;
-              if (bone == 8) {
-                if (headScale == 0) {
-                  targetBonePos = p->getBonePos(bone);
-                  damageDeal = getDamageDeal(p, targetBonePos, weapon, friendlyFire);
-                } else {
-                  bestHeadPoint(p, damageDeal, targetBonePos, headScale,
-                                weapon, friendlyFire);
-                }
+              if ((headScale == 0 && bone == 8) || bodyScale == 0) {
+                targetBonePos = p->getBonePos(bone);
+                damageDeal =
+                    getDamageDeal(p, targetBonePos, weapon, friendlyFire);
               } else {
-                if (bodyScale == 0) {
-                  targetBonePos = p->getBonePos(bone);
-                  damageDeal = getDamageDeal(p, targetBonePos, weapon, friendlyFire);
-                } else {
-                  int hitbox = (int)((1 << i & (int)HitBoxes::HEAD)
-                                         ? HitboxModel::HITBOX_HEAD
-                                     : (1 << i & (int)HitBoxes::NECK)
-                                         ? HitboxModel::HITBOX_NECK
-                                     : (1 << i & (int)HitBoxes::CHEST)
-                                         ? HitboxModel::HITBOX_SPINE
-                                     : (1 << i & (int)HitBoxes::STOMACH)
-                                         ? HitboxModel::HITBOX_LEGS
-                                     : (1 << i & (int)HitBoxes::PELVIS)
-                                         ? HitboxModel::HITBOX_PELVIS
-                                         : HitboxModel::HITBOX_SPINE);
-                  bestMultiPoint(p, hitbox, damageDeal, targetBonePos,
-                                 bodyScale, weapon,
-                                 friendlyFire);
-                }
+                int hitbox = (int)((1 << i & (int)HitBoxes::HEAD)
+                                       ? HitboxModel::HITBOX_HEAD
+                                   : (1 << i & (int)HitBoxes::NECK)
+                                       ? HitboxModel::HITBOX_NECK
+                                   : (1 << i & (int)HitBoxes::CHEST)
+                                       ? HitboxModel::HITBOX_CHEST
+                                   : (1 << i & (int)HitBoxes::STOMACH)
+                                       ? HitboxModel::HITBOX_STOMACH
+                                   : (1 << i & (int)HitBoxes::PELVIS)
+                                       ? HitboxModel::HITBOX_PELVIS
+                                       : HitboxModel::HITBOX_STOMACH);
+                bestMultiPoint(p, hitbox, damageDeal, targetBonePos, headScale, bodyScale,
+                               weapon, friendlyFire);
               }
+
               if (damageDeal <= 0 ||
                   damageDeal < (killShot
                                     ? p->health()
