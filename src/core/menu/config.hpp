@@ -281,7 +281,6 @@ namespace Config {
         CONFIGITEM("Rage>AntiAim>Slow Walk Speed", 55),
         CONFIGITEM("Rage>Quick Peek>Enabled", false),
         CONFIGITEM("Rage>Quick Peek>Key", 0),
-        CONFIGITEM("Rage>Double Tap>Enabled", false),
         //}
         // }
         // Visuals {

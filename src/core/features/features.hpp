@@ -123,9 +123,6 @@ namespace Features {
     namespace FastDuck {
         void createMove(CUserCmd *cmd);
     }
-    namespace DoubleTap {
-        void createMove(CUserCmd *cmd);
-    }
     namespace FakeDuck {
         void createMove(CUserCmd *cmd);
     }
