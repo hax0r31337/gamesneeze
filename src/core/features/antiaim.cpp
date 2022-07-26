@@ -110,7 +110,7 @@ void Features::AntiAim::createMove(CUserCmd* cmd) {
                 break;
               }
               case 6: { // Legit
-                float delta = Globals::localPlayer->getMaxDesyncAngle();
+                float delta = Globals::localPlayer->getMaxDesyncAngle() * 2;
                 static bool invert = true;
                 auto realtime = Interfaces::globals->realtime;
                 static float lastTime{0.0f};
@@ -122,16 +122,24 @@ void Features::AntiAim::createMove(CUserCmd* cmd) {
                 }
 
                 if (updatingLby()) {
+                  Notifications::addNotification(ImColor(255, 0, 0), "LBY");
                   *Globals::sendPacket = false;
                   invert ? cmd->viewangles.y -= delta
                          : cmd->viewangles.y += delta;
-                  return;
                 }
 
-                if (!Globals::sendPacket) {
+                delta = Globals::localPlayer->getMaxDesyncAngle();
+
+                if (Globals::sendPacket) {
                   invert ? cmd->viewangles.y += delta
                          : cmd->viewangles.y -= delta;
+                } else {
+                  	cmd->viewangles.y += 180.f;
                 }
+
+                cmd->buttons &=
+                    ~(IN_FORWARD | IN_BACK | IN_MOVERIGHT | IN_MOVELEFT);
+
                 return;
               }
               }

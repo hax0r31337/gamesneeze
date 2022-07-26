@@ -138,17 +138,17 @@ public:
         if (!state)
            return 0.0f;
 
-          float yawModifier =
-              (state->runningAccelProgress * -0.3f - 0.2f) *
-                  std::clamp(state->feetShuffleSpeed, 0.0f, 1.0f) +
-              1.0f;
+        float yawModifier =
+            (state->stopToFullRunningFraction * -0.3f - 0.2f) *
+                std::clamp(state->footSpeed, 0.0f, 1.0f) +
+            1.0f;
 
-          if (state->duckProgress > 0.0f)
-            yawModifier += (state->duckProgress *
-                            std::clamp(state->feetShuffleSpeed2, 0.0f, 1.0f) *
-                            (0.5f - yawModifier));
+        if (state->duckAmount > 0.0f)
+          yawModifier += (state->duckAmount *
+                          std::clamp(state->footSpeed2, 0.0f, 1.0f) *
+                          (0.5f - yawModifier));
 
-        return state->velocitySubY * yawModifier;
+        return state->velocitySubtractY * yawModifier;
     }
 
     bool isEnemy();
