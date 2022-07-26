@@ -137,8 +137,10 @@ void Features::AntiAim::createMove(CUserCmd* cmd) {
                   	cmd->viewangles.y += 180.f;
                 }
 
-                cmd->buttons &=
-                    ~(IN_FORWARD | IN_BACK | IN_MOVERIGHT | IN_MOVELEFT);
+                normalizeAngles(cmd->viewangles);
+
+                // cmd->buttons &=
+                //     ~(IN_FORWARD | IN_BACK | IN_MOVERIGHT | IN_MOVELEFT);
 
                 return;
               }

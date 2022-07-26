@@ -281,6 +281,7 @@ namespace Config {
         CONFIGITEM("Rage>AntiAim>Slow Walk Speed", 55),
         CONFIGITEM("Rage>Quick Peek>Enabled", false),
         CONFIGITEM("Rage>Quick Peek>Key", 0),
+        CONFIGITEM("Rage>Double Tap>Enabled", false),
         //}
         // }
         // Visuals {
@@ -475,6 +476,8 @@ namespace Config {
         CONFIGITEM("Misc>Misc>Movement>EdgeBug", false),
         CONFIGITEM("Misc>Misc>Movement>EdgeBug Key", 0),
         CONFIGITEM("Misc>Misc>Movement>Fast Duck", false),
+        CONFIGITEM("Misc>Misc>Movement>Fake Duck", false),
+        CONFIGITEM("Misc>Misc>Movement>Fake Duck Key", 0),
 
         CONFIGITEM("Misc>Misc>Hitmarkers>Hitlogs", false),
         CONFIGITEM("Misc>Misc>Hitmarkers>Hitmarkers", false),

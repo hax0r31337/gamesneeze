@@ -5,14 +5,14 @@
 #include <sstream>
 
 void ScriptManager::Execute() {
-  lua_State *state = luaL_newstate();
+  lua_State *L = luaL_newstate();
 
   // Make standard libraries available in the Lua object
-  luaL_openlibs(state);
+  luaL_openlibs(L);
 
-  ScriptApi::PushToLua(state);
+  ScriptApi::PushToLua(L);
 
-  luaL_dostring(state, "client.notify('Hello, world!')");
+  luaL_dostring(L, "client.notify('Hello, world!')");
   return;
 
 /*

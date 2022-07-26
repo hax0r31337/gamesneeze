@@ -182,6 +182,12 @@ void Menu::drawMiscTab() {
                 }
                 ImGui::Checkbox("EdgeBug", &CONFIGBOOL("Misc>Misc>Movement>EdgeBug"));
                 ImGui::Checkbox("Fast Duck", &CONFIGBOOL("Misc>Misc>Movement>Fast Duck"));
+                if (CONFIGBOOL("Misc>Misc>Movement>Fake Duck")) {
+                    static bool toggled = false;
+                    Menu::CustomWidgets::drawKeyBinder("Key", &CONFIGINT("Misc>Misc>Movement>Fake Duck Key"), &toggled);
+                    ImGui::SameLine();
+                }
+                ImGui::Checkbox("Fake Duck", &CONFIGBOOL("Misc>Misc>Movement>Fake Duck"));
                 ImGui::SameLine();
                 ImGui::TextDisabled("?");
                 if (ImGui::IsItemHovered())

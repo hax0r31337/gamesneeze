@@ -1,11 +1,14 @@
 #include "../../includes.hpp"
 #include "hooks.hpp"
+#include <cstring>
 
 Hooks::Events::EventListener::EventListener() {
     Interfaces::eventManager->AddListener(this, "player_hurt", false);
     Interfaces::eventManager->AddListener(this, "player_death", false);
     Interfaces::eventManager->AddListener(this, "bullet_impact", false);
     Interfaces::eventManager->AddListener(this, "vote_cast", false);
+    Interfaces::eventManager->AddListener(this, "round_start", false);
+    Interfaces::eventManager->AddListener(this, "round_freeze_end", false);
 }
 
 Hooks::Events::EventListener::~EventListener() {
@@ -24,8 +27,6 @@ void Hooks::Events::EventListener::FireGameEvent(IGameEvent *event) {
       if (!Interfaces::engine->GetPlayerInfo(victim->index(), &info)) {
         return;
       }
-
-      Globals::kills++;
 
       if (CONFIGBOOL("Misc>Misc>Hitmarkers>Hitlogs")) {
         if (CONFIGBOOL("Legit>Backtrack>Backtrack") &&
@@ -85,6 +86,8 @@ void Hooks::Events::EventListener::FireGameEvent(IGameEvent *event) {
         return;
       }
 
+      Globals::kills++;
+
       if (CONFIGBOOL("Misc>Misc>Hitmarkers>Hitlogs")) {
         Features::Notifications::addNotification(ImColor(220, 40, 40),
                                                  "killed %s", info.name);
@@ -92,6 +95,10 @@ void Hooks::Events::EventListener::FireGameEvent(IGameEvent *event) {
     }
   } else if (strstr(name, "vote_cast")) {
     Features::VoteRevealer::event(event);
+  } else if (strstr(name, "round_start")) {
+    Globals::freezeTime = 0.f;
+  } else if (strstr(name, "round_freeze_end")) {
+    Globals::freezeTime = Interfaces::globals->realtime;
   }
   Features::BulletTracers::event(event);
 }

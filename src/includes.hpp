@@ -33,6 +33,7 @@ namespace Globals {
 
     inline BombData bombData;
     inline int kills = 0;
+    inline float freezeTime = 0.f;
 
     float serverTime(CUserCmd *cmd = nullptr);
     void selfUnload();

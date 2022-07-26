@@ -423,16 +423,25 @@ void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *weapon) {
       Interfaces::globals->interval_per_tick == FP_INFINITE) 
       return;
 
+  const float speed = Globals::localPlayer->velocity().Length2D();
   const float maxSpeed =
       (Globals::localPlayer->scoped()
            ? weapon->GetWeaponInfo()->GetMaxPlayerSpeedScoped()
            : weapon->GetWeaponInfo()->GetMaxPlayerSpeed());
 
-  if (Globals::localPlayer->velocity().Length() > maxSpeed / 3) {
-    cmd->forwardmove = -cmd->forwardmove;
-    cmd->sidemove = -cmd->sidemove;
-    cmd->upmove = 0;
-    cmd->buttons |= IN_WALK;
+  if (speed > maxSpeed / 3) {
+    static const auto cl_forwardspeed = Interfaces::convar->FindVar("cl_forwardspeed");
+
+    QAngle direction;
+    vectorAngles(Globals::localPlayer->velocity(), direction);
+    QAngle viewAngle;
+    Interfaces::engine->GetViewAngles(viewAngle);
+    direction.y = viewAngle.y - direction.y;
+    Vector forward;
+    angleVectors(direction, forward);
+    Vector negated_direction = forward * -(cl_forwardspeed->GetFloat() / speed);
+    cmd->forwardmove = negated_direction.x;
+    cmd->sidemove = negated_direction.y;
   } else {
     float sped = 0.1f;
     float ratio = maxSpeed / 255.0f;
@@ -441,12 +450,14 @@ void Features::RageBot::applyAutoSlow(CUserCmd *cmd, Weapon *weapon) {
     cmd->forwardmove *= sped;
     cmd->sidemove *= sped;
   }
+  cmd->buttons |= IN_WALK;
 }
 
 void Features::RageBot::createMove(CUserCmd *cmd) {
   if (!(Menu::CustomWidgets::isKeyDown(CONFIGINT("Rage>RageBot>Key")) || CONFIGBOOL("Rage>RageBot>Always on")) ||
-        !Interfaces::engine->IsInGame() || !Globals::localPlayer ||
-        Globals::localPlayer->health() <= 0 || Globals::localPlayer->moveType() != MOVETYPE_WALK)
+        !Interfaces::engine->IsInGame() || !Globals::localPlayer || Globals::localPlayer->gunGameImmunity() ||
+        Globals::localPlayer->flags() & FL_FROZEN || Globals::localPlayer->health() <= 0 ||
+        Globals::localPlayer->moveType() != MOVETYPE_WALK)
     return;
 
   const auto weapon = 
@@ -586,7 +597,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
       Player *p = (Player *)Interfaces::entityList->GetClientEntity(i);
       if (p && p != Globals::localPlayer) {
         if (p->health() > 0 && !p->dormant() &&
-            (p->isEnemy() || friendlyFire) && (p->visible() || !visibleOnly)) {
+            (p->isEnemy() || friendlyFire) && (p->visible() || !visibleOnly) && !p->gunGameImmunity()) {
           matrix3x4_t boneMatrix[128];
           if (p->getAnythingBones(boneMatrix)) {
             Vector localPlayerEyePos = Globals::localPlayer->eyePos();

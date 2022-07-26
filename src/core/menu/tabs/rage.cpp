@@ -345,7 +345,8 @@ void Menu::drawRageTab() {
               "Key", &CONFIGINT("Rage>Quick Peek>Key"), &toggled);
         }
         ImGui::Checkbox("Resolver", &CONFIGBOOL("Rage>Resolver"));
-        
+        // ImGui::Checkbox("Double Tap", &CONFIGBOOL("Rage>Double Tap>Enabled"));
+
         ImGui::EndChild();
     }
 }
