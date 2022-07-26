@@ -347,6 +347,7 @@ std::vector<Vector> Features::RageBot::getPoints(Player *player, int iHitbox,
   Vector center = (mins + maxs) * 0.5f;
 
   if (bbox->radius <= 0.f) {
+    Notifications::addNotification(ImColor(255, 255, 255), "negative radius");
     matrix3x4_t rot;
     angleMatrix(bbox->rotation, rot);
 
@@ -357,7 +358,6 @@ std::vector<Vector> Features::RageBot::getPoints(Player *player, int iHitbox,
     points.emplace_back(Vector(center.Dot(rot[0]), center.Dot(rot[1]), center.Dot(rot[2])) + origin);
   } else {
     points.emplace_back(center);
-    auto final_radius = bbox->radius * bodyScale;
 
     if (iHitbox == (int)HitboxModel::HITBOX_HEAD) {
       auto pitch_down = normalizePitch(player->eyeAngles().x) > 85.0f;
@@ -365,6 +365,7 @@ std::vector<Vector> Features::RageBot::getPoints(Player *player, int iHitbox,
       float stuff =
           calcAngle(player->eyePos(), Vector{originY, originY, originY}).y;
       auto backward = fabs(player->eyeAngles().y - stuff) > 120.0f;
+      auto final_radius = bbox->radius * headScale;
 
       points.emplace_back(Vector(bbox->bbmax.x + 0.70710678f * final_radius,
                               bbox->bbmax.y - 0.70710678f * final_radius,
@@ -380,12 +381,24 @@ std::vector<Vector> Features::RageBot::getPoints(Player *player, int iHitbox,
         points.emplace_back(
             Vector(bbox->bbmax.x - final_radius, bbox->bbmax.y, bbox->bbmax.z));
     } else {
-      points.emplace_back(
-          Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z + final_radius));
-      points.emplace_back(
-          Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z - final_radius));
-      points.emplace_back(
-          Vector(center.x, bbox->bbmax.y - final_radius, center.z));
+      auto final_radius = bbox->radius * bodyScale;
+
+      if (iHitbox == (int)HitboxModel::HITBOX_STOMACH) {
+        points.emplace_back(Vector(center.x, center.y, bbox->bbmin.z + final_radius));
+        points.emplace_back(Vector(center.x, center.y, bbox->bbmax.z - final_radius));
+        points.emplace_back(Vector{center.x, bbox->bbmax.y - final_radius, center.z});
+      } else if (iHitbox == (int)HitboxModel::HITBOX_PELVIS || iHitbox == (int)HitboxModel::HITBOX_UPPER_CHEST) {
+        points.emplace_back(Vector(center.x, center.y, bbox->bbmax.z + final_radius));
+        points.emplace_back(Vector(center.x, center.y, bbox->bbmin.z - final_radius));
+      } else if (iHitbox == (int)HitboxModel::HITBOX_LOWER_CHEST || iHitbox == (int)HitboxModel::HITBOX_CHEST) {
+        points.emplace_back(Vector(center.x, center.y, bbox->bbmax.z + final_radius));
+        points.emplace_back(Vector(center.x, center.y, bbox->bbmin.z - final_radius));
+        points.emplace_back(Vector{center.x, bbox->bbmax.y - final_radius, center.z});
+      } else {
+        points.emplace_back(Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z + final_radius));
+        points.emplace_back(Vector(bbox->bbmax.x, bbox->bbmax.y, bbox->bbmax.z - final_radius));
+        points.emplace_back(Vector(center.x, bbox->bbmax.y - final_radius, center.z));
+      }
     }
   }
 

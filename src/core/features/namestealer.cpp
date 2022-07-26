@@ -80,7 +80,7 @@ void Features::NameStealer::frameStageNotify(FrameStage frame) {
 
     if (changeName(false, (std::string{playerInfo.name} + '\x1').c_str())) {
     //   memcpy(Menu::playerName, (std::string{playerInfo.name} + '\x1').c_str(), 127);
-      stolenIds.push_back(playerInfo.userid);
+      stolenIds.emplace_back(playerInfo.userid);
     }
 
     return;

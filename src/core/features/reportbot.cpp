@@ -16,7 +16,7 @@ std::vector<std::uint64_t> Features::ReportBot::getXuidsOfCandidatesToBeReported
     if (!Interfaces::engine->GetPlayerInfo(i, &playerInfo) || playerInfo.fakeplayer)
       continue;
 
-    xuids.push_back(playerInfo.xuid);
+    xuids.emplace_back(playerInfo.xuid);
   }
 
   return xuids;
