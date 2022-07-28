@@ -394,11 +394,18 @@ inline void Vector::NormalizeInPlace()
 {
 	Vector& v = *this;
 
-	float iradius = 1.f / (this->Length() + 1.192092896e-07F); //FLT_EPSILON
+	float length = this->Length();
 
-	v.x *= iradius;
-	v.y *= iradius;
-	v.z *= iradius;
+	if (length != 0)
+	{
+		v.x = x / length;
+		v.y = y / length;
+		v.z = z / length;
+	}
+	else
+	{
+		v.x = v.y = 0.0f; v.z = 1.0f;
+	}
 }
 //===============================================
 inline float VectorNormalize(Vector& v)
@@ -1291,6 +1298,13 @@ public:
     {
         return x || y || z;
     }
+
+	auto normalize() {
+        x = std::isfinite(x) ? std::remainder(x, 360.0f) : 0.0f;
+        y = std::isfinite(y) ? std::remainder(y, 360.0f) : 0.0f;
+        z = 0.0f;
+		return *this;
+	}
 
 	// arithmetic operations
 	QAngle& operator+=(const QAngle &v);

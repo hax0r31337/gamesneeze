@@ -56,33 +56,11 @@ inline void endMovementFix(CUserCmd* cmd) {
                   std::sin(DEG2RAD(yawDelta + 90.0f)) * sidemove;
 }
 
-inline void normalizeAngles(QAngle& angle) {
-	while (angle.x > 89.0f)
-		angle.x -= 180.f;
-
-	while (angle.x < -89.0f)
-		angle.x += 180.f;
-
-	while (angle.y > 180.f)
-		angle.y -= 360.f;
-
-	while (angle.y < -180.f)
-		angle.y += 360.f;
-}
-
 inline QAngle calcAngle(const Vector& src, const Vector& dst) {
-	QAngle vAngle;
-	Vector delta((src.x - dst.x), (src.y - dst.y), (src.z - dst.z));
-	double hyp = sqrt(delta.x*delta.x + delta.y*delta.y);
-
-	vAngle.x = float(atanf(float(delta.z / hyp)) * 57.295779513082f);
-	vAngle.y = float(atanf(float(delta.y / delta.x)) * 57.295779513082f);
-	vAngle.z = 0.0f;
-
-	if (delta.x >= 0.0)
-		vAngle.y += 180.0f;
-
-	return vAngle;
+  auto delta = dst - src;
+  return QAngle(RAD2DEG(std::atan2(-delta.z, std::hypot(delta.x, delta.y))),
+         RAD2DEG(std::atan2(delta.y, delta.x)), 0)
+      .normalize();
 }
 
 inline void vectorAngles(const Vector &forward, const Vector &up, QAngle &angles) {

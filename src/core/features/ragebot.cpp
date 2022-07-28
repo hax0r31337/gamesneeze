@@ -244,8 +244,7 @@ int Features::RageBot::getDamageDeal(Player *player, const Vector &point,
   QAngle angles = calcAngle(data.src, dst);
   angleVectors(angles, data.direction);
 
-  Vector tmp = data.direction;
-  data.direction = tmp.Normalize();
+  data.direction.NormalizeInPlace();
 
   if (simulateFireBullet(weapon, allowFriendlyFire, data))
     return (int)data.current_damage;
@@ -254,7 +253,7 @@ int Features::RageBot::getDamageDeal(Player *player, const Vector &point,
 }
 
 bool Features::RageBot::canShoot(Weapon *weapon, QAngle *angle, 
-              Player *enemy, int hitChance) {
+              Player *enemy, int hitChance, int minDamage) {
   if (hitChance == 0)
     return true;
 
@@ -287,31 +286,28 @@ bool Features::RageBot::canShoot(Weapon *weapon, QAngle *angle,
 
     QAngle viewAnglesSpread;
     vectorAngles(direction, up, viewAnglesSpread);
-    normalizeAngles(viewAnglesSpread);
+    viewAnglesSpread.normalize();
 
     Vector viewForward;
     angleVectors(viewAnglesSpread, viewForward);
     viewForward.NormalizeInPlace();
 
-    viewForward =
-        src + (viewForward * weapon->GetWeaponInfo()->GetRange());
+    // viewForward = (viewForward * weapon->GetWeaponInfo()->GetRange());
 
-    Trace tr;
-    Ray ray;
-    ray.Init(src, viewForward);
-    Interfaces::trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, enemy, &tr);
+    Features::RageBot::FireBulletData data;
+    data.src = src;
+    data.filter.pSkip = Globals::localPlayer;
+    data.direction = viewForward;
 
-    // TraceFilter filter;
-    // filter.pSkip = Globals::localPlayer;
-    // //   hitbox  |  monster  | solid
-    // Interfaces::trace->TraceRay(ray, (0x40000000 | 0x40000 | 0x1), &filter, &tr);
+    if (!simulateFireBullet(weapon, false, data)) {
+      continue;
+    }
 
-    if (tr.m_pEntityHit == enemy) {
+    if (data.current_damage >= minDamage) {
       hitCount++;
     }
 
     if (hitCount >= hitChance) {
-      // Notifications::addNotification(ImColor(255, 255, 255), "HITS OK");
       return true;
     } else if (100 - i + hitCount < hitChance) {
       return false;
@@ -645,14 +641,11 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
                 continue;
               }
 
-              if (!ignoreSmoke &&
-                  Offsets::lineGoesThroughSmoke(Globals::localPlayer->eyePos(),
-                                                targetBonePos, 1))
+              if (!ignoreSmoke && Offsets::lineGoesThroughSmoke(localPlayerEyePos, targetBonePos, 1))
                 continue;
 
               QAngle directAngle = calcAngle(localPlayerEyePos, targetBonePos);
-              QAngle angleTarget = directAngle - cmd->viewangles;
-              normalizeAngles(angleTarget);
+              QAngle angleTarget = (directAngle - cmd->viewangles).normalize();
 
               if (angleTarget.Length() > FOV) {
                 continue;
@@ -660,7 +653,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
 
               if (damageDeal > bestDamage) {
                 hasTarget = true;
-                if (!canShoot(weapon, &directAngle, p, hitChance)) {
+                if (!canShoot(weapon, &directAngle, p, hitChance, minDamage)) {
                   continue;
                 }
                 bestDamage = damageDeal;
@@ -687,7 +680,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
         }
 
         cmd->viewangles = bestPlayerAngle;
-        normalizeAngles(cmd->viewangles);
       }
     }
   }

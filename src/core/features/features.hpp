@@ -174,7 +174,7 @@ namespace Features {
                             Vector &Spot, float headScale, float bodyScale,
                             Weapon *weapon, bool friendlyFire);
         bool canShoot(Weapon *activeWeapon, QAngle *angle, Player *enemy,
-                      int hitChance);
+                      int hitChance, int minDamage);
     }
     namespace AntiAim {
         Player* getNearestTarget(bool check = false);

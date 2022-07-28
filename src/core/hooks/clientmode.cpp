@@ -71,7 +71,7 @@ bool Hooks::CreateMove::hook(void *thisptr, float flInputSampleTime,
     cmd->sidemove = std::clamp(cmd->sidemove, -450.0f, 450.0f);
     cmd->upmove = std::clamp(cmd->upmove, -320.0f, 320.0f);
 
-    normalizeAngles(cmd->viewangles);
+    cmd->viewangles.normalize();
     cmd->viewangles.x = std::clamp(cmd->viewangles.x, -89.0f, 89.0f);
     cmd->viewangles.y = std::clamp(cmd->viewangles.y, -180.0f, 180.0f);
     cmd->viewangles.z = 0.0f;

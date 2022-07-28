@@ -101,8 +101,6 @@ void Features::LegitBot::createMove(CUserCmd* cmd) {
 
                                         QAngle angleToCurrentBone = calcAngle(localPlayerEyePos, targetBonePos) - cmd->viewangles - (recoilCompensation ? Globals::localPlayer->aimPunch()*2 : QAngle(0, 0, 0));
 
-                                        normalizeAngles(angleToCurrentBone);
-
                                         if (angleToCurrentBone.Length() < closestDelta) {
                                             closestDelta = angleToCurrentBone.Length();
                                             angleToClosestBone = angleToCurrentBone;
