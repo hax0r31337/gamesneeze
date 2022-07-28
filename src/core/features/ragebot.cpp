@@ -246,7 +246,7 @@ int Features::RageBot::getDamageDeal(Player *player, const Vector &point,
 
   data.direction.NormalizeInPlace();
 
-  if (simulateFireBullet(weapon, allowFriendlyFire, data))
+  if (simulateFireBullet(weapon, allowFriendlyFire, data) && data.enter_trace.m_pEntityHit == player)
     return (int)data.current_damage;
 
   return -1.0f;
@@ -303,7 +303,7 @@ bool Features::RageBot::canShoot(Weapon *weapon, QAngle *angle,
       continue;
     }
 
-    if (data.current_damage >= minDamage) {
+    if (data.enter_trace.m_pEntityHit == enemy && data.current_damage >= minDamage) {
       hitCount++;
     }
 
