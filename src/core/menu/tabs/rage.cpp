@@ -1,6 +1,6 @@
 #include "../menu.hpp"
 
-const char* antiAimTypes[] = {"None", "Static", "Jitter", "Fake Jitter", "Real Jitter", "SpingBot (p100)", "Legit"};
+const char* antiAimTypes[] = {"Manual", "Peek real", "Peek desync", "Jitter"};
 
 void Menu::hitboxSelectBox(const char *configVarName) {
   ImGui::Text("Hitboxes");
@@ -232,114 +232,49 @@ void Menu::drawRageTab() {
     }
     ImGui::SameLine();
     ImGui::BeginChild("Others", ImVec2((ImGui::GetWindowContentRegionWidth()/2) - 4, 575), true); {
-        ImGui::Text("Anti-Aim");
+        ImGui::Text("Anti Aim");
         ImGui::Separator();
-        
-        ImGui::Text("Type");
+
+        ImGui::Checkbox("Enabled", &CONFIGBOOL("Rage>AntiAim>Enabled"));
+        ImGui::Text("Desync");
         ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-        ImGui::Combo("##Type", &CONFIGINT("Rage>AntiAim>Type"), antiAimTypes, IM_ARRAYSIZE(antiAimTypes));
+        ImGui::SliderInt("##Desync", &CONFIGINT("Rage>AntiAim>Desync"), 0, 180);
+        ImGui::Text("Yaw");
+        ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+        ImGui::SliderInt("##Yaw", &CONFIGINT("Rage>AntiAim>Yaw"), 0, 180);
+        ImGui::Text("Pitch");
+        ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+        ImGui::SliderInt("##Pitch", &CONFIGINT("Rage>AntiAim>Pitch"), -89, 180);
+        ImGui::Checkbox("At Target", &CONFIGBOOL("Rage>AntiAim>At Target"));
+        static bool toggled = false;
+        Menu::CustomWidgets::drawKeyBinder("Invert Key", &CONFIGINT("Rage>AntiAim>Invert Key"),&toggled);
+        ImGui::Text("Desync Mode");
+        ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+        ImGui::Combo("##Desync Mode", &CONFIGINT("Rage>AntiAim>Desync Mode"), antiAimTypes, IM_ARRAYSIZE(antiAimTypes));
 
-        if (CONFIGINT("Rage>AntiAim>Type")) {
-            ImGui::Text("Pitch");
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-            ImGui::SliderInt("##Pitch", &CONFIGINT("Rage>AntiAim>Pitch"), -89, 89);
 
-            ImGui::Text("Yaw Offset");
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-            ImGui::SliderInt("##Offset", &CONFIGINT("Rage>AntiAim>Offset"), 0, 360);
+        ImGui::Text("Slow Walk");
+        ImGui::Separator();
 
-            ImGui::Text("FakeLag");
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-            ImGui::SliderInt("##FakeLag", &CONFIGINT("Rage>AntiAim>FakeLag"), 0, 16);
-        }
+        ImGui::Checkbox("Slow Walk",&CONFIGBOOL("Rage>Slow Walk"));
+        ImGui::SliderInt("Slow Walk Speed (%)", &CONFIGINT("Rage>Slow Walk Speed"), 0, 255);
 
-        if (CONFIGINT("Rage>AntiAim>Type") == 1) { // Static
-            ImGui::Text("Desync");
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-            ImGui::SliderInt("##Desync", &CONFIGINT("Rage>AntiAim>Static>Desync"), -60, 60);
-        }
+        ImGui::Text("Fake Lag");
+        ImGui::Separator();
 
-        if (CONFIGINT("Rage>AntiAim>Type") == 2) { // Jitter
-            ImGui::Text("Desync");
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-            ImGui::SliderInt("##Desync", &CONFIGINT("Rage>AntiAim>Jitter>Desync"), -60, 60);
-
-            ImGui::Text("Jitter Amount");
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-            ImGui::SliderInt("##Jitter Amount", &CONFIGINT("Rage>AntiAim>Jitter>Jitter Amount"), 0, 180);
-
-            ImGui::Text("Jitter Delay");
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-            ImGui::SliderInt("##Jitter Delay", &CONFIGINT("Rage>AntiAim>Jitter>Jitter Delay"), 1, 256);
-
-            ImGui::Checkbox("Random", &CONFIGBOOL("Rage>AntiAim>Jitter>Random"));
-            if (CONFIGBOOL("Rage>AntiAim>Jitter>Random")) {
-                ImGui::Text("Random Min");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Random Min", &CONFIGINT("Rage>AntiAim>Jitter>Random Min"), 0, 180);
-
-                ImGui::Text("Random Max");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Random Max", &CONFIGINT("Rage>AntiAim>Jitter>Random Max"), 0, 180);
-            }
-        }
-
-        if (CONFIGINT("Rage>AntiAim>Type") == 3) { // Fake Jitter
-            ImGui::Text("Jitter Amount");
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-            ImGui::SliderInt("##Jitter Amount", &CONFIGINT("Rage>AntiAim>Fake Jitter>Jitter Amount"), 0, 60);
-
-            ImGui::Text("Jitter Delay");
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-            ImGui::SliderInt("##Jitter Delay", &CONFIGINT("Rage>AntiAim>Fake Jitter>Jitter Delay"), 1, 256);
-
-            ImGui::Checkbox("Random", &CONFIGBOOL("Rage>AntiAim>Fake Jitter>Random"));
-            if (CONFIGBOOL("Rage>AntiAim>Fake Jitter>Random")) {
-                ImGui::Text("Random Min");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Random Min", &CONFIGINT("Rage>AntiAim>Fake Jitter>Random Min"), 0, 60);
-
-                ImGui::Text("Random Max");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Random Max", &CONFIGINT("Rage>AntiAim>Fake Jitter>Random Max"), 0, 60);
-            }
-        }
-
-        if (CONFIGINT("Rage>AntiAim>Type") == 4) { // Real Jitter
-            ImGui::Text("Jitter Amount");
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-            ImGui::SliderInt("##Jitter Amount", &CONFIGINT("Rage>AntiAim>Real Jitter>Jitter Amount"), 0, 60);
-
-            ImGui::Text("Jitter Delay");
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-            ImGui::SliderInt("##Jitter Delay", &CONFIGINT("Rage>AntiAim>Real Jitter>Jitter Delay"), 1, 256);
-
-            ImGui::Checkbox("Random", &CONFIGBOOL("Rage>AntiAim>Fake Jitter>Random"));
-            if (CONFIGBOOL("Rage>AntiAim>Real Jitter>Random")) {
-                ImGui::Text("Random Min");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Random Min", &CONFIGINT("Rage>AntiAim>Real Jitter>Random Min"), 0, 60);
-
-                ImGui::Text("Random Max");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##Random Max", &CONFIGINT("Rage>AntiAim>Real Jitter>Random Max"), 0, 60);
-            }
-        }
-
-        if (CONFIGINT("Rage>AntiAim>Type") == 5) { // Sping
-            ImGui::Text("Desync");
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-            ImGui::SliderInt("##Desync", &CONFIGINT("Rage>AntiAim>Spin>Desync"), -60, 60);
-        }
-        ImGui::Checkbox("Slow Walk",&CONFIGBOOL("Rage>AntiAim>Slow Walk"));
-        ImGui::SliderInt("Slow Walk Speed (%)", &CONFIGINT("Rage>AntiAim>Slow Walk Speed"), 0, 255);
+        ImGui::Checkbox("Fake Lag", &CONFIGBOOL("Rage>Fake Lag>Enabled"));
+        ImGui::Checkbox("Choke On Shot", &CONFIGBOOL("Rage>Fake Lag>Choke On Shot"));
+        ImGui::Checkbox("Adaptive", &CONFIGBOOL("Rage>Fake Lag>Adaptive"));
+        ImGui::Text("Amount");
+        ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+        ImGui::SliderInt("##Amount", &CONFIGINT("Rage>Fake Lag>Amount"), 0, 10);
 
         ImGui::Text("Others");
         ImGui::Separator();
 
         ImGui::Checkbox("Quick Peek", &CONFIGBOOL("Rage>Quick Peek>Enabled"));
-        ImGui::SameLine();
         if (CONFIGBOOL("Rage>Quick Peek>Enabled")) {
+          ImGui::SameLine();
           static bool toggled = false;
           Menu::CustomWidgets::drawKeyBinder(
               "Key", &CONFIGINT("Rage>Quick Peek>Key"), &toggled);

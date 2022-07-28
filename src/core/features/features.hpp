@@ -37,6 +37,9 @@ namespace Features {
     namespace LegitBot {
         void createMove(CUserCmd* cmd);
     }
+    namespace FakeLag {
+        void createMove(CUserCmd* cmd);
+    }
     namespace Backtrack {
         struct BacktrackPlayer {
             matrix3x4_t boneMatrix[128];
@@ -174,8 +177,7 @@ namespace Features {
                       int hitChance);
     }
     namespace AntiAim {
-        inline matrix3x4_t fakeBones[128];
-        inline float fakeYaw;
+        Player* getNearestTarget(bool check = false);
         void createMove(CUserCmd* cmd);
     }
     namespace Hitmarkers {

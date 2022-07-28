@@ -2,6 +2,7 @@
 #include <cstdint>
 #include "../../utils/utils.hpp"
 #include "../classes/vector.h"
+#include "inetchannel.hpp"
 
 #define FULLUPDATE() Offsets::getLocalClient(-1)->m_nDeltaTick = -1
 

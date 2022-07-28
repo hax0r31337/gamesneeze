@@ -241,46 +241,23 @@ namespace Config {
         CONFIGITEM("Rage>RageBot>Heavy>Auto Slow", false),
         CONFIGITEM("Rage>RageBot>Heavy>Kill Shot", false),
 
-        CONFIGITEM("Rage>AntiAim>Type", 0),
+        CONFIGITEM("Rage>AntiAim>Enabled", false),
         CONFIGITEM("Rage>AntiAim>Pitch", 89),
-        CONFIGITEM("Rage>AntiAim>Offset", 180),
-        CONFIGITEM("Rage>AntiAim>FakeLag", 0),
-        // Static {
-        CONFIGITEM("Rage>AntiAim>Static>Desync", 0),
+        CONFIGITEM("Rage>AntiAim>At Target", false),
+        CONFIGITEM("Rage>AntiAim>Invert Key", 0),
+        CONFIGITEM("Rage>AntiAim>Desync Mode", 0),
+        CONFIGITEM("Rage>AntiAim>Desync", 0),
+        CONFIGITEM("Rage>AntiAim>Yaw", 0),
         // }
+        CONFIGITEM("Rage>Slow Walk", false),
+        CONFIGITEM("Rage>Slow Walk Speed", 55),
 
-        // Jitter {
-        CONFIGITEM("Rage>AntiAim>Jitter>Desync", 0),
-        CONFIGITEM("Rage>AntiAim>Jitter>Jitter Amount", 0),
-        CONFIGITEM("Rage>AntiAim>Jitter>Jitter Delay", 1),
-        CONFIGITEM("Rage>AntiAim>Jitter>Random", false),
-        CONFIGITEM("Rage>AntiAim>Jitter>Random Min", 0),
-        CONFIGITEM("Rage>AntiAim>Jitter>Random Max", 0),
-        // }
-
-        // Fake Jitter {
-        CONFIGITEM("Rage>AntiAim>Fake Jitter>Jitter Amount", 0),
-        CONFIGITEM("Rage>AntiAim>Fake Jitter>Jitter Delay", 1),
-        CONFIGITEM("Rage>AntiAim>Fake Jitter>Random", false),
-        CONFIGITEM("Rage>AntiAim>Fake Jitter>Random Min", 0),
-        CONFIGITEM("Rage>AntiAim>Fake Jitter>Random Max", 0),
-        // }
-
-        // Real Jitter {
-        CONFIGITEM("Rage>AntiAim>Real Jitter>Jitter Amount", 0),
-        CONFIGITEM("Rage>AntiAim>Real Jitter>Jitter Delay", 1),
-        CONFIGITEM("Rage>AntiAim>Real Jitter>Random", false),
-        CONFIGITEM("Rage>AntiAim>Real Jitter>Random Min", 0),
-        CONFIGITEM("Rage>AntiAim>Real Jitter>Random Max", 0),
-        // }
-
-        // Spin {
-        CONFIGITEM("Rage>AntiAim>Spin>Desync", 0),
-        // }
-        CONFIGITEM("Rage>AntiAim>Slow Walk", false),
-        CONFIGITEM("Rage>AntiAim>Slow Walk Speed", 55),
         CONFIGITEM("Rage>Quick Peek>Enabled", false),
         CONFIGITEM("Rage>Quick Peek>Key", 0),
+        CONFIGITEM("Rage>Fake Lag>Enabled", false),
+        CONFIGITEM("Rage>Fake Lag>Choke On Shot", false),
+        CONFIGITEM("Rage>Fake Lag>Adaptive", false),
+        CONFIGITEM("Rage>Fake Lag>Amount", 0),
         //}
         // }
         // Visuals {
@@ -509,6 +486,7 @@ namespace Config {
         CONFIGITEM("Misc>Misc>ReportBot>TeamMate", false),
         CONFIGITEM("Misc>Misc>ReportBot>Report Flags", 0),
         CONFIGITEM("Misc>Misc>ReportBot>InfiniReport", false),
+        CONFIGITEM("Misc>Misc>Kill Spam", false),
 
         CONFIGITEM("Misc>Skins>Skins>PaintKit", 0),
         CONFIGITEM("Misc>Skins>Skins>Wear", 0),

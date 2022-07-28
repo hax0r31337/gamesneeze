@@ -92,6 +92,12 @@ void Hooks::Events::EventListener::FireGameEvent(IGameEvent *event) {
         Features::Notifications::addNotification(ImColor(220, 40, 40),
                                                  "killed %s", info.name);
       }
+
+      if (CONFIGBOOL("Misc>Misc>Kill Spam")) {
+        std::ostringstream ss;
+        ss << "say \"L " << info.name << " imagine getting killed by an open-source cheat. ghub/kotonemywaifu/gamesneeze\""; 
+        Interfaces::engine->ExecuteClientCmd(ss.str().c_str());
+      }
     }
   } else if (strstr(name, "vote_cast")) {
     Features::VoteRevealer::event(event);

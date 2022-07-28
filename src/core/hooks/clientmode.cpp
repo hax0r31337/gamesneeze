@@ -36,6 +36,7 @@ bool Hooks::CreateMove::hook(void *thisptr, float flInputSampleTime,
     Features::Prediction::start(cmd);
     // if (CONFIGBOOL("Rage>Enabled")) {
     Features::RageBot::createMove(cmd);
+    Features::FakeLag::createMove(cmd);
     Features::AntiAim::createMove(cmd);
     // } else {
     Features::LegitBot::createMove(cmd);

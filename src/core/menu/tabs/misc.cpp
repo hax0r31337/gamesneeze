@@ -86,6 +86,7 @@ void Menu::drawMiscTab() {
                     ImGui::SameLine();
                     ImGui::Checkbox("InfiniReport", &CONFIGBOOL("Misc>Misc>ReportBot>InfiniReport"));
                     reportBotSelectBox("Misc>Misc>ReportBot>Report Flags");
+                ImGui::Checkbox("Kill Spam", &CONFIGBOOL("Misc>Misc>Kill Spam"));
                 }
                 ImGui::EndChild();
             }
