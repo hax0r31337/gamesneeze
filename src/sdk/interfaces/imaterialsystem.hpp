@@ -1,5 +1,6 @@
 #pragma once
 
+typedef unsigned short MaterialHandle_t;
 class KeyValues;
 
 //-----------------------------------------------------------------------------
@@ -105,23 +106,23 @@ public:
 		return getVirtualFunc<Fn>( this, 84 )( this, pMaterialName, pTextureGroupName, complain, pComplainPrefix );
 	}
 
-	unsigned short FirstMaterial() {
-		typedef unsigned short (*Fn)( void* );
+	MaterialHandle_t FirstMaterial() {
+		typedef MaterialHandle_t (*Fn)( void* );
 		return getVirtualFunc<Fn>( this, 86 )( this );
 	}
 
-	unsigned short NextMaterial( unsigned short h ) {
-		typedef unsigned short (*Fn)( void*, unsigned short );
+	MaterialHandle_t NextMaterial( MaterialHandle_t h ) {
+		typedef MaterialHandle_t (*Fn)( void*, MaterialHandle_t );
 		return getVirtualFunc<Fn>( this, 87 )( this, h );
 	}
 
-	unsigned short InvalidMaterial() {
-		typedef unsigned short (*Fn)( void* );
+	MaterialHandle_t InvalidMaterial() {
+		typedef MaterialHandle_t (*Fn)( void* );
 		return getVirtualFunc<Fn>( this, 88 )( this );
 	}
 
-	IMaterial* GetMaterial( unsigned short h ) {
-		typedef IMaterial* (*Fn)( void*, unsigned short );
+	IMaterial* GetMaterial( MaterialHandle_t h ) {
+		typedef IMaterial* (*Fn)( void*, MaterialHandle_t );
 		return getVirtualFunc<Fn>( this, 89 )( this, h );
 	}
 };

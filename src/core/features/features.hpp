@@ -207,7 +207,9 @@ namespace Features {
     namespace Resolver {
         void frameStageNotify(FrameStage frame);
     }
-
+    namespace AsusWalls {
+        void frameStageNotify(FrameStage frame);
+    }
     namespace RainbowHud {
         void frameStageNotify(FrameStage frame);
     }

@@ -245,6 +245,9 @@ void Menu::drawRageTab() {
         ImGui::Text("Pitch");
         ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
         ImGui::SliderInt("##Pitch", &CONFIGINT("Rage>AntiAim>Pitch"), -89, 180);
+        ImGui::Text("Roll");
+        ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+        ImGui::SliderInt("##Roll", &CONFIGINT("Rage>AntiAim>Roll"), -89, 89);
         ImGui::Checkbox("At Target", &CONFIGBOOL("Rage>AntiAim>At Target"));
         static bool toggled = false;
         Menu::CustomWidgets::drawKeyBinder("Invert Key", &CONFIGINT("Rage>AntiAim>Invert Key"),&toggled);

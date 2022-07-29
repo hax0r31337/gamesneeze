@@ -265,6 +265,12 @@ void Menu::drawVisualsTab() {
                 ImGui::Checkbox("Rainbow HUD", &CONFIGBOOL("Visuals>World>World>Rainbow HUD"));
                 ImGui::Checkbox("No Blur", &CONFIGBOOL("Visuals>World>World>No Blur"));
                 ImGui::Checkbox("No Scope Overlay", &CONFIGBOOL("Visuals>World>World>No Scope Overlay"));
+
+                if (CONFIGBOOL("Visuals>World>World>Asus Walls>Enabled")) {
+                    ImGui::ColorEdit4("Asus Walls Color", (float*)&CONFIGCOL("Visuals>World>World>Asus Walls>Color"), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_PickerHueWheel);
+                    ImGui::SameLine();
+                }
+                ImGui::Checkbox("Asus Walls", &CONFIGBOOL("Visuals>World>World>Asus Walls>Enabled"));
                 
                 ImGui::EndChild();
             }

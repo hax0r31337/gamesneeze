@@ -1,4 +1,3 @@
-#include "../../includes.hpp"
 #include "features.hpp"
 #include <algorithm>
 #include <cmath>
@@ -578,88 +577,100 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     return;
 
   if (cmd->buttons & (1 << 0) || autoShot) {
-    if (scopedOnly && weapon->isSniperRifle() &&
-        !Globals::localPlayer->scoped())
-      return;
-
     int bestDamage = -1;
     QAngle bestPlayerAngle = {0, 0, 0};
     QAngle aimPunch = Globals::localPlayer->aimPunch() * 2;
     bool hasTarget = false;
     bool hasSelectedTarget = false;
+    Vector localPlayerEyePos = Globals::localPlayer->eyePos();
+
+    static auto trySelectTargetBone([&](Vector targetBonePos, int damageDeal,
+                                        Player *p) {
+      if (damageDeal <= 0 ||
+          damageDeal < (killShot ? p->health()
+                                 : (p->health() < minDamage ? p->health()
+                                                            : minDamage))) {
+       return;
+      }
+      if (!ignoreSmoke && Offsets::lineGoesThroughSmoke(localPlayerEyePos, targetBonePos, 1)) {
+        return;
+      }
+
+      QAngle directAngle = calcAngle(localPlayerEyePos, targetBonePos);
+      QAngle angleTarget = (directAngle - cmd->viewangles).normalize();
+
+      if (angleTarget.Length() > FOV) {
+        return;
+      }
+
+      if (damageDeal > bestDamage) {
+        hasTarget = true;
+        if (!canShoot(weapon, &directAngle, p, hitChance, minDamage)) {
+          return;
+        }
+        bestDamage = damageDeal;
+        bestPlayerAngle = directAngle - aimPunch;
+        hasSelectedTarget = true;
+      }
+    });
 
     // Enumerate over players and get angle to the closest player to crosshair
     for (int i = 1; i < Interfaces::globals->maxClients; i++) {
       Player *p = (Player *)Interfaces::entityList->GetClientEntity(i);
-      if (p && p != Globals::localPlayer) {
-        if (p->health() > 0 && !p->dormant() &&
-            (p->isEnemy() || friendlyFire) && (p->visible() || !visibleOnly) && !p->gunGameImmunity()) {
-          matrix3x4_t boneMatrix[128];
-          if (p->getAnythingBones(boneMatrix)) {
-            Vector localPlayerEyePos = Globals::localPlayer->eyePos();
+      if (!p || p == Globals::localPlayer) {
+        continue;
+      }
 
-            // TODO check which bone would be exposed sooner with engine
-            // prediction and which would do more damage.
-            for (int i = 0; i < 5; i++) {
-              if (!(hitboxes & 1 << i))
-                continue;
-              // map hitboxes enum to "actual" hitboxes
-              int bone = (1 << i & (int)HitBoxes::HEAD)      ? 8
-                         : (1 << i & (int)HitBoxes::NECK)    ? 7
-                         : (1 << i & (int)HitBoxes::CHEST)   ? 6
-                         : (1 << i & (int)HitBoxes::STOMACH) ? 5
-                         : (1 << i & (int)HitBoxes::PELVIS)  ? 3
-                                                             : 5;
+      if (p->health() > 0 && !p->dormant() && (p->isEnemy() || friendlyFire) &&
+          (p->visible() || !visibleOnly) && !p->gunGameImmunity()) {
+        matrix3x4_t boneMatrix[128];
+        if (!p->getAnythingBones(boneMatrix)) {
+          continue;
+        }
 
-              Vector targetBonePos = Vector{0, 0, 0};
-              int damageDeal = -1;
-              if ((headScale == 0 && bone == 8) || bodyScale == 0) {
-                targetBonePos = p->getBonePos(bone);
-                damageDeal =
-                    getDamageDeal(p, targetBonePos, weapon, friendlyFire);
-              } else {
-                int hitbox = (int)((1 << i & (int)HitBoxes::HEAD)
-                                       ? HitboxModel::HITBOX_HEAD
-                                   : (1 << i & (int)HitBoxes::NECK)
-                                       ? HitboxModel::HITBOX_NECK
-                                   : (1 << i & (int)HitBoxes::CHEST)
-                                       ? HitboxModel::HITBOX_CHEST
-                                   : (1 << i & (int)HitBoxes::STOMACH)
-                                       ? HitboxModel::HITBOX_STOMACH
-                                   : (1 << i & (int)HitBoxes::PELVIS)
-                                       ? HitboxModel::HITBOX_PELVIS
-                                       : HitboxModel::HITBOX_STOMACH);
-                bestMultiPoint(p, hitbox, damageDeal, targetBonePos, headScale, bodyScale,
-                               weapon, friendlyFire);
-              }
+        for (int i = 0; i < 5; i++) {
+          if (!(hitboxes & 1 << i)) {
+            continue;
+          }
+          // map hitboxes enum to "actual" hitboxes
+          int bone = (1 << i & (int)HitBoxes::HEAD)      ? 8
+                     : (1 << i & (int)HitBoxes::NECK)    ? 7
+                     : (1 << i & (int)HitBoxes::CHEST)   ? 6
+                     : (1 << i & (int)HitBoxes::STOMACH) ? 5
+                     : (1 << i & (int)HitBoxes::PELVIS)  ? 3
+                                                         : 5;
 
-              if (damageDeal <= 0 ||
-                  damageDeal < (killShot
-                                    ? p->health()
-                                    : (p->health() < minDamage ? p->health()
-                                                               : minDamage))) {
-                continue;
-              }
+          Vector targetBonePos = Vector{0, 0, 0};
+          int damageDeal = -1;
+          if ((headScale == 0 && bone == 8) || bodyScale == 0) {
+            targetBonePos = p->getBonePos(bone);
+            damageDeal = getDamageDeal(p, targetBonePos, weapon, friendlyFire);
+            trySelectTargetBone(targetBonePos, damageDeal, p);
+          } else {
+            int hitbox =
+                (int)((1 << i & (int)HitBoxes::HEAD) ? HitboxModel::HITBOX_HEAD
+                      : (1 << i & (int)HitBoxes::NECK)
+                          ? HitboxModel::HITBOX_NECK
+                      : (1 << i & (int)HitBoxes::CHEST)
+                          ? HitboxModel::HITBOX_CHEST
+                      : (1 << i & (int)HitBoxes::STOMACH)
+                          ? HitboxModel::HITBOX_STOMACH
+                      : (1 << i & (int)HitBoxes::PELVIS)
+                          ? HitboxModel::HITBOX_PELVIS
+                          : HitboxModel::HITBOX_STOMACH);
+            bestMultiPoint(p, hitbox, damageDeal, targetBonePos, headScale,
+                           bodyScale, weapon, friendlyFire);
+            trySelectTargetBone(targetBonePos, damageDeal, p);
+            if (hitbox == (int)HitboxModel::HITBOX_CHEST) {
+              hitbox = (int)HitboxModel::HITBOX_LOWER_CHEST;
+              bestMultiPoint(p, hitbox, damageDeal, targetBonePos, headScale,
+                             bodyScale, weapon, friendlyFire);
+              trySelectTargetBone(targetBonePos, damageDeal, p);
 
-              if (!ignoreSmoke && Offsets::lineGoesThroughSmoke(localPlayerEyePos, targetBonePos, 1))
-                continue;
-
-              QAngle directAngle = calcAngle(localPlayerEyePos, targetBonePos);
-              QAngle angleTarget = (directAngle - cmd->viewangles).normalize();
-
-              if (angleTarget.Length() > FOV) {
-                continue;
-              }
-
-              if (damageDeal > bestDamage) {
-                hasTarget = true;
-                if (!canShoot(weapon, &directAngle, p, hitChance, minDamage)) {
-                  continue;
-                }
-                bestDamage = damageDeal;
-                bestPlayerAngle = directAngle - aimPunch;
-                hasSelectedTarget = true;
-              }
+              hitbox = (int)HitboxModel::HITBOX_UPPER_CHEST;
+              bestMultiPoint(p, hitbox, damageDeal, targetBonePos, headScale,
+                             bodyScale, weapon, friendlyFire);
+              trySelectTargetBone(targetBonePos, damageDeal, p);
             }
           }
         }
@@ -672,6 +683,10 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
       if (autoScope && weapon->isSniperRifle() &&
           !Globals::localPlayer->scoped()) {
         cmd->buttons |= IN_ATTACK2;
+        return;
+      }
+      if (scopedOnly && weapon->isSniperRifle() &&
+          !Globals::localPlayer->scoped()) {
         return;
       }
       if (hasSelectedTarget) {

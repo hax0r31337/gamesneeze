@@ -1,4 +1,3 @@
-#include "../../includes.hpp"
 #include "features.hpp"
 
 std::vector<std::uint64_t> Features::ReportBot::getXuidsOfCandidatesToBeReported() {

@@ -243,11 +243,11 @@ namespace Config {
 
         CONFIGITEM("Rage>AntiAim>Enabled", false),
         CONFIGITEM("Rage>AntiAim>Pitch", 89),
+        CONFIGITEM("Rage>AntiAim>Roll", 89),
         CONFIGITEM("Rage>AntiAim>At Target", false),
         CONFIGITEM("Rage>AntiAim>Invert Key", 0),
         CONFIGITEM("Rage>AntiAim>Desync Mode", 0),
-        CONFIGITEM("Rage>AntiAim>Desync", 0),
-        CONFIGITEM("Rage>AntiAim>Yaw", 0),
+        CONFIGITEM("Rage>AntiAim>Desync", 0), CONFIGITEM("Rage>AntiAim>Yaw", 0),
         // }
         CONFIGITEM("Rage>Slow Walk", false),
         CONFIGITEM("Rage>Slow Walk Speed", 55),
@@ -436,6 +436,9 @@ namespace Config {
         CONFIGITEM("Visuals>World>World>Rainbow HUD", false),
         CONFIGITEM("Visuals>World>World>No Blur", false),
         CONFIGITEM("Visuals>World>World>No Scope Overlay", false),
+        CONFIGITEM("Visuals>World>World>Asus Walls>Enabled", false),
+        CONFIGITEM("Visuals>World>World>Asus Walls>Color",
+                   ImColor(255, 255, 255, 150)),
         // }
         // }
         // Misc {
