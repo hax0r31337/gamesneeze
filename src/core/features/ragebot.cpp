@@ -291,19 +291,26 @@ bool Features::RageBot::canShoot(Weapon *weapon, QAngle *angle,
     angleVectors(viewAnglesSpread, viewForward);
     viewForward.NormalizeInPlace();
 
-    // viewForward = (viewForward * weapon->GetWeaponInfo()->GetRange());
+    Trace trace;
+    Ray ray;
+    ray.Init(src, src + (viewForward * weapon->GetWeaponInfo()->GetRange()));
 
-    Features::RageBot::FireBulletData data;
-    data.src = src;
-    data.filter.pSkip = Globals::localPlayer;
-    data.direction = viewForward;
+    Interfaces::trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, enemy, &trace);
 
-    if (!simulateFireBullet(weapon, false, data)) {
-      continue;
-    }
+    if (trace.m_pEntityHit == enemy) {
+      // the ray were able to connect with entity, we should calculate wall penetrates
+      Features::RageBot::FireBulletData data;
+      data.src = src;
+      data.filter.pSkip = Globals::localPlayer;
+      data.direction = viewForward;
 
-    if (data.enter_trace.m_pEntityHit == enemy && data.current_damage >= minDamage) {
-      hitCount++;
+      if (!simulateFireBullet(weapon, false, data)) {
+        continue;
+      }
+
+      if (data.enter_trace.m_pEntityHit == enemy && data.current_damage > minDamage) {
+        hitCount++;
+      }
     }
 
     if (hitCount >= hitChance) {
