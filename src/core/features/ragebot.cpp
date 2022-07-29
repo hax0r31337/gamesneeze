@@ -262,7 +262,7 @@ bool Features::RageBot::canShoot(Weapon *weapon, QAngle *angle,
 
   int hitCount = 0;
 
-  weapon->UpdateAccuracyPenalty();
+  // weapon->UpdateAccuracyPenalty();
   float weap_spread = weapon->GetSpread();
   float weap_inaccuracy = weapon->GetInaccuracy();
 
@@ -342,7 +342,6 @@ std::vector<Vector> Features::RageBot::getPoints(Player *player, int iHitbox,
   Vector center = (mins + maxs) * 0.5f;
 
   if (bbox->radius <= 0.f) {
-    Notifications::addNotification(ImColor(255, 255, 255), "negative radius");
     matrix3x4_t rot;
     angleMatrix(bbox->rotation, rot);
 
@@ -578,14 +577,16 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
 
   if (cmd->buttons & (1 << 0) || autoShot) {
     int bestDamage = -1;
+    Player* selectedPlayer = nullptr;
     QAngle bestPlayerAngle = {0, 0, 0};
     QAngle aimPunch = Globals::localPlayer->aimPunch() * 2;
     bool hasTarget = false;
     bool hasSelectedTarget = false;
+    int selectedBone = -1;
     Vector localPlayerEyePos = Globals::localPlayer->eyePos();
 
     static auto trySelectTargetBone([&](Vector targetBonePos, int damageDeal,
-                                        Player *p) {
+                                        Player *p, int hitbox) {
       if (damageDeal <= 0 ||
           damageDeal < (killShot ? p->health()
                                  : (p->health() < minDamage ? p->health()
@@ -611,6 +612,8 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
         bestDamage = damageDeal;
         bestPlayerAngle = directAngle - aimPunch;
         hasSelectedTarget = true;
+        selectedPlayer = p;
+        selectedBone = hitbox;
       }
     });
 
@@ -645,7 +648,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
           if ((headScale == 0 && bone == 8) || bodyScale == 0) {
             targetBonePos = p->getBonePos(bone);
             damageDeal = getDamageDeal(p, targetBonePos, weapon, friendlyFire);
-            trySelectTargetBone(targetBonePos, damageDeal, p);
+            trySelectTargetBone(targetBonePos, damageDeal, p, bone);
           } else {
             int hitbox =
                 (int)((1 << i & (int)HitBoxes::HEAD) ? HitboxModel::HITBOX_HEAD
@@ -660,17 +663,17 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
                           : HitboxModel::HITBOX_STOMACH);
             bestMultiPoint(p, hitbox, damageDeal, targetBonePos, headScale,
                            bodyScale, weapon, friendlyFire);
-            trySelectTargetBone(targetBonePos, damageDeal, p);
+            trySelectTargetBone(targetBonePos, damageDeal, p, bone);
             if (hitbox == (int)HitboxModel::HITBOX_CHEST) {
               hitbox = (int)HitboxModel::HITBOX_LOWER_CHEST;
               bestMultiPoint(p, hitbox, damageDeal, targetBonePos, headScale,
                              bodyScale, weapon, friendlyFire);
-              trySelectTargetBone(targetBonePos, damageDeal, p);
+              trySelectTargetBone(targetBonePos, damageDeal, p, bone);
 
               hitbox = (int)HitboxModel::HITBOX_UPPER_CHEST;
               bestMultiPoint(p, hitbox, damageDeal, targetBonePos, headScale,
                              bodyScale, weapon, friendlyFire);
-              trySelectTargetBone(targetBonePos, damageDeal, p);
+              trySelectTargetBone(targetBonePos, damageDeal, p, bone);
             }
           }
         }
@@ -692,6 +695,14 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
       if (hasSelectedTarget) {
         if (autoShot) {
           cmd->buttons |= IN_ATTACK;
+        }
+        if (CONFIGBOOL("Misc>Misc>Hitmarkers>Hitlogs")) {
+          player_info_t playerInfo;
+          if (Interfaces::engine->GetPlayerInfo(selectedPlayer->index(), &playerInfo)) {
+          Notifications::addNotification(
+                ImColor(255, 255, 255),
+                "Try damage %s for %i health on bone %i", playerInfo.name, bestDamage, selectedBone);
+          }
         }
 
         cmd->viewangles = bestPlayerAngle;

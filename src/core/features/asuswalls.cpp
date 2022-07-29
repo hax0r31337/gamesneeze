@@ -1,6 +1,11 @@
 #include "features.hpp"
 
 void Features::AsusWalls::frameStageNotify(FrameStage frame) {
+  if (frame != FRAME_NET_UPDATE_POSTDATAUPDATE_END ||
+      !CONFIGBOOL("Visuals>World>World>Asus Walls>Enabled")) {
+    return;
+  }
+
   static float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
 
   std::unordered_map<MaterialHandle_t, ImColor> worldMaterials;
@@ -23,10 +28,6 @@ void Features::AsusWalls::frameStageNotify(FrameStage frame) {
 
     worldMaterials.clear();
     // worldMaterials2.clear();
-  }
-
-  if (frame != FRAME_NET_UPDATE_POSTDATAUPDATE_END || !CONFIGBOOL("Visuals>World>World>Asus Walls>Enabled")) {
-    return;
   }
 
   for (MaterialHandle_t i = Interfaces::materialSystem->FirstMaterial();
