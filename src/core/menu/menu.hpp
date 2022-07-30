@@ -34,7 +34,7 @@ namespace Menu {
     ImFont *addFontFromVFONT(const std::string &path, float size,
                          const ImWchar *glyphRanges, bool merge);
 
-    void hitboxSelectBox(const char *configVarName);
+    void hitboxSelectBox(const char *configVarName, bool hasText = true, const char *label = "##HitBoxes");
     namespace CustomWidgets {
         void drawKeyBinder(const char* label, int* key, bool* toggled);
         bool isKeyDown(int key);

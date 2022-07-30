@@ -473,7 +473,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
   int hitboxes = CONFIGINT("Rage>RageBot>Default>Hitboxes");
   float FOV = CONFIGINT("Rage>RageBot>Default>FOV") / 10.f;
   int hitChance = CONFIGINT("Rage>RageBot>Default>Hit Chance");
-  float minDamage = CONFIGINT("Rage>RageBot>Default>Min Damage") * 1.f;
+  int minDamage = CONFIGINT("Rage>RageBot>Default>Min Damage");
   float headScale = CONFIGINT("Rage>RageBot>Default>Head Scale") / 100.f;
   float bodyScale = CONFIGINT("Rage>RageBot>Default>Head Scale") / 100.f;
   bool friendlyFire = CONFIGBOOL("Rage>RageBot>Default>Friendly Fire");
@@ -486,6 +486,12 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
   bool autoSlow = CONFIGBOOL("Rage>RageBot>Default>Auto Slow");
   bool killShot = CONFIGBOOL("Rage>RageBot>Default>Kill Shot");
 
+  bool forceSafePoint =
+      CONFIGBOOL("Rage>RageBot>Default>Force Safe Point") &&
+      (CONFIGINT("Rage>RageBot>Default>Force Safe Point Key") == 0 ||
+       Menu::CustomWidgets::isKeyDown(CONFIGINT("Rage>RageBot>Default>Force Safe Point Key")));
+  int safePoints = CONFIGINT("Rage>RageBot>Default>Force Safe Point Flags");
+
   bool useableWeapon = false;
 
   if ((std::find(std::begin(pistols), std::end(pistols),
@@ -494,7 +500,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>Pistol>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>Pistol>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>Pistol>Hit Chance");
-      minDamage = CONFIGINT("Rage>RageBot>Pistol>Min Damage") * 1.f;
+      minDamage = CONFIGINT("Rage>RageBot>Pistol>Min Damage");
       headScale = CONFIGINT("Rage>RageBot>Pistol>Head Scale") / 100.f;
       bodyScale = CONFIGINT("Rage>RageBot>Pistol>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>Pistol>Auto Slow");
@@ -506,7 +512,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>Heavy Pistol>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>Heavy Pistol>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>Heavy Pistol>Hit Chance");
-      minDamage = CONFIGINT("Rage>RageBot>Heavy Pistol>Min Damage") * 1.f;
+      minDamage = CONFIGINT("Rage>RageBot>Heavy Pistol>Min Damage");
       headScale = CONFIGINT("Rage>RageBot>Heavy Pistol>Head Scale") / 100.f;
       bodyScale = CONFIGINT("Rage>RageBot>Heavy Pistol>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>Heavy Pistol>Auto Slow");
@@ -518,7 +524,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>Rifle>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>Rifle>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>Rifle>Hit Chance");
-      minDamage = CONFIGINT("Rage>RageBot>Rifle>Min Damage") * 1.f;
+      minDamage = CONFIGINT("Rage>RageBot>Rifle>Min Damage");
       headScale = CONFIGINT("Rage>RageBot>Rifle>Head Scale") / 100.f;
       bodyScale = CONFIGINT("Rage>RageBot>Rifle>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>Rifle>Auto Slow");
@@ -530,7 +536,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>SMG>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>SMG>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>SMG>Hit Chance");
-      minDamage = CONFIGINT("Rage>RageBot>SMG>Min Damage") * 1.f;
+      minDamage = CONFIGINT("Rage>RageBot>SMG>Min Damage");
       headScale = CONFIGINT("Rage>RageBot>SMG>Head Scale") / 100.f;
       bodyScale = CONFIGINT("Rage>RageBot>SMG>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>SMG>Auto Slow");
@@ -541,7 +547,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>Scout>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>Scout>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>Scout>Hit Chance");
-      minDamage = CONFIGINT("Rage>RageBot>Scout>Min Damage") * 1.f;
+      minDamage = CONFIGINT("Rage>RageBot>Scout>Min Damage");
       headScale = CONFIGINT("Rage>RageBot>Scout>Head Scale") / 100.f;
       bodyScale = CONFIGINT("Rage>RageBot>Scout>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>Scout>Auto Slow");
@@ -552,7 +558,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>AWP>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>AWP>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>AWP>Hit Chance");
-      minDamage = CONFIGINT("Rage>RageBot>AWP>Min Damage") * 1.f;
+      minDamage = CONFIGINT("Rage>RageBot>AWP>Min Damage");
       headScale = CONFIGINT("Rage>RageBot>AWP>Head Scale") / 100.f;
       bodyScale = CONFIGINT("Rage>RageBot>AWP>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>AWP>Auto Slow");
@@ -565,7 +571,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     if (CONFIGBOOL("Rage>RageBot>Heavy>Override")) {
       hitboxes = CONFIGINT("Rage>RageBot>Heavy>Hitboxes");
       hitChance = CONFIGINT("Rage>RageBot>Heavy>Hit Chance");
-      minDamage = CONFIGINT("Rage>RageBot>Heavy>Min Damage") * 1.f;
+      minDamage = CONFIGINT("Rage>RageBot>Heavy>Min Damage");
       headScale = CONFIGINT("Rage>RageBot>Heavy>Head Scale") / 100.f;
       bodyScale = CONFIGINT("Rage>RageBot>Heavy>Head Scale") / 100.f;
       autoSlow = CONFIGBOOL("Rage>RageBot>Heavy>Auto Slow");
@@ -581,6 +587,12 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     
   if (!ignoreBlind && Globals::localPlayer->maxFlashAlpha() > 75.f)
     return;
+
+  if (CONFIGBOOL("Rage>RageBot>Default>Min Damage Overwrite") &&
+      (CONFIGINT("Rage>RageBot>Default>Min Damage Overwrite Key") == 0 ||
+       Menu::CustomWidgets::isKeyDown(CONFIGINT("Rage>RageBot>Default>Min Damage Overwrite Key")))) {
+    minDamage = CONFIGINT("Rage>RageBot>Default>Min Damage Overwrite Value");
+  }
 
   if (cmd->buttons & (1 << 0) || autoShot) {
     int bestDamage = -1;
@@ -643,12 +655,16 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
             continue;
           }
           // map hitboxes enum to "actual" hitboxes
-          int bone = (1 << i & (int)HitBoxes::HEAD)      ? 8
-                     : (1 << i & (int)HitBoxes::NECK)    ? 7
-                     : (1 << i & (int)HitBoxes::CHEST)   ? 6
-                     : (1 << i & (int)HitBoxes::STOMACH) ? 5
-                     : (1 << i & (int)HitBoxes::PELVIS)  ? 3
-                                                         : 5;
+          int bone = (1 << i & (int)HitBoxes::HEAD)      ? (!forceSafePoint || safePoints & (int)HitBoxes::HEAD ? 8 : -1)
+                     : (1 << i & (int)HitBoxes::NECK)    ? (!forceSafePoint || safePoints & (int)HitBoxes::NECK ? 7 : -1)
+                     : (1 << i & (int)HitBoxes::CHEST)   ? (!forceSafePoint || safePoints & (int)HitBoxes::CHEST ? 6 : -1)
+                     : (1 << i & (int)HitBoxes::STOMACH) ? (!forceSafePoint || safePoints & (int)HitBoxes::STOMACH ? 5 : -1)
+                     : (1 << i & (int)HitBoxes::PELVIS)  ? (!forceSafePoint || safePoints & (int)HitBoxes::PELVIS ? 3 : -1)
+                                                         : -1;
+          
+          if (bone == -1) {
+            continue;
+          }
 
           Vector targetBonePos = Vector{0, 0, 0};
           int damageDeal = -1;

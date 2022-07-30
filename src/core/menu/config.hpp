@@ -177,6 +177,12 @@ namespace Config {
         CONFIGITEM("Rage>RageBot>Default>Visible Only", false),
         CONFIGITEM("Rage>RageBot>Default>Auto Slow", false),
         CONFIGITEM("Rage>RageBot>Default>Kill Shot", false),
+        CONFIGITEM("Rage>RageBot>Default>Force Safe Point", false),
+        CONFIGITEM("Rage>RageBot>Default>Force Safe Point Key", 0),
+        CONFIGITEM("Rage>RageBot>Default>Force Safe Point Flags", 0),
+        CONFIGITEM("Rage>RageBot>Default>Min Damage Overwrite", false),
+        CONFIGITEM("Rage>RageBot>Default>Min Damage Overwrite Key", 0),
+        CONFIGITEM("Rage>RageBot>Default>Min Damage Overwrite Value", 10),
 
         CONFIGITEM("Rage>RageBot>Pistol>Override", false),
         CONFIGITEM("Rage>RageBot>Pistol>Hitboxes", 1),

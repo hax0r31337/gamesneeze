@@ -2,8 +2,10 @@
 
 const char* antiAimTypes[] = {"Manual", "Peek real", "Peek desync", "Jitter"};
 
-void Menu::hitboxSelectBox(const char *configVarName) {
-  ImGui::Text("Hitboxes");
+void Menu::hitboxSelectBox(const char *configVarName, bool hasText, const char *label) {
+  if (hasText) {
+    ImGui::Text("Hitboxes");
+  }
   ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
 
   int curSelected = CONFIGINT(configVarName);
@@ -15,7 +17,7 @@ void Menu::hitboxSelectBox(const char *configVarName) {
                    << (curSelected & (int)HitBoxes::STOMACH ? "Stomach, " : "")
                    << (curSelected & (int)HitBoxes::PELVIS ? "Pelvis, " : "");
 
-  if (ImGui::BeginCombo("##HitBoxes", selectedHitboxes.str().c_str())) {
+  if (ImGui::BeginCombo(label, selectedHitboxes.str().c_str())) {
 
     if (ImGui::Selectable("Head", curSelected & (int)HitBoxes::HEAD,
                           ImGuiSelectableFlags_DontClosePopups))
@@ -83,6 +85,24 @@ void Menu::drawRageTab() {
 
                 ImGui::Separator();
 
+                ImGui::Checkbox("Force Safe Points", &CONFIGBOOL("Rage>RageBot>Default>Force Safe Point"));
+                if (CONFIGBOOL("Rage>RageBot>Default>Force Safe Point")) {
+                  ImGui::SameLine();
+                  static bool toggled = false;
+                  Menu::CustomWidgets::drawKeyBinder(
+                      "FSP_Key", &CONFIGINT("Rage>RageBot>Default>Force Safe Point Key"), &toggled);
+                  hitboxSelectBox("Rage>RageBot>Default>Force Safe Point Flags", false, "##FSP_HitBoxes");
+                }
+
+                ImGui::Checkbox("Min Damage Overwrite", &CONFIGBOOL("Rage>RageBot>Default>Min Damage Overwrite"));
+                if (CONFIGBOOL("Rage>RageBot>Default>Min Damage Overwrite")) {
+                  ImGui::SameLine();
+                  static bool toggled = false;
+                  Menu::CustomWidgets::drawKeyBinder(
+                      "MDO_Key", &CONFIGINT("Rage>RageBot>Default>Min Damage Overwrite Key"), &toggled);
+                  ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
+                  ImGui::SliderInt("##Min Damage Overwrite", &CONFIGINT("Rage>RageBot>Default>Min Damage Overwrite Value"), 1, 100);
+                }
                 ImGui::Checkbox("Friendly Fire", &CONFIGBOOL("Rage>RageBot>Default>Friendly Fire"));
                 ImGui::Checkbox("Ignore Blind", &CONFIGBOOL("Rage>RageBot>Default>Ignore Blind"));
                 ImGui::Checkbox("Ignore Smoke", &CONFIGBOOL("Rage>RageBot>Default>Ignore Smoke"));
