@@ -2,15 +2,20 @@
 #include <sstream>
 
 void Menu::drawLegitTab() {
-    ImGui::BeginChild("LegitBot", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.65f, 260), true); {
+    if (ImGui::BeginChild("LegitBot", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.65f, 260), true)) {
         ImGui::Text("LegitBot");
+
+        ImGui::SameLine();
+        ImGui::Checkbox("Enabled", &CONFIGBOOL("Legit>LegitBot>Enabled"));
+        if (CONFIGBOOL("Legit>LegitBot>Enabled")) {
+          ImGui::SameLine();
+          static bool keybindToggled;
+          Menu::CustomWidgets::drawKeyBinder("Key", &CONFIGINT("Legit>LegitBot>Default>Key"), &keybindToggled);
+        }
+
         ImGui::Separator();
         if (ImGui::BeginTabBar("Aim Weapons Tabbar")) {
             if (ImGui::BeginTabItem("Default")) {
-                static bool keybindToggled;
-                Menu::CustomWidgets::drawKeyBinder("Key", &CONFIGINT("Legit>LegitBot>Default>Key"), &keybindToggled);
-                ImGui::SameLine();
-                ImGui::Checkbox("Always On", &CONFIGBOOL("Legit>LegitBot>Default>Always on"));
                 hitboxSelectBox("Legit>LegitBot>Default>Hitboxes");
                 ImGui::Text("FOV (x10)");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
@@ -123,15 +128,16 @@ void Menu::drawLegitTab() {
         ImGui::EndChild();
     }
     ImGui::SameLine();
-    ImGui::BeginChild("Triggerbot", ImVec2(0, 260), true); {
+    if (ImGui::BeginChild("Triggerbot", ImVec2(0, 260), true)) {
         ImGui::Text("Triggerbot");
-        ImGui::Separator();
+        ImGui::SameLine();
+        ImGui::Checkbox("Enabled", &CONFIGBOOL("Legit>Triggerbot>Triggerbot"));
         if (CONFIGBOOL("Legit>Triggerbot>Triggerbot")) {
             static bool triggerbotKeyToggled = false;
-            CustomWidgets::drawKeyBinder("Key", &CONFIGINT("Legit>Triggerbot>Key"), &triggerbotKeyToggled);
             ImGui::SameLine();
+            CustomWidgets::drawKeyBinder("Key", &CONFIGINT("Legit>Triggerbot>Key"), &triggerbotKeyToggled);
         }
-        ImGui::Checkbox("Triggerbot", &CONFIGBOOL("Legit>Triggerbot>Triggerbot"));
+        ImGui::Separator();
         if (CONFIGBOOL("Legit>Triggerbot>Triggerbot")) {
             ImGui::Text("Head Hitchance");
             ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
@@ -144,7 +150,7 @@ void Menu::drawLegitTab() {
 
         ImGui::EndChild();
     }
-    ImGui::BeginChild("Backtrack", ImVec2(0, 260), true); {
+    if (ImGui::BeginChild("Backtrack", ImVec2(0, 260), true)) {
         ImGui::Text("Backtrack");
         ImGui::Separator();
         ImGui::Checkbox("Backtrack", &CONFIGBOOL("Legit>Backtrack>Backtrack"));

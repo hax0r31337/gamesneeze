@@ -206,7 +206,7 @@ void Menu::drawVisualsTab() {
                 if (
                   ImGui::ColorEdit4("World Color Modulation", (float*)&CONFIGCOL("Visuals>World>World>World Color Modulation"), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_PickerHueWheel) ||
                   ImGui::ColorEdit4("SkyBox Color Modulation", (float*)&CONFIGCOL("Visuals>World>World>SkyBox Color Modulation"), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_PickerHueWheel) ||
-                  ImGui::Button("Update Color Modulation")) {
+                  (Interfaces::engine->IsInGame() && ImGui::Button("Update Color Modulation"))) {
                     Features::ColorModulation::updateColorModulation();
                 }
 
@@ -266,12 +266,6 @@ void Menu::drawVisualsTab() {
                 ImGui::Checkbox("No Blur", &CONFIGBOOL("Visuals>World>World>No Blur"));
                 ImGui::Checkbox("No Scope Overlay", &CONFIGBOOL("Visuals>World>World>No Scope Overlay"));
 
-                if (CONFIGBOOL("Visuals>World>World>Asus Walls>Enabled")) {
-                    ImGui::ColorEdit4("Asus Walls Color", (float*)&CONFIGCOL("Visuals>World>World>Asus Walls>Color"), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_PickerHueWheel);
-                    ImGui::SameLine();
-                }
-                ImGui::Checkbox("Asus Walls", &CONFIGBOOL("Visuals>World>World>Asus Walls>Enabled"));
-                
                 ImGui::EndChild();
             }
             ImGui::SameLine();

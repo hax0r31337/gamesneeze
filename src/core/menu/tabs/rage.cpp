@@ -44,20 +44,18 @@ void Menu::hitboxSelectBox(const char *configVarName, bool hasText, const char *
 }
 
 void Menu::drawRageTab() {
-    // ImGui::Checkbox("Enabled", &CONFIGBOOL("Rage>Enabled"));
-    // ImGui::SameLine();
-    // ImGui::Separator();
-
     ImGui::BeginChild("Rage", ImVec2((ImGui::GetWindowContentRegionWidth()/2) - 4, 575), true); {
         ImGui::Text("RageBot");
+        ImGui::SameLine();
+        ImGui::Checkbox("Enabled", &CONFIGBOOL("Rage>RageBot>Enabled"));
+        if (CONFIGBOOL("Rage>RageBot>Enabled")) {
+          ImGui::SameLine();
+          static bool keybindToggled;
+          Menu::CustomWidgets::drawKeyBinder("Key", &CONFIGINT("Rage>RageBot>Key"), &keybindToggled);
+        }
         ImGui::Separator();
         if (ImGui::BeginTabBar("Weapons Tabbar")) {
             if (ImGui::BeginTabItem("Default")) {
-                static bool keybindToggled;
-                Menu::CustomWidgets::drawKeyBinder("Key", &CONFIGINT("Rage>RageBot>Key"), &keybindToggled);
-                ImGui::SameLine();
-                ImGui::Checkbox("Always On", &CONFIGBOOL("Rage>RageBot>Always on"));
-
                 ImGui::Separator();
 
                 hitboxSelectBox("Rage>RageBot>Default>Hitboxes");
@@ -104,7 +102,6 @@ void Menu::drawRageTab() {
                 ImGui::Checkbox("Ignore Blind", &CONFIGBOOL("Rage>RageBot>Default>Ignore Blind"));
                 ImGui::Checkbox("Ignore Smoke", &CONFIGBOOL("Rage>RageBot>Default>Ignore Smoke"));
                 ImGui::Checkbox("Scoped Only", &CONFIGBOOL("Rage>RageBot>Default>Scoped Only"));
-                ImGui::Checkbox("Auto Shot", &CONFIGBOOL("Rage>RageBot>Default>Auto Shot"));
                 ImGui::Checkbox("Auto Scope", &CONFIGBOOL("Rage>RageBot>Default>Auto Scope"));
                 ImGui::Checkbox("Visible Only", &CONFIGBOOL("Rage>RageBot>Default>Visible Only"));
 
@@ -250,9 +247,11 @@ void Menu::drawRageTab() {
     ImGui::SameLine();
     ImGui::BeginChild("Others", ImVec2((ImGui::GetWindowContentRegionWidth()/2) - 4, 575), true); {
         ImGui::Text("Anti Aim");
+        ImGui::SameLine();
+        ImGui::Checkbox("Enabled", &CONFIGBOOL("Rage>AntiAim>Enabled"));
+
         ImGui::Separator();
 
-        ImGui::Checkbox("Enabled", &CONFIGBOOL("Rage>AntiAim>Enabled"));
         ImGui::Text("Desync");
         ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
         ImGui::SliderInt("##Desync", &CONFIGINT("Rage>AntiAim>Desync"), 0, 180);

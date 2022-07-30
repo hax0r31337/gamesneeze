@@ -78,8 +78,10 @@ namespace Config {
         // Legit {
         // LegitBot {
         // Default {
+
+        CONFIGITEM("Legit>LegitBot>Enabled", false),
         CONFIGITEM("Legit>LegitBot>Default>Key", 0),
-        CONFIGITEM("Legit>LegitBot>Default>Always on", false),
+
         CONFIGITEM("Legit>LegitBot>Default>Hitboxes", 1),
         CONFIGITEM("Legit>LegitBot>Default>FOV", 0),
         CONFIGITEM("Legit>LegitBot>Default>Smoothing", 0),
@@ -157,9 +159,8 @@ namespace Config {
 
         CONFIGITEM("Rage>Resolver", false),
 
-        // CONFIGITEM("Rage>Enabled", false),
+        CONFIGITEM("Rage>RageBot>Enabled", false),
         CONFIGITEM("Rage>RageBot>Key", 0),
-        CONFIGITEM("Rage>RageBot>Always on", false),
 
         CONFIGITEM("Rage>RageBot>Default>Hitboxes", 1),
         CONFIGITEM("Rage>RageBot>Default>Hit Chance", 0),
@@ -170,7 +171,6 @@ namespace Config {
         CONFIGITEM("Rage>RageBot>Default>Ignore Blind", false),
         CONFIGITEM("Rage>RageBot>Default>Ignore Smoke", false),
         CONFIGITEM("Rage>RageBot>Default>Scoped Only", false),
-        CONFIGITEM("Rage>RageBot>Default>Auto Shot", false),
         CONFIGITEM("Rage>RageBot>Default>Auto Scope", false),
         CONFIGITEM("Rage>RageBot>Default>Visible Only", false),
         CONFIGITEM("Rage>RageBot>Default>Auto Slow", false),
@@ -440,9 +440,6 @@ namespace Config {
         CONFIGITEM("Visuals>World>World>Rainbow HUD", false),
         CONFIGITEM("Visuals>World>World>No Blur", false),
         CONFIGITEM("Visuals>World>World>No Scope Overlay", false),
-        CONFIGITEM("Visuals>World>World>Asus Walls>Enabled", false),
-        CONFIGITEM("Visuals>World>World>Asus Walls>Color",
-                   ImColor(255, 255, 255, 150)),
         // }
         // }
         // Misc {
@@ -484,8 +481,6 @@ namespace Config {
         CONFIGITEM("Misc>Misc>Misc>Auto Defuse", false),
         CONFIGITEM("Misc>Misc>Misc>Auto Defuse Rotate", false),
         CONFIGITEM("Misc>Misc>Misc>Chat Filter Bypass", false),
-        CONFIGITEM("Misc>Misc>Misc>Use Spam", false),
-        CONFIGITEM("Misc>Misc>Misc>Use Spam Key", 0),
         CONFIGITEM("Misc>Misc>Misc>Disable Setting Cvars", false),
         CONFIGITEM("Misc>Misc>Misc>Disable Post Processing", false),
         CONFIGITEM("Misc>Misc>Misc>No Movement Fix", false),

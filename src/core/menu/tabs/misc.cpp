@@ -70,12 +70,6 @@ void Menu::drawMiscTab() {
                     ImGui::Checkbox("Rotate", &CONFIGBOOL("Misc>Misc>Misc>Auto Defuse Rotate"));
                 }
                 ImGui::Checkbox("Chat Filter Bypass", &CONFIGBOOL("Misc>Misc>Misc>Chat Filter Bypass"));
-                if (CONFIGBOOL("Misc>Misc>Misc>Use Spam")) {
-                    static bool toggled = false;
-                    Menu::CustomWidgets::drawKeyBinder("Key", &CONFIGINT("Misc>Misc>Misc>Use Spam Key"), &toggled);
-                    ImGui::SameLine();
-                }
-                ImGui::Checkbox("Use Spam", &CONFIGBOOL("Misc>Misc>Misc>Use Spam"));
                 ImGui::Checkbox("Disable Setting Cvars", &CONFIGBOOL("Misc>Misc>Misc>Disable Setting Cvars"));
                 ImGui::Checkbox("Disable Post Processing", &CONFIGBOOL("Misc>Misc>Misc>Disable Post Processing"));
                 ImGui::Checkbox("No Movement Fix", &CONFIGBOOL("Misc>Misc>Misc>No Movement Fix"));

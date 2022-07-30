@@ -18,7 +18,6 @@ void Hooks::FrameStageNotify::hook(void* thisptr, FrameStage frame) {
     Features::NoVisualRecoil::frameStageNotify(frame);
     Features::RainbowHud::frameStageNotify(frame);
     Features::NoBlur::frameStageNotify(frame);
-    Features::AsusWalls::frameStageNotify(frame);
 
     if (frame == FRAME_RENDER_START) {
         cachePlayers();

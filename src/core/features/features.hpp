@@ -60,9 +60,6 @@ namespace Features {
         void store(CUserCmd* cmd);
         void createMove(CUserCmd* cmd);
     }
-    namespace Forwardtrack {
-        void createMove(CUserCmd* cmd);
-    }
     namespace ColorModulation {
         void updateColorModulation();
     }
@@ -113,9 +110,6 @@ namespace Features {
     }
     namespace FlappyBird {
         void draw();
-    }
-    namespace UseSpam {
-        void createMove(CUserCmd* cmd);
     }
     namespace AutoAccept {
         void emitSound(const char* pSoundEntry);
@@ -205,9 +199,6 @@ namespace Features {
         void frameStageNotify(FrameStage frame);
     }
     namespace Resolver {
-        void frameStageNotify(FrameStage frame);
-    }
-    namespace AsusWalls {
         void frameStageNotify(FrameStage frame);
     }
     namespace RainbowHud {

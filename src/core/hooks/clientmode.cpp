@@ -30,21 +30,19 @@ bool Hooks::CreateMove::hook(void *thisptr, float flInputSampleTime,
     Features::RankReveal::createMove(cmd);
     Features::FastDuck::createMove(cmd);
     Features::FakeDuck::createMove(cmd);
-    Features::UseSpam::createMove(cmd);
     Features::Movement::prePredCreateMove(cmd);
 
     Features::Prediction::start(cmd);
-    // if (CONFIGBOOL("Rage>Enabled")) {
-    Features::RageBot::createMove(cmd);
-    Features::FakeLag::createMove(cmd);
-    Features::AntiAim::createMove(cmd);
-    // } else {
+
     Features::LegitBot::createMove(cmd);
     Features::Triggerbot::createMove(cmd);
     Features::Backtrack::store(cmd);
     Features::Backtrack::createMove(cmd);
-    Features::Forwardtrack::createMove(cmd);
-    // }
+
+    Features::RageBot::createMove(cmd);
+    Features::FakeLag::createMove(cmd);
+    Features::AntiAim::createMove(cmd);
+
     Features::Prediction::end();
 
     Features::Movement::postPredCreateMove(cmd);
