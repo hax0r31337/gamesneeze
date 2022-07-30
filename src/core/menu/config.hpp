@@ -160,10 +160,8 @@ namespace Config {
         // CONFIGITEM("Rage>Enabled", false),
         CONFIGITEM("Rage>RageBot>Key", 0),
         CONFIGITEM("Rage>RageBot>Always on", false),
-        // CONFIGITEM("Rage>RageBot>Default>FOV", 0),
 
         CONFIGITEM("Rage>RageBot>Default>Hitboxes", 1),
-        CONFIGITEM("Rage>RageBot>Default>FOV", 0),
         CONFIGITEM("Rage>RageBot>Default>Hit Chance", 0),
         CONFIGITEM("Rage>RageBot>Default>Min Damage", 1),
         CONFIGITEM("Rage>RageBot>Default>Head Scale", 100),

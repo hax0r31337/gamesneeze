@@ -61,9 +61,6 @@ void Menu::drawRageTab() {
                 ImGui::Separator();
 
                 hitboxSelectBox("Rage>RageBot>Default>Hitboxes");
-                ImGui::Text("FOV (x10)");
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
-                ImGui::SliderInt("##FOV", &CONFIGINT("Rage>RageBot>Default>FOV"), 0, 1800);
                 ImGui::Text("Hit Chance");
                 ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
                 ImGui::SliderInt("##Hit Chance", &CONFIGINT("Rage>RageBot>Default>Hit Chance"), 0, 100);

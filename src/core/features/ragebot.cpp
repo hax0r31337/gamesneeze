@@ -471,7 +471,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
     return;
 
   int hitboxes = CONFIGINT("Rage>RageBot>Default>Hitboxes");
-  float FOV = CONFIGINT("Rage>RageBot>Default>FOV") / 10.f;
   int hitChance = CONFIGINT("Rage>RageBot>Default>Hit Chance");
   int minDamage = CONFIGINT("Rage>RageBot>Default>Min Damage");
   float headScale = CONFIGINT("Rage>RageBot>Default>Head Scale") / 100.f;
@@ -617,11 +616,6 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
       }
 
       QAngle directAngle = calcAngle(localPlayerEyePos, targetBonePos);
-      QAngle angleTarget = (directAngle - cmd->viewangles).normalize();
-
-      if (angleTarget.Length() > FOV) {
-        return;
-      }
 
       if (damageDeal > bestDamage) {
         hasTarget = true;
@@ -629,7 +623,7 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
           return;
         }
         bestDamage = damageDeal;
-        bestPlayerAngle = directAngle - aimPunch;
+        bestPlayerAngle = (directAngle - aimPunch).normalize();
         hasSelectedTarget = true;
         selectedPlayer = p;
         selectedBone = hitbox;
@@ -655,11 +649,11 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
             continue;
           }
           // map hitboxes enum to "actual" hitboxes
-          int bone = (1 << i & (int)HitBoxes::HEAD)      ? (!forceSafePoint || safePoints & (int)HitBoxes::HEAD ? 8 : -1)
-                     : (1 << i & (int)HitBoxes::NECK)    ? (!forceSafePoint || safePoints & (int)HitBoxes::NECK ? 7 : -1)
-                     : (1 << i & (int)HitBoxes::CHEST)   ? (!forceSafePoint || safePoints & (int)HitBoxes::CHEST ? 6 : -1)
-                     : (1 << i & (int)HitBoxes::STOMACH) ? (!forceSafePoint || safePoints & (int)HitBoxes::STOMACH ? 5 : -1)
-                     : (1 << i & (int)HitBoxes::PELVIS)  ? (!forceSafePoint || safePoints & (int)HitBoxes::PELVIS ? 3 : -1)
+          int bone = (1 << i & (int)HitBoxes::HEAD)      ? (!forceSafePoint || (safePoints & (int)HitBoxes::HEAD) ? 8 : -1)
+                     : (1 << i & (int)HitBoxes::NECK)    ? (!forceSafePoint || (safePoints & (int)HitBoxes::NECK) ? 7 : -1)
+                     : (1 << i & (int)HitBoxes::CHEST)   ? (!forceSafePoint || (safePoints & (int)HitBoxes::CHEST) ? 6 : -1)
+                     : (1 << i & (int)HitBoxes::STOMACH) ? (!forceSafePoint || (safePoints & (int)HitBoxes::STOMACH) ? 5 : -1)
+                     : (1 << i & (int)HitBoxes::PELVIS)  ? (!forceSafePoint || (safePoints & (int)HitBoxes::PELVIS) ? 3 : -1)
                                                          : -1;
           
           if (bone == -1) {
@@ -699,6 +693,10 @@ void Features::RageBot::createMove(CUserCmd *cmd) {
               trySelectTargetBone(targetBonePos, damageDeal, p, bone);
             }
           }
+        }
+
+        if (hasSelectedTarget) { // reduce fps drops
+          break;
         }
       }
     }
