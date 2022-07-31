@@ -10,8 +10,8 @@ void cachePlayers();
 class ICollideable {
 public:
 	virtual void pad0();
-	virtual const Vector& OBBMins() const;
-	virtual const Vector& OBBMaxs() const;
+	virtual Vector& OBBMins();
+	virtual Vector& OBBMaxs();
 };
 
 class Entity {
@@ -99,10 +99,21 @@ public:
     NETVAR("DT_CSPlayer", "m_bHasHelmet", helmet, bool);
     NETVAR("DT_CSPlayer", "m_ArmorValue", armor, int);
     NETVAR("DT_CSPlayer", "m_nSurvivalTeam", survivalTeam, int);
+    NETVAR("DT_BaseAnimating", "m_bClientSideAnimation", clientAnimation, bool);
 
     AnimState *animState() {
       return *reinterpret_cast<AnimState **>((uintptr_t)this +
                                              Offsets::animState);
+	}
+
+	void SetAbsOrigin(const Vector *const angles)
+	{
+		asm volatile("mov %0, %%rdi;\n\t"
+				   "mov %1, %%rsi;\n\t"
+				   "call *%P2;"
+				   :
+				   : "r"(this), "r"(angles), "r"(Offsets::SetAbsOriginFnAddr)
+				   : "%rdi", "%rsi");
 	}
 
 	QAngle* viewAngles() {

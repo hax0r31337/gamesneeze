@@ -34,9 +34,9 @@ inline std::map<std::pair<std::string_view, std::string_view>, uintptr_t>
         {std::make_pair("DT_BasePlayer", "deadflag"), 0},
         {std::make_pair("DT_CSPlayer", "m_bHasHelmet"), 0},
         {std::make_pair("DT_CSPlayer", "m_ArmorValue"), 0},
-        {std::make_pair("DT_BaseEntity", "m_nRenderMode"),
-         0}, // Used for movetype
+        {std::make_pair("DT_BaseEntity", "m_nRenderMode"), 0}, // Used for movetype
         {std::make_pair("DT_CSPlayer", "m_nSurvivalTeam"), 0},
+        {std::make_pair("DT_BaseAnimating", "m_bClientSideAnimation"), 0},
 
         /* Item */
         {std::make_pair("DT_BaseAttributableItem", "m_iItemDefinitionIndex"),
@@ -136,6 +136,7 @@ namespace Offsets {
     inline std::uintptr_t scopeDust;
     inline std::uintptr_t scopeArc;
     inline std::uintptr_t demoOrHLTV;
+    inline std::uintptr_t SetAbsOriginFnAddr;
 }
 
 #define GETNETVAROFFSET(table, prop) Netvar::offsets.at({table, prop})

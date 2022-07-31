@@ -7,18 +7,16 @@ bool Hooks::CreateMove::hook(void *thisptr, float flInputSampleTime,
                              CUserCmd *cmd) {
   original(thisptr, flInputSampleTime, cmd);
   if (cmd->tick_count != 0) {
+    // https://www.unknowncheats.me/forum/counterstrike-global-offensive/290258-updating-bsendpacket-linux.html
     uintptr_t rbp;
     asm volatile("mov %%rbp, %0" : "=r"(rbp));
-    Globals::sendPacket =
-        ((*(bool **)rbp) -
-         0x18); // https://www.unknowncheats.me/forum/counterstrike-global-offensive/290258-updating-bsendpacket-linux.html
+    Globals::sendPacket = ((*(bool **)rbp) - 0x18);
 
     if (Interfaces::engine->IsInGame()) {
       static ConVar *mat_postprocess_enable =
           Interfaces::convar->FindVar("mat_postprocess_enable");
       if (mat_postprocess_enable) {
-        mat_postprocess_enable->SetValue(
-            !CONFIGBOOL("Misc>Misc>Misc>Disable Post Processing"));
+        mat_postprocess_enable->SetValue(!CONFIGBOOL("Misc>Misc>Misc>Disable Post Processing"));
       }
     }
     bool noMovementFix = CONFIGBOOL("Misc>Misc>Misc>No Movement Fix");

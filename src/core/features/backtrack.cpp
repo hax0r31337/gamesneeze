@@ -4,6 +4,7 @@
 
 void Features::Backtrack::store(CUserCmd *cmd) {
     if (!CONFIGBOOL("Legit>Backtrack>Backtrack") || cmd->tick_count == 0 || !Interfaces::engine->IsInGame() || !Globals::localPlayer) {
+        backtrackTicks.clear();
         return;
     }
 
@@ -19,12 +20,14 @@ void Features::Backtrack::store(CUserCmd *cmd) {
           player.playerFlags = p->flags();
           player.playerVelocity = p->velocity().Length2D();
           if (p->getAnythingBones(player.boneMatrix)) {
+            player.playerHeadPos =
+                Vector(player.boneMatrix[8][0][3], player.boneMatrix[8][1][3],
+                       player.boneMatrix[8][2][3]);
+            player.mins = p->collideable().OBBMins();
+            player.maxs = p->collideable().OBBMaxs();
             currentTick.players.insert(
                 std::pair<int, BacktrackPlayer>(i, player));
           }
-          player.playerHeadPos =
-              Vector(player.boneMatrix[8][0][3], player.boneMatrix[8][1][3],
-                     player.boneMatrix[8][2][3]);
         } else {
           if (currentTick.players.find(i) != currentTick.players.end()) {
             currentTick.players.erase(i);
@@ -36,14 +39,13 @@ void Features::Backtrack::store(CUserCmd *cmd) {
     backtrackTicks.insert(backtrackTicks.begin(), currentTick);
 
     // Delete ticks we cant backtrack
-    while ((int)backtrackTicks.size() >
-           CONFIGINT("Legit>Backtrack>Backtrack Ticks")) {
+    while ((int)backtrackTicks.size() > CONFIGINT("Legit>Backtrack>Backtrack Ticks")) {
       backtrackTicks.pop_back();
     }
 }
 
 void Features::Backtrack::createMove(CUserCmd* cmd) {
-    if (cmd->tick_count == 0 || !Interfaces::engine->IsInGame() || !Globals::localPlayer || !(cmd->buttons & (1 << 0))) {
+    if (cmd->tick_count == 0 || !Interfaces::engine->IsInGame() || !Globals::localPlayer || !(cmd->buttons & IN_ATTACK)) {
         return;
     }
 
@@ -58,8 +60,7 @@ void Features::Backtrack::createMove(CUserCmd* cmd) {
 
         for (BackTrackTick tick : backtrackTicks) {
           for (auto player : tick.players) {
-            Player *p = (Player *)Interfaces::entityList->GetClientEntity(
-                player.second.playerIndex);
+            Player *p = (Player *)Interfaces::entityList->GetClientEntity(player.second.playerIndex);
             if (p) {
               if (p->health() > 0 && !p->dormant()) {
                 Vector localPlayerEyePos = Globals::localPlayer->eyePos();

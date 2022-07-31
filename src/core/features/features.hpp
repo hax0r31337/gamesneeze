@@ -47,6 +47,7 @@ namespace Features {
             int playerFlags;
             float playerVelocity;
             Vector playerHeadPos;
+            Vector mins, maxs;
         };
 
         struct BackTrackTick {
@@ -163,10 +164,10 @@ namespace Features {
         int getDamageDeal(Player *entity, const Vector &destination,
                           Weapon *weapon, bool allowFriendlyFire);
         std::vector<Vector> getPoints(Player *player, int iHitbox,
-                                      float headScale, float bodyScale);
+                                      float headScale, float bodyScale, matrix3x4_t bones[128]);
         void bestMultiPoint(Player *player, int &BoneIndex, int &Damage,
                             Vector &Spot, float headScale, float bodyScale,
-                            Weapon *weapon, bool friendlyFire);
+                            Weapon *weapon, bool friendlyFire, matrix3x4_t bones[128]);
         bool canShoot(Weapon *activeWeapon, QAngle *angle, Player *enemy,
                       int hitChance, int minDamage);
     }
